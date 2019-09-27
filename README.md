@@ -39,6 +39,7 @@
               sortable: true,
               slot: true,
               slotHeader: true
+              // .... other element-ui column attrs
             }
           ],
           on: {
@@ -57,4 +58,4 @@
 
 ## 相关链接
 
-- [element-ui upload 组件](https://element.eleme.cn/#/zh-CN/component/upload)
+- [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
