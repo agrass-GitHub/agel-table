@@ -10,7 +10,14 @@
 
 ```html
 <template>
-  <agel-table v-model="table"></agel-table>
+  <agel-table v-model="table">
+    <template v-slot:nameHeader>
+      <span>自定义表头</span>
+    </template>
+    <template v-slot:name>
+      <el-button size="mini">自定义列</el-button>
+    </template>
+  </agel-table>
 </template>
 <script>
   export default {
@@ -20,7 +27,6 @@
           isResize: true,
           isPage: true,
           showSummary: true,
-          border: true,
           data: [],
           columns: [
             { label: '姓名', prop: 'name' },
@@ -32,7 +38,6 @@
               display: true,
               sortable: true,
               slot: true,
-              resizable: true,
               slotHeader: true
             }
           ],
