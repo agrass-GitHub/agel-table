@@ -7,184 +7,261 @@
         <slot name="append"></slot>
       </template>
 
-      <!-- column -->
-      <agel-column v-for="(item, index) in columns" :key="getId(index)" :column="item">
-        <!-- slot header -->
-        <template v-slot:[item.prop+header]="{scope}">
-          <slot :name="item.prop+header" :column="scope.column" :index="scope.$index"></slot>
-        </template>
+      <!-- append  -->
+      <template v-slot:empty>
+        <slot name="empty"></slot>
+      </template>
 
-        <!-- slot -->
-        <template v-slot:[item.prop]="{scope}">
-          <slot :name="item.prop" :index="scope.$index" :row="scope.row" :column="scope.column"></slot>
-        </template>
-
-        <!-- slot expand -->
-        <template v-slot:expand="{scope}">
-          <slot name="expand" :index="scope.$index" :row="scope.row"></slot>
-        </template>
-      </agel-column>
+      <!-- columns  -->
+      <agel-column v-for="column in columns" :key="column.key" :column="column"></agel-column>
     </el-table>
 
     <!-- el-pagination -->
-    <el-pagination ref="page" v-if="value.isPage" v-bind="value.page"></el-pagination>
+    <el-pagination ref="page" v-if="value.isPage" v-bind="pageAttrs" v-on="events"></el-pagination>
   </div>
 </template>
  
 <script>
+import { guid, kebabcase } from './tool';
 import agelColumn from './agel-column';
-
 export default {
   name: 'agel-table',
+  install(vue, opts = {}) {
+    let config = Object.assign(
+      {
+        name: this.name,
+        table: {},
+        cloumn: {},
+        page: {}
+      },
+      opts
+    );
+    vue.prototype.$agelTableConfig = config;
+    vue.component(config.name, this);
+  },
+  provide() {
+    return {
+      table: this
+    };
+  },
   components: {
     agelColumn
   },
   props: {
-    value: Object
-  },
-  install(vue, ops = {}) {
-    vue.component(ops.componentName || this.name, this);
+    value: {
+      type: Object,
+      defualt: () => new Object()
+    }
   },
   data() {
-    return {
-      header: 'Header'
-    };
+    return {};
   },
   computed: {
     attrs() {
-      let attrs = {};
-      let ignore = Object.keys(this.getTableApi().extendApi);
-      for (const key in this.value) {
-        if (!ignore.includes(key)) attrs[key] = this.value[key];
-      }
-      return attrs;
+      return this.getValidAttrs(this.value, 'table');
     },
-    events() {
-      let events = {};
-      for (const key in this.value.on) {
-        // 把驼峰命名转为 kebab-case
-        let regx = /([A-Z])/g;
-        let name = regx.test(key)
-          ? key.replace(regx, '-$1').toLowerCase()
-          : key;
-        events[name] = this.value.on[key];
-      }
-      return events;
+    pageAttrs() {
+      return this.getValidAttrs(this.value.page, 'page');
     },
     columns() {
-      return this.value.columns.filter(v => {
-        let display = v.display == undefined ? true : v.display;
-        return display;
-      });
+      return this.getValidColumns(this.value.columns);
+    },
+    events() {
+      return this.getValidEvents();
     }
   },
   watch: {
     'value.showSummary'() {
       let { height, resize } = this.value;
-      if (height) resize();
+      height && resize();
     },
     'value.data'() {
       // 在有合计的时候和固定高度的情况下，获取数据需要重新自适应容器
       let { showSummary, height, resize } = this.value;
-      if (showSummary && height) resize();
+      showSummary && height && resize();
     },
     'value.isPage'() {
       // 在开启了自适应的情况下，切换分页组件的显示隐藏，需要重新自适应容器
       let { isResize, resize } = this.value;
-      if (isResize) resize();
+      isResize && resize();
     },
     'value.isResize'() {
-      this.registrationResize();
+      this.registerResize();
     }
   },
-  created() {
-    this.initTabel();
+  beforeMount() {
+    this.init();
   },
   beforeDestroy() {
-    this.registrationResize(false);
+    this.registerResize(false);
   },
   methods: {
-    getId(index) {
-      return `${index}-${Number(
-        Math.random()
-          .toString()
-          .substr(3, 3) + Date.now()
-      ).toString(36)}`;
+    init() {
+      let api = this.getApi();
+      let table = {
+        ...api.defaultApi,
+        ...api.globalApi,
+        ...api.localApi,
+        page: {
+          ...api.pageApi,
+          ...api.globalPageApi,
+          ...api.localPageApi
+        }
+      };
+      this.$emit('input', table);
+      this.$nextTick(() => {
+        this.value.$ref = this.$refs.table;
+        this.registerResize();
+      });
     },
-    getTableApi() {
-      const extendApi = {
+    getApi() {
+      const table = this.value;
+      const defaultApi = {
         $ref: undefined,
         loading: false,
         isPage: true,
         isResize: false,
+        data: [],
+        height: '',
         columns: [],
-        page: {
-          pageSize: 10,
-          pageSizes: [10, 50, 100, 200],
-          currentPage: 1,
-          layout: 'total, sizes, prev, pager, next, jumper',
-          class: 'agel-pagination',
-          total: 100
-        },
+        order: '',
+        orderColumn: '',
+        page: {},
         on: {},
+        queryProps: {
+          page: 'page',
+          pageSize: 'pageSize',
+          order: 'order',
+          orderColumn: 'orderColumn'
+        },
+        request: null,
+        async getData() {
+          if (!this.request) return;
+          this.loading = true;
+          let { page, pageSize, order, orderColumn } = this.queryProps;
+          let params = {
+            [page]: this.page.currentPage,
+            [pageSize]: this.page.pageSize,
+            [order]: this.order,
+            [orderColumn]: this.orderColumn
+          };
+          new Promise(resolve => this.request(params, resolve)).then(
+            ({ data = this.data, total = this.page.total }) => {
+              this.loading = false;
+              this.data = data;
+              this.page.total = total;
+            }
+          );
+        },
         resize: e => {
           let table = this.value;
-          // 轻量级自适应
           let lightweightResize = () => {
             let { container, page } = this.$refs;
-            let containerH = container ? container.clientHeight : 0;
+            let containerH = container ? container.parentNode.clientHeight : 0;
             let pageH = page ? page.$el.clientHeight : 0;
             table.height = containerH - pageH;
           };
-          // 强制性自适应
           let heavylweightResize = () => {
             this.$nextTick(() => {
               lightweightResize();
               table.$ref && table.$ref.doLayout();
             });
           };
-
+          // windowResize use lightweight
           e && e.type == 'resize' ? lightweightResize() : heavylweightResize();
-        },
-        async getList() {
-          this.loading = true;
-          let params = {
-            page: this.page,
-            pageSize: this.size,
-            order: 0,
-            orderColumn: ''
-          };
-          let data = await this.api(params);
-          this.data = data.list;
-          this.total = data.total;
-          this.loading = false;
         }
       };
-      const defaultApi = {
-        data: [],
-        height: undefined
+      const pageApi = {
+        pageSize: 20,
+        pageSizes: [10, 20, 50, 100],
+        currentPage: 1,
+        layout: 'total, sizes, prev, pager, next, jumper',
+        class: 'agel-pagination',
+        total: 0
       };
-      return { defaultApi, extendApi };
+      const eventsApi = {
+        sortChange: ({ column, prop, order }) => {
+          if (column.sortable !== 'custom') return;
+          table.order = order;
+          table.orderColumn = prop;
+          table.getData();
+        },
+        sizeChange: size => {
+          table.page.pageSize = size;
+          table.getData();
+        },
+        // 重名事件 currentChange
+        currentChange: (...params) => {
+          if (isNaN(params[0])) {
+            // emit table currentChange event
+            return 'currentChange';
+          } else {
+            // emit page pageChange event
+            this.value.page.currentPage = params[0];
+            this.value.getData();
+            return 'pageChange';
+          }
+        }
+      };
+      const globalApi = this.$agelTableConfig.table;
+      const globalPageApi = this.$agelTableConfig.page;
+      const globalColumnApi = this.$agelTableConfig.column;
+      const localApi = this.value;
+      const localPageApi = this.value.page;
+      const localEventsApi = this.value.on;
+      return {
+        // 默认配置
+        defaultApi,
+        eventsApi,
+        pageApi,
+        // 全局配置
+        globalApi,
+        globalPageApi,
+        globalColumnApi,
+        // 局部配置
+        localApi,
+        localPageApi,
+        localEventsApi
+      };
     },
-    initTabel() {
-      console.log('重新生成table');
-      let { defaultApi, extendApi } = this.getTableApi();
-      let page = Object.assign(extendApi.page, this.value.page || {});
-      let table = Object.assign(defaultApi, extendApi, this.value, { page });
-      this.$emit('input', table);
-      this.$nextTick(() => {
-        this.value.$ref = this.$refs.table;
-        this.registrationResize();
-      });
+    getValidAttrs(data, name) {
+      let attrs = {};
+      let props = this.$refs[name] ? this.$refs[name].$props : {};
+      let vaildAttrs = { ...props, class: '' };
+      for (const key in data) {
+        if (vaildAttrs.hasOwnProperty(key)) attrs[key] = data[key];
+      }
+      return attrs;
     },
-    registrationResize(isResize = this.value.isResize) {
+    getValidColumns(columns) {
+      let { globalColumnApi } = this.getApi();
+      return columns
+        .map(v => {
+          let o = { ...v, ...globalColumnApi, key: guid() };
+          if (o.display == undefined) v.display = true;
+          if (o.children) o.children = this.getValidColumns(o.children);
+          return o;
+        })
+        .filter(v => v.display);
+    },
+    getValidEvents() {
+      let events = {};
+      let { eventsApi: a, localEventsApi: b } = this.getApi();
+      for (const key in { ...a, ...b }) {
+        events[kebabcase(key)] = (...params) => {
+          let cusotmKey = ''; // 自定义向上触发的方法名称
+          if (a[key]) cusotmKey = a[key](...params);
+          if (b[cusotmKey || key]) b[cusotmKey || key](...params);
+        };
+      }
+      return events;
+    },
+    registerResize(isResize = this.value.isResize) {
       this.value.height = '';
       if (isResize) {
         this.value.resize();
-        console.log('注册自适应');
         window.addEventListener('resize', this.value.resize);
       } else {
-        console.log('移除自适应');
         window.removeEventListener('resize', this.value.resize);
       }
     }
@@ -194,21 +271,13 @@ export default {
  
 <style >
 .agel-table {
-  height: 100%;
   width: 100%;
-  overflow: auto;
+  height: auto !important;
 }
-.agel-table .el-table {
-  width: 100%;
-}
-
 .agel-table .agel-pagination {
   overflow: hidden;
-  display: flex;
-  align-items: center;
   padding: 10px;
 }
-
 .agel-table .el-table__empty-text {
   position: absolute;
   left: 50%;

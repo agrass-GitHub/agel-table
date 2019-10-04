@@ -1,25 +1,22 @@
 <template>
-  <el-table-column v-bind="column">
-    <!-- slot  children  -->
+  <el-table-column v-bind="column" :key="column._key">
     <template v-if="column.children&&column.children.length>0">
-      <agel-column v-for="(item, index) in column.children" :key="index" :column="item"></agel-column>
+      <agel-column v-for="item in column.children" :key="item.key" :column="item"></agel-column>
     </template>
 
-    <!-- slot header -->
-    <template v-slot:header="scope">
-      <slot v-if="column.slotHeader" :name="column.prop+'Header'" :scope="scope"></slot>
-      <span v-else>{{column.label}}</span>
+    <template v-if="column.slotHeader" v-slot:header="scope">
+      {{renderSlot(column.slotHeader,scope)}}
+      <slot :name="column.slotHeader"></slot>
     </template>
 
-    <!-- slot  column  -->
-    <template v-if="column.type===undefined" v-slot="scope">
-      <slot v-if="column.slot" :name="column.prop" :scope="scope"></slot>
-      <template v-else>{{scope.row[column.prop]}}</template>
+    <template v-if="column.slotColumn" v-slot="scope">
+      {{renderSlot(column.slotColumn,scope)}}
+      <slot :name="column.slotColumn"></slot>
     </template>
 
-    <!-- slot expand need v-eles-if -->
-    <template v-else-if="column.type==='expand'" v-slot="scope">
-      <slot name="expand" :scope="scope"></slot>
+    <template v-else-if="column.type=='expand'" v-slot="scope">
+      {{renderSlot('expand',scope)}}
+      <slot name="expand"></slot>
     </template>
   </el-table-column>
 </template>
@@ -27,17 +24,18 @@
 <script>
 export default {
   name: 'agel-column',
+  inject: ['table'],
   props: {
     column: {
       type: Object,
       default: () => new Object()
     }
   },
-  data() {
-    return {};
-  },
-  watch: {},
-  mounted() {}
+  methods: {
+    renderSlot(key, scope) {
+      this.$slots[key] = this.table.$scopedSlots[key]({ ...scope });
+    }
+  }
 };
 </script>
  

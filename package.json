@@ -1,10 +1,11 @@
 {
   "name": "agel-table",
   "version": "0.0.1",
-  "main": "./dist/agel-table.umd.min",
+  "main": "lib/agel-table.umd.min.js",
   "description": "a easy table of element-ui table",
+  "private": false,
+  "license": "MIT",
   "author": "agrass",
-  "license": "ISC",
   "keywords": [
     "element-ui",
     "element-ui table",
@@ -15,7 +16,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "build-lib": "vue-cli-service build --target lib --name agel-table ./src/lib/index.js"
+    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js"
   },
   "dependencies": {
     "core-js": "^2.6.5",

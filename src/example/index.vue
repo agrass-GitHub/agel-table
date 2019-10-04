@@ -2,13 +2,18 @@
   <div class="app">
     <div class="left">
       <div class="table-box" :style="{height:table.isResize?'100%':'auto'}">
-        <agel-table v-model="table">
+        <agel-table v-model="table" ref="table">
           <template v-slot:append v-if="isSlotAppend">
             <p class="append-slot">table slot append .... loading ...</p>
           </template>
-          <template v-slot:nameHeader="{index}">自定义表头{{index}}</template>
-          <template v-slot:name="{row}">
-            <el-button size="mini" @click="rowClick(row)">点击我</el-button>
+          <template v-slot:empty v-if="isSlotEmpty">
+            <p class="append-slot">table slot empty .... 暂无数据 ...</p>
+          </template>
+          <template v-slot:cutomHeader="scope">
+            <el-button size="mini" @click="rowClick(scope)">{{scope.column.label}}</el-button>
+          </template>
+          <template v-slot:cutomColumn="scope">
+            <el-button size="mini" @click="rowClick(scope)">自定义列</el-button>
           </template>
           <template v-slot:expand="{index,row}">
             <p>展开行：{{row.name}}</p>
@@ -20,27 +25,30 @@
       <div class="input-box">
         <div class="input-item">
           <div class="lablel">功能</div>
-          <el-checkbox v-model="table.isResize">自适应</el-checkbox>
           <el-checkbox v-model="table.showHeader">表头</el-checkbox>
-          <el-checkbox v-model="table.stripe">斑马纹</el-checkbox>
           <el-checkbox v-model="table.isPage">分页</el-checkbox>
+          <el-checkbox v-model="table.isResize">自适应</el-checkbox>
+          <el-checkbox v-model="table.loading">加载</el-checkbox>
+          <el-checkbox v-model="table.stripe">斑马纹</el-checkbox>
           <el-checkbox v-model="table.showSummary">合计</el-checkbox>
           <el-checkbox v-model="table.highlightCurrentRow">单选高亮行</el-checkbox>
-          <el-checkbox v-model="table.isResizable" @change="changeResizable">拖动列</el-checkbox>
           <el-checkbox v-model="table.columns[0].fixed">固定列</el-checkbox>
           <el-checkbox v-model="mainColumn.sortable">排序</el-checkbox>
-          <el-checkbox v-model="mainColumn.slot">自定义列</el-checkbox>
-          <el-checkbox v-model="mainColumn.slotHeader">自定义表头</el-checkbox>
           <el-checkbox v-model="isCustomIndex">自定义索引</el-checkbox>
           <el-checkbox v-model="isSlotAppend">自定义追加</el-checkbox>
+          <el-checkbox v-model="isSlotEmpty">自定义无数据</el-checkbox>
           <el-checkbox :value="true" :disabled="true">自定义类名</el-checkbox>
+          <!-- 多级表头下默认自带边框 -->
           <el-checkbox v-model="table.border" :disabled="true">边框</el-checkbox>
-          <el-checkbox :value="true" :disabled="true">树形</el-checkbox>
           <el-checkbox :value="true" :disabled="true">筛选列</el-checkbox>
+          <el-checkbox :value="true" :disabled="true">拖动列</el-checkbox>
           <el-checkbox :value="true" :disabled="true">展开行</el-checkbox>
           <el-checkbox :value="true" :disabled="true">固定表头</el-checkbox>
           <el-checkbox :value="true" :disabled="true">流体高度</el-checkbox>
           <el-checkbox :value="true" :disabled="true">多级表头</el-checkbox>
+          <el-checkbox :value="true" :disabled="true">懒加载树形</el-checkbox>
+          <el-checkbox :value="true" :disabled="true">自定义列</el-checkbox>
+          <el-checkbox :value="true" :disabled="true">自定义表头</el-checkbox>
         </div>
         <div class="input-item">
           <div class="lablel">动态显示列</div>
@@ -60,29 +68,28 @@
           <el-input type="number" v-model="table.maxHeight"></el-input>
         </div>
         <div class="input-item">
-          <el-button @click="getData">追加数据</el-button>
-          <el-input-number v-model="number" :min="1" :max="100" :precision="0"></el-input-number>
+          <el-button @click="getData">加载数据</el-button>
+          <el-button @click="removeData">清空数据</el-button>
         </div>
-        <el-button @click="removeData">清空数据</el-button>
       </div>
     </div>
   </div>
 </template>
  
 <script>
+import { guid } from '../lib/tool';
 export default {
   name: 'app',
+  components: {},
   data() {
     return {
-      index: 0,
-      number: 5,
       isSlotAppend: false,
-      isResizable: false,
+      isSlotEmpty: false,
       isCustomIndex: false,
-      treeDeep: [1, 2, 3],
+      treeDeep: [0, 1, 2],
       table: {
         isResize: false,
-        isPage: false,
+        isPage: true,
         showSummary: false,
         border: true,
         showHeader: true,
@@ -90,14 +97,11 @@ export default {
         rowKey: 'id',
         lazy: true,
         highlightCurrentRow: false,
-        data: [],
         columns: [
           {
             label: '多选',
             type: 'selection',
             display: true,
-            fixed: false,
-            resizable: false,
             align: 'center',
             width: 50
           },
@@ -107,18 +111,21 @@ export default {
             type: 'index',
             display: true,
             align: 'center',
-            resizable: false,
             width: 80,
-            index: v => (this.isCustomIndex ? `index-${v}` : v)
+            index: v => {
+              let { currentPage, pageSize } = this.table.page;
+              return this.isCustomIndex
+                ? `index-${(currentPage - 1) * pageSize + v}`
+                : v;
+            }
           },
           {
-            label: '姓名',
-            prop: 'name',
+            label: '用户',
             minWidth: 300,
-            sortable: false,
-            slot: false,
-            resizable: false,
-            slotHeader: false,
+            sortable: 'custom',
+            display: true,
+            slotColumn: 'cutomColumn',
+            slotHeader: 'cutomHeader',
             filters: [
               { text: '编号前3名', value: 3 },
               { text: '编号前10名', value: 10 }
@@ -127,100 +134,113 @@ export default {
           },
           {
             label: '平台账户',
-            prop: 'user',
             width: 120,
-            resizable: false,
             // 多级表头必须出现 border
             children: [
-              { label: '账号', prop: 'user', width: 100 },
-              { label: '密码', prop: 'pwd', width: 100 }
+              {
+                label: '姓名',
+                prop: 'name',
+                width: 100,
+                display: true
+              },
+              {
+                label: '性别',
+                prop: 'user',
+                width: 100,
+                display: true,
+                slotColumn: 'cutomColumn',
+                slotHeader: 'cutomHeader'
+              }
             ],
             display: true
           },
-          { label: '手机', prop: 'phone', display: true, resizable: false },
+          {
+            label: '手机',
+            prop: 'phone',
+            width: 100,
+            showOverflowTooltip: true,
+            display: true
+          },
           {
             label: '简介',
             prop: 'intor',
             display: true,
-            resizable: false,
-            width: 600
+            minWidth: 300
           }
         ],
-        rowClassName: ({ rowIndex }) => `customRowClass-${rowIndex + 1}`,
+        request: (params, resolve) => {
+          this.http(params).then(data => {
+            resolve({ data, total: params.pageSize * 5 });
+          });
+        },
         load: (tree, treeNode, resolve) => {
-          this.http(tree.level + 1, 0, 3).then(data => {
+          this.http({ page: 1, pageSize: 5, level: 2 }).then(data => {
             this.treeDeep.pop();
             resolve(data);
           });
         },
+        rowClassName: ({ rowIndex }) => `customRowClass-${rowIndex + 1}`,
         on: {
-          sortChange({ column, prop, order }) {
-            console.log(this, { column, prop, order });
+          sortChange: sort => {
+            console.log('触发sortChange:', sort);
+          },
+          currentChange: row => {
+            console.log('触发currentChange:', row);
+          },
+          pageChange: page => {
+            this.treeDeep = [0, 1, 2];
+            console.log('触发pageChange:' + page);
+          },
+          sizeChange: size => {
+            console.log('触发sizeChange:' + size);
           }
         }
       }
     };
   },
-  mounted() {
-    this.getData();
-  },
+  mounted() {},
   computed: {
     displayColumns() {
       return this.table.columns.filter(item => item.display != undefined);
     },
     mainColumn() {
-      return this.table.columns.find(v => v.label == '姓名');
+      return this.table.columns.find(v => v.label == '用户');
     }
   },
   methods: {
-    getId() {
-      return Number(
-        Math.random()
-          .toString()
-          .substr(3, 3) + Date.now()
-      ).toString(36);
-    },
-    http(level, index, maxLength) {
+    // 模拟数据
+    http({ page, pageSize, level = 1 }) {
       return new Promise(resolve => {
         setTimeout(() => {
           let data = [];
-          for (let i = 0; i < maxLength; i++) {
-            index++;
+          for (let i = 0; i < pageSize; i++) {
+            let index = (page - 1) * pageSize + i;
             data.push({
-              id: this.getId(),
+              id: guid(),
               name: `编号-${level}-${index}`,
               user: 'admin',
-              phone: 110,
+              phone: 100,
               intor: '暂无简介',
               index: index,
               level: level,
-              hasChildren: this.treeDeep.includes(index)
+              hasChildren: this.treeDeep.includes(i)
             });
           }
           resolve(data);
         }, 200);
       });
     },
-    rowClick(row) {
-      this.$message(`当前点击的是${row.name}`);
-    },
-    changeResizable(is) {
-      this.table.columns.forEach(v => (v.resizable = is));
-    },
-    removeData() {
-      this.table.loading = true;
-      this.http().then(() => {
-        this.table.data = [];
-        this.index = 0;
-        this.table.loading = false;
-      });
+    rowClick() {
+      console.log('点击事件');
     },
     getData() {
-      this.table.loading = true;
-      this.http(1, this.index, this.number).then(data => {
-        this.table.data = this.table.data.concat(data);
-        this.index = this.table.data.length;
-        this.table.loading = false;
+      this.table.getData();
+    },
+    removeData() {
+      this.http({ page: 1, pageSize: 0 }).then(data => {
+        this.table.data = data;
+        this.table.page.total = 0;
+        this.table.page.currentPage = 1;
       });
     }
   }
