@@ -1,4 +1,4 @@
-# agel-table | 使 element-ui table 组件更简单、好用
+# agel-table | 使 element-ui table 组件更简单
 
 ## 特性
 
@@ -81,11 +81,15 @@ Vue.prototype.$agelTableConfig = config;
 
 ## Column 参数
 
-| 属性     | 类型    | 注释说明                          |
-| -------- | ------- | --------------------------------- |
-| ......   | Any     | More Element-ui Column Attributes |
-| display  | Boolean | 是否显示该列                      |
-| children | Array   | 配置多级表头                      |
+- 值得提醒的是，当你修改列的属性，为了更好的更新，table 是会重新渲染所有的列
+
+| 属性       | 类型    | 注释说明                          |
+| ---------- | ------- | --------------------------------- |
+| ......     | Any     | More Element-ui Column Attributes |
+| display    | Boolean | 是否显示该列                      |
+| children   | Array   | 配置多级表头                      |
+| slotColumn | String  | 自定义表列的插槽名称              |
+| slotHeader | String  | 自定义表头的插槽名称              |
 
 ## Page 参数
 
@@ -114,14 +118,17 @@ Vue.prototype.$agelTableConfig = config;
 | sizeChange | 当 page.pageSize 发生变化时触发         |
 | sortChange | 当 排序发生变化时触发                   |
 
+## Slot 插槽
+
+| 插槽名 | 注释说明                                                       |
+| ------ | -------------------------------------------------------------- |
+| empty  | 没有数据展示                                                   |
+| append | 插入至表格最后一行之后的内容                                   |
+| expand | 展开行的内容                                                   |
+| -      | 自定义列的内容，需要在 column 的 slotColumn 属性指定插槽名称   |
+| -      | 自定义表头的内容，需要在 column 的 slotHeader 属性指定插槽名称 |
+
 ## 相关链接
 
 - [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
-
-# 更新日志
-
-- [x] 解决`el-table` 和 `el-pagination` 组件拥有同名事件`current-change`的冲突问题
-- [x] 可配置全局属性
-- [x] 解决多级表头自定义`slotColum` `SlotHeader`失败问题
-- [x] 解决多级表头列添加添加属性`display`为`false`，渲染异常
-- [x] 添加`request` `getData`属性 api，方便和接口对接
+- [element-ui pagination 组件](https://element.eleme.cn/#/zh-CN/component/pagination)

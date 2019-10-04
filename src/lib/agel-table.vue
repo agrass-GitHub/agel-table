@@ -27,17 +27,8 @@ import agelColumn from './agel-column';
 export default {
   name: 'agel-table',
   install(vue, opts = {}) {
-    let config = Object.assign(
-      {
-        name: this.name,
-        table: {},
-        cloumn: {},
-        page: {}
-      },
-      opts
-    );
-    vue.prototype.$agelTableConfig = config;
-    vue.component(config.name, this);
+    vue.prototype.$agelTableConfig = opts;
+    vue.component(opts.name || this.name, this);
   },
   provide() {
     return {
@@ -115,7 +106,6 @@ export default {
       });
     },
     getApi() {
-      const table = this.value;
       const defaultApi = {
         $ref: undefined,
         loading: false,
@@ -182,13 +172,13 @@ export default {
       const eventsApi = {
         sortChange: ({ column, prop, order }) => {
           if (column.sortable !== 'custom') return;
-          table.order = order;
-          table.orderColumn = prop;
-          table.getData();
+          this.value.order = order;
+          this.value.orderColumn = prop;
+          this.value.getData();
         },
         sizeChange: size => {
-          table.page.pageSize = size;
-          table.getData();
+          this.value.page.pageSize = size;
+          this.value.getData();
         },
         // 重名事件 currentChange
         currentChange: (...params) => {
@@ -203,9 +193,11 @@ export default {
           }
         }
       };
-      const globalApi = this.$agelTableConfig.table;
-      const globalPageApi = this.$agelTableConfig.page;
-      const globalColumnApi = this.$agelTableConfig.column;
+
+      const config = this.$agelTableConfig || {};
+      const globalApi = config.table || {};
+      const globalPageApi = config.page || {};
+      const globalColumnApi = config.column || {};
       const localApi = this.value;
       const localPageApi = this.value.page;
       const localEventsApi = this.value.on;

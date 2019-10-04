@@ -80,7 +80,6 @@
 import { guid } from '../lib/tool';
 export default {
   name: 'app',
-  components: {},
   data() {
     return {
       isSlotAppend: false,
