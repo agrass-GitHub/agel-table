@@ -121,13 +121,14 @@ export default {
           {
             label: '用户',
             minWidth: 300,
+            prop: 'user',
             sortable: 'custom',
             display: true,
             slotColumn: 'cutomColumn',
             slotHeader: 'cutomHeader',
             filters: [
-              { text: '编号前3名', value: 3 },
-              { text: '编号前10名', value: 10 }
+              { text: '编号 < 1-3', value: 3 },
+              { text: '编号 < 1-5', value: 5 }
             ],
             filterMethod: (v, row) => row.index <= v
           },
@@ -173,10 +174,11 @@ export default {
           });
         },
         load: (tree, treeNode, resolve) => {
-          this.http({ page: 1, pageSize: 5, level: 2 }).then(data => {
-            this.treeDeep.pop();
-            resolve(data);
-          });
+          this.http({
+            page: 1,
+            pageSize: 3 - tree.level,
+            level: tree.level + 1
+          }).then(data => resolve(data));
         },
         rowClassName: ({ rowIndex }) => `customRowClass-${rowIndex + 1}`,
         on: {
@@ -187,7 +189,6 @@ export default {
             console.log('触发currentChange:', row);
           },
           pageChange: page => {
-            this.treeDeep = [0, 1, 2];
             console.log('触发pageChange:' + page);
           },
           sizeChange: size => {
@@ -222,15 +223,15 @@ export default {
               intor: '暂无简介',
               index: index,
               level: level,
-              hasChildren: this.treeDeep.includes(i)
+              hasChildren: i < 3 && level < 3
             });
           }
           resolve(data);
         }, 200);
       });
     },
-    rowClick() {
-      console.log('点击事件');
+    rowClick({ row }) {
+      console.log('触发按钮点击事件', row);
     },
     getData() {
       this.table.getData();

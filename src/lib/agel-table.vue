@@ -218,7 +218,7 @@ export default {
     },
     getValidAttrs(data, name) {
       let attrs = {};
-      let props = this.$refs[name] ? this.$refs[name].$props : {};
+      let props = this.$refs[name] ? this.$refs[name].$props : data;
       let vaildAttrs = { ...props, class: '' };
       for (const key in data) {
         if (vaildAttrs.hasOwnProperty(key)) attrs[key] = data[key];

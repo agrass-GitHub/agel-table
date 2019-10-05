@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "main": "lib/agel-table.umd.min.js",
   "description": "a easy table of element-ui table",
+  "homepage": "https://agrass.gitee.io/agel-table",
   "private": false,
   "license": "MIT",
   "author": "agrass",
@@ -14,9 +15,11 @@
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "dist": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js"
+    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js",
+    "demo": "gh-pages -d dist",
+    "build": "npm run build && npm run lib && npm run demo"
   },
   "dependencies": {
     "core-js": "^2.6.5",
@@ -30,6 +33,7 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "gh-pages": "^2.1.1",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {

@@ -47,7 +47,7 @@ Vue.prototype.$agelTableConfig = config;
     data() {
       return {
         table: {
-          // ... more attrs
+          // ... All attrs
           data: [],
           columns: [{ label: '姓名', prop: 'name' }]
         }
@@ -56,6 +56,14 @@ Vue.prototype.$agelTableConfig = config;
   };
 </script>
 ```
+
+## 演示例子
+
+- [例子演示 - github](https://agrass.github.io/agel-table/)
+- [例子演示 - gitee - 国内访问速度较快](https://agrass.gitee.io/agel-table/)
+- [代码演示 ](https://github.com/agrass-GitHub/agel-table/blob/master/src/example/index.vue)
+
+![demo](./public/demo.png)
 
 # API 文档
 
@@ -67,7 +75,7 @@ Vue.prototype.$agelTableConfig = config;
 
 | 属性        | 类型     | 注释说明                                                                                       |
 | ----------- | -------- | ---------------------------------------------------------------------------------------------- |
-| ......      | Any      | More Element-ui Table Attributes                                                               |
+| ......      | Any      | All Element-ui Table Attributes                                                                |
 | data        | Array    | 数据                                                                                           |
 | \$ref       | Object   | Element-ui Table Vue 实例，内置属性不需要传递                                                  |
 | loading     | Boolean  | 开启加载状态                                                                                   |
@@ -87,13 +95,13 @@ Vue.prototype.$agelTableConfig = config;
 
 - 值得提醒的是，当你修改列的属性，为了更好的更新，table 是会重新渲染所有的列
 
-| 属性       | 类型    | 注释说明                          |
-| ---------- | ------- | --------------------------------- |
-| ......     | Any     | More Element-ui Column Attributes |
-| display    | Boolean | 是否显示该列                      |
-| children   | Array   | 配置多级表头                      |
-| slotColumn | String  | 自定义表列的插槽名称              |
-| slotHeader | String  | 自定义表头的插槽名称              |
+| 属性       | 类型    | 注释说明                         |
+| ---------- | ------- | -------------------------------- |
+| ......     | Any     | All Element-ui Column Attributes |
+| display    | Boolean | 是否显示该列                     |
+| children   | Array   | 配置多级表头                     |
+| slotColumn | String  | 自定义表列的插槽名称             |
+| slotHeader | String  | 自定义表头的插槽名称             |
 
 ## Page 参数
 
@@ -101,7 +109,7 @@ Vue.prototype.$agelTableConfig = config;
 
 | 属性        | 默认                                      |
 | ----------- | ----------------------------------------- |
-| ......      | More Element-ui Pagination Attributes     |
+| ......      | All Element-ui Pagination Attributes      |
 | class       | 'agel-pagination''                        |
 | layout      | 'total, sizes, prev, pager, next, jumper' |
 | pageSizes   | [10, 20, 50, 100]                         |
@@ -115,12 +123,12 @@ Vue.prototype.$agelTableConfig = config;
 - page 组件的`current-change`,`prev-click`,`next-click`合并为 pageChange
 - 当分页或者排序发生变化，table 会自动触发 `getData` 事件
 
-| 属性       | 注释说明                                |
-| ---------- | --------------------------------------- |
-| ......     | More Element-ui Table Pagination Events |
-| pageChange | 当 page.currentPage 发生变化时触发      |
-| sizeChange | 当 page.pageSize 发生变化时触发         |
-| sortChange | 当 排序发生变化时触发                   |
+| 属性       | 注释说明                               |
+| ---------- | -------------------------------------- |
+| ......     | All Element-ui Table Pagination Events |
+| pageChange | 当 page.currentPage 发生变化时触发     |
+| sizeChange | 当 page.pageSize 发生变化时触发        |
+| sortChange | 当 排序发生变化时触发                  |
 
 ## Slot 插槽
 

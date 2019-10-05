@@ -1,5 +1,6 @@
 # 功能更新日志
 
+- [x] 解决初始化获取 attrs 导致 table load 属性失效的问题
 - [x] 局部引用组件报错
 - [x] 解决`el-table` 和 `el-pagination` 组件拥有同名事件`current-change`的冲突问题
 - [x] 可配置全局属性
