@@ -147,7 +147,7 @@ export default {
           let table = this.value;
           let lightweightResize = () => {
             let { container, page } = this.$refs;
-            let containerH = container ? container.parentNode.clientHeight : 0;
+            let containerH = container ? container.clientHeight : 0;
             let pageH = page ? page.$el.clientHeight : 0;
             table.height = containerH - pageH;
           };
@@ -264,7 +264,7 @@ export default {
 <style >
 .agel-table {
   width: 100%;
-  height: auto !important;
+  height: 100% !important;
 }
 .agel-table .agel-pagination {
   overflow: hidden;

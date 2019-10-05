@@ -7,34 +7,13 @@
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1，data2 ... 等变量，简单明了。
 
+# 使用
+
 ## 安装
 
 `npm install agel-table --save`
 
-## 使用
-
-### 简单 demo
-
-```html
-<template>
-  <agel-table v-model="table"> </agel-table>
-</template>
-<script>
-  export default {
-    data() {
-      return {
-        table: {
-          // ... more attrs
-          data: [],
-          columns: [{ label: '姓名', prop: 'name' }]
-        }
-      };
-    }
-  };
-</script>
-```
-
-## 全局配置
+## 全局注册
 
 ```js
 import agelTable from 'agel-table';
@@ -51,6 +30,31 @@ Vue.use(agelTable, conigf);
 // or
 
 Vue.prototype.$agelTableConfig = config;
+```
+
+## 局部注册
+
+```html
+<template>
+  <agel-table v-model="table"> </agel-table>
+</template>
+<script>
+  import agelTable from 'agel-table';
+  export default {
+    components: {
+      agelTable
+    },
+    data() {
+      return {
+        table: {
+          // ... more attrs
+          data: [],
+          columns: [{ label: '姓名', prop: 'name' }]
+        }
+      };
+    }
+  };
+</script>
 ```
 
 # API 文档
@@ -71,7 +75,7 @@ Vue.prototype.$agelTableConfig = config;
 | isResize    | Boolean  | 是否自适应父容器高度                                                                           |
 | class       | String   | Table 的 Class 名称                                                                            |
 | order       | String   | 当前排序状态                                                                                   |
-| orderColumn | Array    | 当前排序列名称                                                                                 |
+| orderColumn | String   | 当前排序列名称                                                                                 |
 | queryProps  | Object   | 指定传递给 request 方法的的参数属性值 `{page,pageSize,order,orderColumn}`                      |
 | page        | Object   | Page 组件相关配置                                                                              |
 | on          | Object   | Table Page 组件的 Event 事件                                                                   |

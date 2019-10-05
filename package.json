@@ -1,6 +1,6 @@
 {
   "name": "agel-table",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "lib/agel-table.umd.min.js",
   "description": "a easy table of element-ui table",
   "private": false,
