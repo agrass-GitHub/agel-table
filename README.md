@@ -5,7 +5,15 @@
 - 支持 element-ui table 组件的所有 api 和 slot
 - 更少的代码量，更简单的思想，更快的开发速度
 
-该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1，data2 ... 等变量，简单明了。
+该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
+
+## 演示
+
+- [代码演示 - github ](https://github.com/agrass-GitHub/agel-table/blob/master/src/example/index.vue)
+- [例子演示 - github](https://agrass-github.github.io/agel-table/)
+- [例子演示 - gitee - 国内访问速度较快](https://agrass.gitee.io/agel-table/)
+
+![demo](./public/demo.png)
 
 # 使用
 
@@ -56,14 +64,6 @@ Vue.prototype.$agelTableConfig = config;
   };
 </script>
 ```
-
-## 演示例子
-
-- [例子演示 - github](https://agrass.github.io/agel-table/)
-- [例子演示 - gitee - 国内访问速度较快](https://agrass.gitee.io/agel-table/)
-- [代码演示 ](https://github.com/agrass-GitHub/agel-table/blob/master/src/example/index.vue)
-
-![demo](./public/demo.png)
 
 # API 文档
 
