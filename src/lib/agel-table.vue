@@ -1,7 +1,7 @@
 <template>
   <div ref="container" class="agel-table" v-loading="value.loading">
     <!-- el-table -->
-    <el-table ref="table" v-bind="attrs" v-on="events">
+    <el-table ref="table" v-bind="attrs" v-on="events" style="width:100%">
       <!-- append  -->
       <template v-slot:append>
         <slot name="append"></slot>
@@ -17,7 +17,7 @@
     </el-table>
 
     <!-- el-pagination -->
-    <el-pagination ref="page" v-if="value.isPage" v-bind="pageAttrs" v-on="events"></el-pagination>
+    <el-pagination ref="page" v-if="value.isPage" v-bind="value.page" v-on="events"></el-pagination>
   </div>
 </template>
  
@@ -49,30 +49,26 @@ export default {
   },
   computed: {
     attrs() {
-      return this.getValidAttrs(this.value, 'table');
-    },
-    pageAttrs() {
-      return this.getValidAttrs(this.value.page, 'page');
-    },
-    columns() {
-      return this.getValidColumns(this.value.columns);
+      return this.getValidAttrs();
     },
     events() {
       return this.getValidEvents();
+    },
+    columns() {
+      return this.getValidColumns(this.value.columns);
     }
   },
   watch: {
+    'value.data'() {
+      // 解决 element-ui table 特定情况下的bug，显示合计异常，列无法对齐的问题
+      let { showSummary, height, resize } = this.value;
+      if (showSummary || height) resize();
+    },
     'value.showSummary'() {
       let { height, resize } = this.value;
       height && resize();
     },
-    'value.data'() {
-      // 在有合计的时候和固定高度的情况下，获取数据需要重新自适应容器
-      let { showSummary, height, resize } = this.value;
-      showSummary && height && resize();
-    },
     'value.isPage'() {
-      // 在开启了自适应的情况下，切换分页组件的显示隐藏，需要重新自适应容器
       let { isResize, resize } = this.value;
       isResize && resize();
     },
@@ -80,7 +76,7 @@ export default {
       this.registerResize();
     }
   },
-  beforeMount() {
+  created() {
     this.init();
   },
   beforeDestroy() {
@@ -91,6 +87,7 @@ export default {
       let api = this.getApi();
       let table = {
         ...api.defaultApi,
+        ...api.extendApi,
         ...api.globalApi,
         ...api.localApi,
         page: {
@@ -106,13 +103,11 @@ export default {
       });
     },
     getApi() {
-      const defaultApi = {
+      const extendApi = {
         $ref: undefined,
         loading: false,
         isPage: true,
         isResize: false,
-        data: [],
-        height: '',
         columns: [],
         order: '',
         orderColumn: '',
@@ -161,6 +156,10 @@ export default {
           e && e.type == 'resize' ? lightweightResize() : heavylweightResize();
         }
       };
+      const defaultApi = {
+        data: [],
+        height: ''
+      };
       const pageApi = {
         pageSize: 20,
         pageSizes: [10, 20, 50, 100],
@@ -203,6 +202,7 @@ export default {
       const localEventsApi = this.value.on;
       return {
         // 默认配置
+        extendApi,
         defaultApi,
         eventsApi,
         pageApi,
@@ -216,12 +216,11 @@ export default {
         localEventsApi
       };
     },
-    getValidAttrs(data, name) {
+    getValidAttrs() {
       let attrs = {};
-      let props = this.$refs[name] ? this.$refs[name].$props : data;
-      let vaildAttrs = { ...props, class: '' };
-      for (const key in data) {
-        if (vaildAttrs.hasOwnProperty(key)) attrs[key] = data[key];
+      let ignore = this.getApi().extendApi;
+      for (const key in this.value) {
+        if (!ignore.hasOwnProperty(key)) attrs[key] = this.value[key];
       }
       return attrs;
     },
@@ -249,7 +248,6 @@ export default {
       return events;
     },
     registerResize(isResize = this.value.isResize) {
-      this.value.height = '';
       if (isResize) {
         this.value.resize();
         window.addEventListener('resize', this.value.resize);
@@ -266,6 +264,7 @@ export default {
   width: 100%;
   height: 100% !important;
 }
+
 .agel-table .agel-pagination {
   overflow: hidden;
   padding: 10px;

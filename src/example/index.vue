@@ -2,7 +2,7 @@
   <div class="app">
     <div class="left">
       <div class="table-box" :style="{height:table.isResize?'100%':'auto'}">
-        <agel-table v-model="table" ref="table">
+        <agel-table v-model="table">
           <template v-slot:append v-if="isSlotAppend">
             <p class="append-slot">table slot append .... loading ...</p>
           </template>
@@ -20,6 +20,9 @@
           </template>
         </agel-table>
       </div>
+      <!-- <el-table :data="table.data" :height="table.height" showSummary border style="width:100%">
+        <el-table-column v-for="column in table.columns" :key="column.key" v-bind="column"></el-table-column>
+      </el-table>-->
     </div>
     <div class="right">
       <div class="input-box">
@@ -89,11 +92,12 @@ export default {
       table: {
         isResize: false,
         isPage: true,
-        showSummary: false,
+        showSummary: true,
         border: true,
         showHeader: true,
         stripe: false,
         rowKey: 'id',
+        height: 300,
         lazy: true,
         highlightCurrentRow: false,
         columns: [
@@ -205,6 +209,11 @@ export default {
     },
     mainColumn() {
       return this.table.columns.find(v => v.label == '用户');
+    }
+  },
+  watch: {
+    'table.isResize'(v) {
+      if (!v) this.table.height = '';
     }
   },
   methods: {

@@ -2,8 +2,11 @@
 
 ## 特性
 
-- 支持 element-ui table 组件的所有 api 和 slot
 - 更少的代码量，更简单的思想，更快的开发速度
+- 支持 element-ui table 组件的所有 api 和 slot
+- 解决了 element-ui table 一些潜在问题
+  - [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
+  - [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
 
@@ -13,7 +16,7 @@
 - [例子演示 - github](https://agrass-github.github.io/agel-table/)
 - [例子演示 - gitee - 国内访问速度较快](https://agrass.gitee.io/agel-table/)
 
-![demo](./public/demo.png)
+![demo](https://gitee.com/agrass/agel-table/raw/master/public/demo.png)
 
 # 使用
 
@@ -38,6 +41,7 @@ Vue.use(agelTable, conigf);
 // or
 
 Vue.prototype.$agelTableConfig = config;
+Vue.component('agel-table', agelTable);
 ```
 
 ## 局部注册
@@ -140,7 +144,11 @@ Vue.prototype.$agelTableConfig = config;
 | -      | 自定义列的内容，需要在 column 的 slotColumn 属性指定插槽名称   |
 | -      | 自定义表头的内容，需要在 column 的 slotHeader 属性指定插槽名称 |
 
-## 相关链接
+# 相关链接
 
 - [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
 - [element-ui pagination 组件](https://element.eleme.cn/#/zh-CN/component/pagination)
+
+# 更新日志
+
+- [agel-table 更新日志](https://github.com/agrass-GitHub/agel-table/blob/master/update-log.md)
