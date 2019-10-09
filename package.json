@@ -15,11 +15,11 @@
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "dist": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "dist": "vue-cli-service build",
     "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js",
-    "demo": "gh-pages -d dist",
-    "build": "npm run build && npm run lib && npm run demo"
+    "build": "npm run build && npm run lib && npm run demo",
+    "demo": "gh-pages -d dist"
   },
   "dependencies": {
     "core-js": "^2.6.5",
