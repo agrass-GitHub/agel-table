@@ -7,7 +7,7 @@
         <slot name="append"></slot>
       </template>
 
-      <!-- append  -->
+      <!-- empty  -->
       <template v-slot:empty>
         <slot name="empty"></slot>
       </template>
@@ -142,9 +142,11 @@ export default {
           let table = this.value;
           let lightweightResize = () => {
             let { container, page } = this.$refs;
-            let containerH = container ? container.clientHeight : 0;
+            let containerH = container ? container.parentNode.clientHeight : 0;
             let pageH = page ? page.$el.clientHeight : 0;
-            table.height = containerH - pageH;
+            let resizeH = containerH - pageH;
+            if (resizeH <= 0) return;
+            table.height = resizeH;
           };
           let heavylweightResize = () => {
             this.$nextTick(() => {
@@ -158,7 +160,7 @@ export default {
       };
       const defaultApi = {
         data: [],
-        height: ''
+        height: undefined
       };
       const pageApi = {
         pageSize: 20,
@@ -228,8 +230,9 @@ export default {
       let { globalColumnApi } = this.getApi();
       return columns
         .map(v => {
-          let o = { ...v, ...globalColumnApi, key: guid() };
-          if (o.display == undefined) v.display = true;
+          let key = v.key == undefined ? guid() : v.key;
+          let display = v.display == undefined ? true : v.display;
+          let o = { ...v, ...globalColumnApi, display, key };
           if (o.children) o.children = this.getValidColumns(o.children);
           return o;
         })
@@ -238,11 +241,10 @@ export default {
     getValidEvents() {
       let events = {};
       let { eventsApi: a, localEventsApi: b } = this.getApi();
-      for (const key in { ...a, ...b }) {
+      for (let key in { ...a, ...b }) {
         events[kebabcase(key)] = (...params) => {
-          let cusotmKey = ''; // 自定义向上触发的方法名称
-          if (a[key]) cusotmKey = a[key](...params);
-          if (b[cusotmKey || key]) b[cusotmKey || key](...params);
+          if (a[key]) key = a[key](...params) || key;
+          if (b[key]) b[key](...params);
         };
       }
       return events;
@@ -262,7 +264,7 @@ export default {
 <style >
 .agel-table {
   width: 100%;
-  height: 100% !important;
+  height: auto;
 }
 
 .agel-table .agel-pagination {

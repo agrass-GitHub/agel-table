@@ -92,20 +92,21 @@ export default {
       table: {
         isResize: false,
         isPage: true,
-        showSummary: true,
+        showSummary: false,
         border: true,
         showHeader: true,
         stripe: false,
         rowKey: 'id',
-        height: 300,
         lazy: true,
+        height: 300,
+        data: [],
         highlightCurrentRow: false,
         columns: [
           {
             label: '多选',
             type: 'selection',
-            display: true,
             align: 'center',
+            display: true,
             width: 50
           },
           { label: '展开', type: 'expand', display: true, width: 60 },
@@ -141,20 +142,8 @@ export default {
             width: 120,
             // 多级表头必须出现 border
             children: [
-              {
-                label: '姓名',
-                prop: 'name',
-                width: 100,
-                display: true
-              },
-              {
-                label: '性别',
-                prop: 'user',
-                width: 100,
-                display: true,
-                slotColumn: 'cutomColumn',
-                slotHeader: 'cutomHeader'
-              }
+              { label: '姓名', prop: 'name', display: true },
+              { label: '性别', prop: 'user', display: true }
             ],
             display: true
           },
@@ -202,7 +191,9 @@ export default {
       }
     };
   },
-  mounted() {},
+  mounted() {
+    this.table.getData();
+  },
   computed: {
     displayColumns() {
       return this.table.columns.filter(item => item.display != undefined);

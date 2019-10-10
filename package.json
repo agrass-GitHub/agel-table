@@ -17,8 +17,7 @@
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
     "dist": "vue-cli-service build --report",
-    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js --report",
-    "build": "npm run build && npm run lib && npm run demo",
+    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js",
     "demo": "gh-pages -d dist"
   },
   "dependencies": {},
