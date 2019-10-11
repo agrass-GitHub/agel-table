@@ -200,6 +200,9 @@ export default {
     },
     mainColumn() {
       return this.table.columns.find(v => v.label == '用户');
+    },
+    cusotmColumns() {
+      return this.table.columns.filter(v => v.children == undefined);
     }
   },
   watch: {

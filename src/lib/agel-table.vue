@@ -1,5 +1,5 @@
 <template>
-  <div ref="container" class="agel-table" v-loading="value.loading">
+  <div ref="container" class="agel-table" v-loading="value.loading" v-if="LOAD">
     <!-- el-table -->
     <el-table ref="table" v-bind="attrs" v-on="events" style="width:100%">
       <!-- append  -->
@@ -42,10 +42,16 @@ export default {
     value: {
       type: Object,
       defualt: () => new Object()
+    },
+    attach: {
+      type: Object,
+      defualt: () => new Object()
     }
   },
   data() {
-    return {};
+    return {
+      LOAD: false
+    };
   },
   computed: {
     attrs() {
@@ -56,6 +62,9 @@ export default {
     },
     columns() {
       return this.getValidColumns(this.value.columns);
+    },
+    isMultistep() {
+      return this.value.columns.some(v => v.children && v.children.length > 0);
     }
   },
   watch: {
@@ -94,12 +103,16 @@ export default {
           ...api.pageApi,
           ...api.globalPageApi,
           ...api.localPageApi
-        }
+        },
+        ...this.attach
       };
       this.$emit('input', table);
       this.$nextTick(() => {
-        this.value.$ref = this.$refs.table;
-        this.registerResize();
+        this.LOAD = true;
+        this.$nextTick(() => {
+          this.value.$ref = this.$refs.table;
+          this.registerResize();
+        });
       });
     },
     getApi() {
@@ -120,23 +133,28 @@ export default {
           orderColumn: 'orderColumn'
         },
         request: null,
-        async getData() {
-          if (!this.request) return;
-          this.loading = true;
+        getQuery() {
           let { page, pageSize, order, orderColumn } = this.queryProps;
-          let params = {
+          return {
             [page]: this.page.currentPage,
             [pageSize]: this.page.pageSize,
             [order]: this.order,
             [orderColumn]: this.orderColumn
           };
-          new Promise(resolve => this.request(params, resolve)).then(
-            ({ data = this.data, total = this.page.total }) => {
+        },
+        getData() {
+          if (!this.request) return;
+          this.loading = true;
+          new Promise(resolve => this.request(this.getQuery(), resolve))
+            .then(({ data = this.data, total = this.page.total }) => {
               this.loading = false;
               this.data = data;
               this.page.total = total;
-            }
-          );
+            })
+            .catch(err => {
+              this.loading = false;
+              console.error('获取数据失败' + err);
+            });
         },
         resize: e => {
           let table = this.value;
@@ -219,6 +237,7 @@ export default {
       };
     },
     getValidAttrs() {
+      if (!this.LOAD) return {};
       let attrs = {};
       let ignore = this.getApi().extendApi;
       for (const key in this.value) {
@@ -227,21 +246,24 @@ export default {
       return attrs;
     },
     getValidColumns(columns) {
+      if (!this.LOAD) return {};
       let { globalColumnApi } = this.getApi();
       return columns
         .map(v => {
-          let key = v.key == undefined ? guid() : v.key;
+          if (v.key == undefined || this.isMultistep) v.key = guid();
           let display = v.display == undefined ? true : v.display;
-          let o = { ...v, ...globalColumnApi, display, key };
+          let o = { ...v, ...globalColumnApi, display };
           if (o.children) o.children = this.getValidColumns(o.children);
           return o;
         })
         .filter(v => v.display);
     },
     getValidEvents() {
+      if (!this.LOAD) return {};
       let events = {};
       let { eventsApi: a, localEventsApi: b } = this.getApi();
       for (let key in { ...a, ...b }) {
+        // 事件拦截器，在提交event之前可以做点什么...
         events[kebabcase(key)] = (...params) => {
           if (a[key]) key = a[key](...params) || key;
           if (b[key]) b[key](...params);

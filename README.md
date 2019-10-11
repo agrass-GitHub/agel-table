@@ -1,9 +1,7 @@
 # agel-table | 使 element-ui table 组件更简单
 
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg)](https://opensource.org/licenses/mit-license.php)
-
 [![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
-
 [![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
 
 ## 特性
@@ -11,11 +9,15 @@
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
 
 - 更少的代码量，更简单的思想，更快的开发速度
-- 添加额外的扩展功能
-- 支持 element-ui table 组件的所有 api 和 slot
+- 支持 element-ui table 组件的所有 api, slot, event, method
 - 解决 element-ui table 一些潜在问题
-  - [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
-  - [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
+- [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
+- [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
+- 添加额外的扩展功能
+  - 集成分页
+  - 数据代理
+  - 自适应容器大小
+  - 动态显隐列
 
 ## 演示
 
@@ -78,29 +80,39 @@ Vue.component('agel-table', agelTable);
 
 # API 文档
 
+## Props
+
+- 初始化完成后，会为 table（v-model) 参数添加额外的内置参数和方法
+- 根据场景需求可传递可选参数 `attach`，最终会合并到 table
+
+| 属性    | 类型   | 注释说明                                         |
+| ------- | ------ | ------------------------------------------------ |
+| v-model | Object | table 参数配置，不可为计算属性，必须使用 v-model |
+| attach  | Object | table 附属配置，可以为计算属性，会合并到 v-model |
+
 ## Table 参数
 
-- `agel-table` 初始化完成后，会为 table 对象添加额外的内置参数
-- `this.table.$ref` 可以用来直接调用 Element-ui Table Methods
+- `$ref` 可直接调用 Element-ui Table Methods
 - `request` 可参考 Element-ui Table `load` 属性
 
-| 属性        | 类型     | 注释说明                                                                                       |
-| ----------- | -------- | ---------------------------------------------------------------------------------------------- |
-| ......      | Any      | All Element-ui Table Attributes                                                                |
-| data        | Array    | 数据                                                                                           |
-| \$ref       | Object   | Element-ui Table Vue 实例，内置属性不需要传递                                                  |
-| loading     | Boolean  | 开启加载状态                                                                                   |
-| isPage      | Boolean  | 显示分页组件                                                                                   |
-| isResize    | Boolean  | 是否自适应父容器高度，跟随窗口调整而变化                                                       |
-| class       | String   | Table 的 Class 名称                                                                            |
-| order       | String   | 当前排序状态                                                                                   |
-| orderColumn | String   | 当前排序列名称                                                                                 |
-| queryProps  | Object   | 指定传递给 request 方法的的参数属性值 `{page,pageSize,order,orderColumn}`                      |
-| page        | Object   | Page 组件相关配置                                                                              |
-| on          | Object   | Table Page 组件的 Event 事件                                                                   |
-| request     | Function | 获取列表数据的接口函数,参数:`({page,pageSize,order,orderColumn}, resolve)`,返回:`{data,total}` |
-| getData     | Function | 获取列表数据的函数，自动调用 request，同时加载 loading，回填 data 和分页，内置方法不需要传递   |
-| resize      | Function | 自适应容器高度，内置方法不需要传递                                                             |
+| 属性        | 类型     | 注释说明                                                                                     |
+| ----------- | -------- | -------------------------------------------------------------------------------------------- |
+| ......      | Any      | All Element-ui Table Attributes                                                              |
+| data        | Array    | 数据                                                                                         |
+| \$ref       | Object   | Element-ui Table Vue 实例，内置属性不需要传递                                                |
+| loading     | Boolean  | 开启加载状态                                                                                 |
+| isPage      | Boolean  | 显示分页组件                                                                                 |
+| isResize    | Boolean  | 是否自适应父容器高度，跟随窗口调整而变化                                                     |
+| class       | String   | Table 的 Class 名称                                                                          |
+| order       | String   | 当前排序状态                                                                                 |
+| orderColumn | String   | 当前排序列名称                                                                               |
+| page        | Object   | Page 组件相关配置                                                                            |
+| on          | Object   | Table Page 组件的 Event 事件                                                                 |
+| queryProps  | Object   | 指定传递给 request 方法的的参数属性值 `{page,pageSize,order,orderColumn}`                    |
+| getQuery    | Function | 返回 query 参数 `{page,pageSize,order,orderColumn}`                                          |
+| request     | Function | 获取列表数据的接口函数,参数:`(query, resolve)`,返回:`resolve({data,total})`                  |
+| getData     | Function | 获取列表数据的函数，自动调用 request，同时加载 loading，回填 data 和分页，内置方法不需要传递 |
+| resize      | Function | 自适应容器高度，内置方法不需要传递                                                           |
 
 ## Column 参数
 
