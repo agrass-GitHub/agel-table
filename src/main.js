@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './example';
-import agelTable from './lib';
+import agelTable from './package';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 

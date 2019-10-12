@@ -194,10 +194,14 @@ export default {
           }
         }
       },
-      attach: {}
+      attach: {
+        height: 500
+      }
     };
   },
-  mounted() {},
+  mounted() {
+    this.table.getData();
+  },
   computed: {
     displayColumns() {
       return this.table.columns.filter(item => item.display != undefined);

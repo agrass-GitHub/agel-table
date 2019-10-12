@@ -52,13 +52,13 @@ props: {
 
 [演示](https://codepen.io/agrass-github/pen/ExxjXVO)，版本 2.12，触发条件：固定高度，异步加载数据，因为高度不够原因，合计行会被盖住不会显示出来。
 
-重新调用 resize 解决。
+重新调用 table doLayout 解决。
 
 ### 3.element-ui table 在特定情况下列无法对齐
 
 [演示](https://codepen.io/agrass-github/pen/BaaNRae)，版本 2.12，触发条件:固定高度同时出现横向滚动条 -> 异步加载数据 -> 数据超出，出现竖向滚动条 -> 拉横向滚动条至最右侧。
 
-重新调用 resize 解决。
+重新调用 table doLayout 解决。
 
 ### 5.参数无法定义在计算属性上
 

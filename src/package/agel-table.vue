@@ -1,7 +1,13 @@
 <template>
-  <div ref="container" class="agel-table" v-loading="value.loading" v-if="LOAD">
+  <div
+    v-if="LOAD"
+    v-loading="value.loading"
+    :style="{'height':value.height?value.height+'px':'auto'}"
+    ref="container"
+    class="agel-table"
+  >
     <!-- el-table -->
-    <el-table ref="table" v-bind="attrs" v-on="events" style="width:100%">
+    <el-table v-bind="attrs" v-on="events" ref="table" style="width:100%">
       <!-- append  -->
       <template v-slot:append>
         <slot name="append"></slot>
@@ -26,7 +32,7 @@
  
 <script>
 import { guid, kebabcase } from './tool';
-import getColumnsVnode from './agel-column-vnode';
+import getColumnsVnode from './columns-vnode';
 export default {
   name: 'agel-table',
   install(vue, opts = {}) {
@@ -41,8 +47,8 @@ export default {
   components: {},
   props: {
     value: {
-      type: Object,
-      defualt: () => new Object()
+      required: true,
+      type: Object
     },
     attach: {
       type: Object,
@@ -51,18 +57,37 @@ export default {
   },
   data() {
     return {
+      pageHeight: 0,
       LOAD: false
     };
   },
   computed: {
     attrs() {
-      return this.getValidAttrs();
+      if (!this.LOAD) return {};
+      let attrs = {};
+      let extend = this.getApi().extendApi;
+      for (const key in this.value) {
+        if (!extend.hasOwnProperty(key)) attrs[key] = this.value[key];
+      }
+      if (attrs.height && this.value.isPage) {
+        let proxyH = Number(attrs.height) - this.pageHeight;
+        attrs.height = proxyH < 0 ? 0 : proxyH;
+      }
+      return attrs;
     },
     events() {
-      return this.getValidEvents();
-    },
-    isMultistep() {
-      return this.value.columns.some(v => v.children && v.children.length > 0);
+      if (!this.LOAD) return {};
+      let events = {};
+      let { eventsApi: a, localEventsApi: b } = this.getApi();
+      for (let key in { ...a, ...b }) {
+        // 事件拦截器，在提交event之前可以做点什么...
+        events[kebabcase(key)] = (...params) => {
+          let customKey = key;
+          if (a[key]) customKey = a[key](...params);
+          if (b[customKey]) b[customKey](...params);
+        };
+      }
+      return events;
     }
   },
   watch: {
@@ -72,25 +97,10 @@ export default {
         this.$emit('input', { ...this.value, ...v });
       }
     },
-    'value.data'() {
-      // 解决 element-ui table 特定情况下的bug，显示合计异常，列无法对齐的问题
-      let { showSummary, height, resize } = this.value;
-      if (showSummary || height) resize();
-    },
-    'value.showSummary'() {
-      let { height, resize } = this.value;
-      height && resize();
-    },
-    'value.isPage'() {
-      let { isResize, resize } = this.value;
-      isResize && resize();
-    },
-    'value.isResize'() {
-      this.registerResize();
-    }
+    'value.isResize': 'registerResize'
   },
   created() {
-    this.initApi();
+    this.value && this.initApi();
   },
   beforeDestroy() {
     this.registerResize(false);
@@ -103,10 +113,7 @@ export default {
         ...api.extendApi,
         ...api.globalApi,
         ...api.localApi,
-        columns: this.getValidColumns(
-          api.localApi.columns,
-          api.globalColumnApi
-        ),
+        columns: this.getColumns(api.localApi.columns, api.globalColumnApi),
         page: {
           ...api.pageApi,
           ...api.globalPageApi,
@@ -119,6 +126,7 @@ export default {
         this.LOAD = true;
         this.$nextTick(() => {
           this.value.$ref = this.$refs.table;
+          this.pageHeight = this.$refs.page.$el.clientHeight;
           this.registerResize();
         });
       });
@@ -167,12 +175,10 @@ export default {
         resize: e => {
           let table = this.value;
           let lightweightResize = () => {
-            let { container, page } = this.$refs;
+            let { container } = this.$refs;
             let containerH = container ? container.parentNode.clientHeight : 0;
-            let pageH = page ? page.$el.clientHeight : 0;
-            let resizeH = containerH - pageH;
-            if (resizeH <= 0) return;
-            table.height = resizeH;
+            if (containerH <= 0) return;
+            table.height = containerH;
           };
           let heavylweightResize = () => {
             this.$nextTick(() => {
@@ -216,7 +222,6 @@ export default {
             // emit page pageChange event
             this.value.page.currentPage = params[0];
             this.value.getData();
-            console.log('11');
             return 'pageChange';
           }
         }
@@ -226,9 +231,9 @@ export default {
       const globalApi = config.table || {};
       const globalPageApi = config.page || {};
       const globalColumnApi = config.column || {};
-      const localApi = this.value;
-      const localPageApi = this.value.page;
-      const localEventsApi = this.value.on;
+      const localApi = this.value || {};
+      const localPageApi = localApi.page || {};
+      const localEventsApi = localApi.on || {};
       return {
         // 默认配置
         extendApi,
@@ -245,7 +250,7 @@ export default {
         localEventsApi
       };
     },
-    getValidColumns(columns = [], globalColumnApi) {
+    getColumns(columns = [], globalColumnApi) {
       return columns.map(v => {
         let o = {
           ...globalColumnApi,
@@ -254,33 +259,10 @@ export default {
           display: v.display === undefined ? true : v.display
         };
         if (v.children) {
-          v.children = this.getValidColumns(v.children, globalColumnApi);
+          v.children = this.getColumns(v.children, globalColumnApi);
         }
         return o;
       });
-    },
-    getValidAttrs() {
-      if (!this.LOAD) return {};
-      let attrs = {};
-      let ignore = this.getApi().extendApi;
-      for (const key in this.value) {
-        if (!ignore.hasOwnProperty(key)) attrs[key] = this.value[key];
-      }
-      return attrs;
-    },
-    getValidEvents() {
-      if (!this.LOAD) return {};
-      let events = {};
-      let { eventsApi: a, localEventsApi: b } = this.getApi();
-      for (let key in { ...a, ...b }) {
-        // 事件拦截器，在提交event之前可以做点什么...
-        events[kebabcase(key)] = (...params) => {
-          let customKey = key;
-          if (a[key]) customKey = a[key](...params);
-          if (b[customKey]) b[customKey](...params);
-        };
-      }
-      return events;
     },
     renderColumns() {
       this.$slots.columns = getColumnsVnode(
@@ -288,7 +270,9 @@ export default {
         this.$scopedSlots,
         this.value.columns
       );
-      this.$nextTick(this.value.resize);
+      this.$nextTick(() => {
+        this.value.$ref.doLayout();
+      });
     },
     registerResize(isResize = this.value.isResize) {
       if (isResize) {
@@ -306,6 +290,7 @@ export default {
 .agel-table {
   width: 100%;
   height: auto;
+  overflow: hidden;
 }
 
 .agel-table .agel-pagination {
