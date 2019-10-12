@@ -13,7 +13,10 @@
       </template>
 
       <!-- columns  -->
-      <agel-column v-for="column in columns" :key="column.key" :column="column"></agel-column>
+      <template v-slot:default>
+        {{renderColumns()}}
+        <slot name="columns"></slot>
+      </template>
     </el-table>
 
     <!-- el-pagination -->
@@ -23,7 +26,7 @@
  
 <script>
 import { guid, kebabcase } from './tool';
-import agelColumn from './agel-column';
+import getColumnsVnode from './agel-column-vnode';
 export default {
   name: 'agel-table',
   install(vue, opts = {}) {
@@ -35,9 +38,7 @@ export default {
       table: this
     };
   },
-  components: {
-    agelColumn
-  },
+  components: {},
   props: {
     value: {
       type: Object,
@@ -60,14 +61,17 @@ export default {
     events() {
       return this.getValidEvents();
     },
-    columns() {
-      return this.getValidColumns(this.value.columns);
-    },
     isMultistep() {
       return this.value.columns.some(v => v.children && v.children.length > 0);
     }
   },
   watch: {
+    attach: {
+      deep: true,
+      handler(v) {
+        this.$emit('input', { ...this.value, ...v });
+      }
+    },
     'value.data'() {
       // 解决 element-ui table 特定情况下的bug，显示合计异常，列无法对齐的问题
       let { showSummary, height, resize } = this.value;
@@ -86,19 +90,23 @@ export default {
     }
   },
   created() {
-    this.init();
+    this.initApi();
   },
   beforeDestroy() {
     this.registerResize(false);
   },
   methods: {
-    init() {
+    initApi() {
       let api = this.getApi();
       let table = {
         ...api.defaultApi,
         ...api.extendApi,
         ...api.globalApi,
         ...api.localApi,
+        columns: this.getValidColumns(
+          api.localApi.columns,
+          api.globalColumnApi
+        ),
         page: {
           ...api.pageApi,
           ...api.globalPageApi,
@@ -208,6 +216,7 @@ export default {
             // emit page pageChange event
             this.value.page.currentPage = params[0];
             this.value.getData();
+            console.log('11');
             return 'pageChange';
           }
         }
@@ -236,6 +245,20 @@ export default {
         localEventsApi
       };
     },
+    getValidColumns(columns = [], globalColumnApi) {
+      return columns.map(v => {
+        let o = {
+          ...globalColumnApi,
+          ...v,
+          key: v.key == undefined ? guid() : v.key,
+          display: v.display === undefined ? true : v.display
+        };
+        if (v.children) {
+          v.children = this.getValidColumns(v.children, globalColumnApi);
+        }
+        return o;
+      });
+    },
     getValidAttrs() {
       if (!this.LOAD) return {};
       let attrs = {};
@@ -245,19 +268,6 @@ export default {
       }
       return attrs;
     },
-    getValidColumns(columns) {
-      if (!this.LOAD) return {};
-      let { globalColumnApi } = this.getApi();
-      return columns
-        .map(v => {
-          if (v.key == undefined || this.isMultistep) v.key = guid();
-          let display = v.display == undefined ? true : v.display;
-          let o = { ...v, ...globalColumnApi, display };
-          if (o.children) o.children = this.getValidColumns(o.children);
-          return o;
-        })
-        .filter(v => v.display);
-    },
     getValidEvents() {
       if (!this.LOAD) return {};
       let events = {};
@@ -265,11 +275,20 @@ export default {
       for (let key in { ...a, ...b }) {
         // 事件拦截器，在提交event之前可以做点什么...
         events[kebabcase(key)] = (...params) => {
-          if (a[key]) key = a[key](...params) || key;
-          if (b[key]) b[key](...params);
+          let customKey = key;
+          if (a[key]) customKey = a[key](...params);
+          if (b[customKey]) b[customKey](...params);
         };
       }
       return events;
+    },
+    renderColumns() {
+      this.$slots.columns = getColumnsVnode(
+        this.$createElement,
+        this.$scopedSlots,
+        this.value.columns
+      );
+      this.$nextTick(this.value.resize);
     },
     registerResize(isResize = this.value.isResize) {
       if (isResize) {

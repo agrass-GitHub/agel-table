@@ -2,17 +2,18 @@
 
 ## Props
 
-- 初始化完成后，会为 table（v-model) 参数添加额外的内置参数和方法，该参数所有选项都是可选，哪怕完全可以传递一个空对象，也会正常渲染
-- 根据场景需求可传递可选参数 `attach`，最终会合并到 table
+- 初始化完成后，会为 table（v-model) 参数添加额外的内置参数和方法
+- 根据场景需求可传递可选参数 `attach`，当发生变化最终同步合并到 table
 
 | 属性    | 类型   | 注释说明                                         |
 | ------- | ------ | ------------------------------------------------ |
 | v-model | Object | table 参数配置，不可为计算属性，必须使用 v-model |
-| attach  | Object | table 附属配置，可以为计算属性，会合并到 v-model |
+| attach  | Object | table 附属配置，可以为计算属性，会同步到 v-model |
 
 ## Table 参数
 
-- `$ref` 可直接调用 Element-ui Table Methods
+- 该参数所有都是可选，按需配置
+- `$ref` 可直接调用 Element-ui Table `Methods`
 - `request` 可参考 Element-ui Table `load` 属性
 
 | 属性        | 类型     | 注释说明                                                                                     |

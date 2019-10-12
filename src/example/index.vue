@@ -2,7 +2,7 @@
   <div class="app">
     <div class="left">
       <div class="table-box" :style="{height:table.isResize?'100%':'auto'}">
-        <agel-table v-model="table">
+        <agel-table v-model="table" :attach="attach">
           <template v-slot:append v-if="isSlotAppend">
             <p class="append-slot">table slot append .... loading ...</p>
           </template>
@@ -139,11 +139,16 @@ export default {
           },
           {
             label: '平台账户',
-            width: 120,
+            width: 250,
             // 多级表头必须出现 border
             children: [
               { label: '姓名', prop: 'name', display: true },
-              { label: '性别', prop: 'user', display: true }
+              {
+                label: '性别',
+                prop: 'user',
+                display: true,
+                slotHeader: 'cutomHeader'
+              }
             ],
             display: true
           },
@@ -188,6 +193,9 @@ export default {
             console.log('触发sizeChange:' + size);
           }
         }
+      },
+      attach: {
+        height: 500
       }
     };
   },
@@ -233,8 +241,8 @@ export default {
         }, 200);
       });
     },
-    rowClick({ row }) {
-      console.log('触发按钮点击事件', row);
+    rowClick(scoped) {
+      console.log('触发按钮点击事件', scoped);
     },
     getData() {
       this.table.getData();

@@ -1,5 +1,5 @@
 <template>
-  <el-table-column v-bind="column" :key="column._key">
+  <el-table-column v-bind="column">
     <!-- slotHeader -->
     <template v-if="isSlot(column.slotHeader)" v-slot:header="scope">
       {{renderSlot(column.slotHeader,scope)}}
@@ -26,6 +26,10 @@
 </template>
  
 <script>
+/**
+ * 该组件被 agel-column-vnode jsx 代替, 不再使用
+ * 解决多级表头在动态显隐列功能下的显示异常的问题
+ */
 export default {
   name: 'agel-column',
   inject: ['table'],

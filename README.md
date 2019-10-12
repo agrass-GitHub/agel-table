@@ -11,8 +11,8 @@
 - 更少的代码量，更简单的思想，更快的开发速度
 - 支持 element-ui table 组件的所有 api, slot, event, method
 - 解决 element-ui table 一些潜在问题
-- [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
-- [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
+  - [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
+  - [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
 - 添加额外的扩展功能
   - 集成分页
   - 数据代理
@@ -83,16 +83,17 @@ Vue.component('agel-table', agelTable);
 ## Props
 
 - 初始化完成后，会为 table（v-model) 参数添加额外的内置参数和方法
-- 根据场景需求可传递可选参数 `attach`，最终会合并到 table
+- 根据场景需求可传递可选参数 `attach`，当发生变化最终同步合并到 table
 
 | 属性    | 类型   | 注释说明                                         |
 | ------- | ------ | ------------------------------------------------ |
 | v-model | Object | table 参数配置，不可为计算属性，必须使用 v-model |
-| attach  | Object | table 附属配置，可以为计算属性，会合并到 v-model |
+| attach  | Object | table 附属配置，可以为计算属性，会同步到 v-model |
 
 ## Table 参数
 
-- `$ref` 可直接调用 Element-ui Table Methods
+- 该参数所有都是可选，按需配置
+- `$ref` 可直接调用 Element-ui Table `Methods`
 - `request` 可参考 Element-ui Table `load` 属性
 
 | 属性        | 类型     | 注释说明                                                                                     |
@@ -116,7 +117,7 @@ Vue.component('agel-table', agelTable);
 
 ## Column 参数
 
-- 值得提醒的是，当你修改列的属性，为了更好的更新，table 是会重新渲染所有的列
+- 当列包含多级表头时，为了更好的更新，columns 每次变化是会重新渲染所有的列
 
 | 属性       | 类型    | 注释说明                         |
 | ---------- | ------- | -------------------------------- |
@@ -168,6 +169,10 @@ Vue.component('agel-table', agelTable);
 - [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
 - [element-ui pagination 组件](https://element.eleme.cn/#/zh-CN/component/pagination)
 
-# 更新日志
+# 其他
 
 - [agel-table 更新日志](https://github.com/agrass-GitHub/agel-table/blob/master/doc/update-log.md)
+
+- [agel-table 总结思考](https://github.com/agrass-GitHub/agel-table/blob/master/doc/summary.md)
+
+- [agel-table 接口文档](https://github.com/agrass-GitHub/agel-table/blob/master/doc/api.md)
