@@ -10,14 +10,14 @@
 
 - 更少的代码量，更简单的思想，更快的开发速度
 - 支持 element-ui table 组件的所有 api, slot, event, method
-- 解决 element-ui table 一些潜在问题
-  - [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
-  - [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
 - 添加额外的扩展功能
   - 集成分页
   - 数据代理
   - 自适应容器大小
   - 动态显隐列
+- 解决 element-ui table 一些潜在问题
+  - [特定条件下列无法对齐](https://codepen.io/agrass-github/pen/BaaNRae)
+  - [特定条件下显示合计异常](https://codepen.io/agrass-github/pen/ExxjXVO)
 
 ## 演示
 
@@ -99,8 +99,9 @@ Vue.component('agel-table', agelTable);
 | 属性        | 类型     | 注释说明                                                                                       |
 | ----------- | -------- | ---------------------------------------------------------------------------------------------- |
 | ......      | Any      | All Element-ui Table Attributes                                                                |
-| data        | Array    | 数据                                                                                           |
 | \$ref       | Object   | Element-ui Table Vue 实例，内置属性不需要传递                                                  |
+| data        | Array    | 数据                                                                                           |
+| columns     | Array    | 列配置                                                                                         |
 | loading     | Boolean  | 开启加载状态                                                                                   |
 | isPage      | Boolean  | 显示分页组件                                                                                   |
 | isResize    | Boolean  | 是否自适应父容器高度，跟随窗口调整而变化                                                       |
@@ -115,9 +116,7 @@ Vue.component('agel-table', agelTable);
 | getData     | Function | 获取列表数据的函数，自动调用 request，同时加载 loading，回填 data 和分页，内置方法不需要传递   |
 | resize      | Function | 自适应容器高度，内置方法不需要传递                                                             |
 
-## Column 参数
-
-- 当列包含多级表头时，为了更好的更新，columns 每次变化是会重新渲染所有的列
+## column 参数
 
 | 属性       | 类型    | 注释说明                                |
 | ---------- | ------- | --------------------------------------- |
@@ -165,15 +164,15 @@ Vue.component('agel-table', agelTable);
 | -      | 自定义列的内容，需要在 column 的 slotColumn 属性指定插槽名称   |
 | -      | 自定义表头的内容，需要在 column 的 slotHeader 属性指定插槽名称 |
 
-# 相关链接
+## 相关链接
 
 - [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
 - [element-ui pagination 组件](https://element.eleme.cn/#/zh-CN/component/pagination)
 
-# 其他
+# 更多
 
-- [agel-table 更新日志](https://github.com/agrass-GitHub/agel-table/blob/master/doc/update-log.md)
+- [agel-table 接口文档](https://github.com/agrass-GitHub/agel-table/blob/master/doc/api.md)
 
 - [agel-table 总结思考](https://github.com/agrass-GitHub/agel-table/blob/master/doc/summary.md)
 
-- [agel-table 接口文档](https://github.com/agrass-GitHub/agel-table/blob/master/doc/api.md)
+* [agel-table 更新日志](https://github.com/agrass-GitHub/agel-table/blob/master/doc/update-log.md)

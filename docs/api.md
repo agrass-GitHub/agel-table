@@ -19,8 +19,9 @@
 | 属性        | 类型     | 注释说明                                                                                       |
 | ----------- | -------- | ---------------------------------------------------------------------------------------------- |
 | ......      | Any      | All Element-ui Table Attributes                                                                |
-| data        | Array    | 数据                                                                                           |
 | \$ref       | Object   | Element-ui Table Vue 实例，内置属性不需要传递                                                  |
+| data        | Array    | 数据                                                                                           |
+| columns     | Array    | 列配置                                                                                         |
 | loading     | Boolean  | 开启加载状态                                                                                   |
 | isPage      | Boolean  | 显示分页组件                                                                                   |
 | isResize    | Boolean  | 是否自适应父容器高度，跟随窗口调整而变化                                                       |
@@ -35,9 +36,7 @@
 | getData     | Function | 获取列表数据的函数，自动调用 request，同时加载 loading，回填 data 和分页，内置方法不需要传递   |
 | resize      | Function | 自适应容器高度，内置方法不需要传递                                                             |
 
-## Column 参数
-
-- 当列包含多级表头时，为了更好的更新，columns 每次变化是会重新渲染所有的列
+## column 参数
 
 | 属性       | 类型    | 注释说明                                |
 | ---------- | ------- | --------------------------------------- |
@@ -84,3 +83,8 @@
 | expand | 展开行的内容                                                   |
 | -      | 自定义列的内容，需要在 column 的 slotColumn 属性指定插槽名称   |
 | -      | 自定义表头的内容，需要在 column 的 slotHeader 属性指定插槽名称 |
+
+## 相关链接
+
+- [element-ui table 组件](https://element.eleme.cn/#/zh-CN/component/table)
+- [element-ui pagination 组件](https://element.eleme.cn/#/zh-CN/component/pagination)
