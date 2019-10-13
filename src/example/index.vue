@@ -2,7 +2,7 @@
   <div class="app">
     <div class="left">
       <div class="table-box" :style="{height:table.isResize?'100%':'auto'}">
-        <agel-table v-model="table" :attach="attach">
+        <agel-table v-model="table">
           <template v-slot:append v-if="isSlotAppend">
             <p class="append-slot">table slot append .... loading ...</p>
           </template>
@@ -20,9 +20,6 @@
           </template>
         </agel-table>
       </div>
-      <!-- <el-table :data="table.data" :height="table.height" showSummary border style="width:100%">
-        <el-table-column v-for="column in table.columns" :key="column.key" v-bind="column"></el-table-column>
-      </el-table>-->
     </div>
     <div class="right">
       <div class="input-box">
@@ -98,8 +95,7 @@ export default {
         stripe: false,
         rowKey: 'id',
         lazy: true,
-        height: 300,
-        data: [],
+        height: 500,
         highlightCurrentRow: false,
         columns: [
           {
@@ -147,7 +143,9 @@ export default {
                 label: '性别',
                 prop: 'user',
                 display: true,
-                slotHeader: 'cutomHeader'
+                width: 120,
+                slotHeader: 'cutomHeader',
+                slotColumn: 'cutomColumn'
               }
             ],
             display: true
@@ -193,20 +191,18 @@ export default {
             console.log('触发sizeChange:' + size);
           }
         }
-      },
-      attach: {}
+      }
     };
   },
-  mounted() {},
+  mounted() {
+    this.table.getData();
+  },
   computed: {
     displayColumns() {
       return this.table.columns.filter(item => item.display != undefined);
     },
     mainColumn() {
       return this.table.columns.find(v => v.label == '用户');
-    },
-    cusotmColumns() {
-      return this.table.columns.filter(v => v.children == undefined);
     }
   },
   watch: {

@@ -28,7 +28,7 @@ props: {
 
 所以选择了只定义一个对象参树 `value`，由`v-model` 传递，用户只需要传递自己要覆盖的的配置，其他额外参数由组件内部初始化之后自动添加在`value`中。
 
-用户不需要定义通用分页排序加载等参数，也可直接通过 `this.table.xxxx` 来进行使用。
+用户不需要手动定义通用分页排序加载等参数，也可直接通过 `this.table.xxxx` 来进行使用。
 
 ## 遇到哪些比较难的问题？
 
@@ -38,7 +38,7 @@ props: {
 
 1. 因为 el-table 的多级表头，是在 column 中嵌套 column，这里就只有写个递归组件，但是 slot 就卡在这里，无法在进行向下传递。slot 穿透流程变成：自定义 slot -> agel-table slot -> agel-column slot -> 递归循环自身（x）。
 
-2. 探索 N 久之后，利用`provide,inject`直接向下传递 table `$scopedSlots`,不用层次传递，使用 `$slots,$scopedSlots`生成 vnode，直接渲染在模板上, 解决了这个问题，算是很冷门的解决方案。slot 穿透流程变成：自定义 slot -> agel-column slot -> 递归循环自身（√）。
+2. 探索 N 久之后，利用`provide,inject`直接向下传递 table `$scopedSlots`,不用层层传递，使用 `$slots,$scopedSlots`生成 vnode，直接渲染在模板上, 解决了这个问题，算是很冷门的解决方案。slot 穿透流程变成：自定义 slot -> agel-column slot -> 递归循环自身（√）。
 
 3. 此时组件结构：el-table -> agel-column(v-for)-> el-table-column，在做动态显隐列功能时，修改多级表头列的 display 属性，页面列的渲染会出现递减，递减数量为多级表头的 children 的长度，把结构改成 el-table -> el-table-column(v-for)，则不会出现这个问题，可是这样写又无法递归循环 el-table-column，成了死循环。
 
@@ -52,13 +52,13 @@ props: {
 
 [演示](https://codepen.io/agrass-github/pen/ExxjXVO)，版本 2.12，触发条件：固定高度，异步加载数据，因为高度不够原因，合计行会被盖住不会显示出来。
 
-重新调用 table doLayout 解决。
+在渲染列时候自动调用 table doLayout 解决。
 
 ### 3.element-ui table 在特定情况下列无法对齐
 
 [演示](https://codepen.io/agrass-github/pen/BaaNRae)，版本 2.12，触发条件:固定高度同时出现横向滚动条 -> 异步加载数据 -> 数据超出，出现竖向滚动条 -> 拉横向滚动条至最右侧。
 
-重新调用 table doLayout 解决。
+在渲染列时候自动调用 table doLayout 解决。
 
 ### 5.参数无法定义在计算属性上
 

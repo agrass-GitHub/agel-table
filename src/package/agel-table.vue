@@ -32,6 +32,7 @@
  
 <script>
 import { guid, kebabcase } from './tool';
+import getApi from './api';
 import getColumnsVnode from './columns-vnode';
 export default {
   name: 'agel-table',
@@ -51,8 +52,7 @@ export default {
       type: Object
     },
     attach: {
-      type: Object,
-      defualt: () => new Object()
+      type: Object
     }
   },
   data() {
@@ -80,7 +80,7 @@ export default {
       let events = {};
       let { eventsApi: a, localEventsApi: b } = this.getApi();
       for (let key in { ...a, ...b }) {
-        // 事件拦截器，在提交event之前可以做点什么...
+        // 事件拦截，在提交event之前可以做点什么...
         events[kebabcase(key)] = (...params) => {
           let customKey = key;
           if (a[key]) customKey = a[key](...params);
@@ -106,6 +106,7 @@ export default {
     this.registerResize(false);
   },
   methods: {
+    getApi: getApi,
     initApi() {
       let api = this.getApi();
       let table = {
@@ -119,7 +120,7 @@ export default {
           ...api.globalPageApi,
           ...api.localPageApi
         },
-        ...this.attach
+        ...api.attachApi
       };
       this.$emit('input', table);
       this.$nextTick(() => {
@@ -131,147 +132,29 @@ export default {
         });
       });
     },
-    getApi() {
-      const extendApi = {
-        $ref: undefined,
-        loading: false,
-        isPage: true,
-        isResize: false,
-        columns: [],
-        order: '',
-        orderColumn: '',
-        page: {},
-        on: {},
-        queryProps: {
-          page: 'page',
-          pageSize: 'pageSize',
-          order: 'order',
-          orderColumn: 'orderColumn'
-        },
-        request: null,
-        getQuery() {
-          let { page, pageSize, order, orderColumn } = this.queryProps;
-          return {
-            [page]: this.page.currentPage,
-            [pageSize]: this.page.pageSize,
-            [order]: this.order,
-            [orderColumn]: this.orderColumn
-          };
-        },
-        getData() {
-          if (!this.request) return;
-          this.loading = true;
-          new Promise(resolve => this.request(this.getQuery(), resolve))
-            .then(({ data = this.data, total = this.page.total }) => {
-              this.loading = false;
-              this.data = data;
-              this.page.total = total;
-            })
-            .catch(err => {
-              this.loading = false;
-              console.error('获取数据失败' + err);
-            });
-        },
-        resize: e => {
-          let table = this.value;
-          let lightweightResize = () => {
-            let { container } = this.$refs;
-            let containerH = container ? container.parentNode.clientHeight : 0;
-            if (containerH <= 0) return;
-            table.height = containerH;
-          };
-          let heavylweightResize = () => {
-            this.$nextTick(() => {
-              lightweightResize();
-              table.$ref && table.$ref.doLayout();
-            });
-          };
-          // windowResize use lightweight
-          e && e.type == 'resize' ? lightweightResize() : heavylweightResize();
-        }
-      };
-      const defaultApi = {
-        data: [],
-        height: undefined
-      };
-      const pageApi = {
-        pageSize: 20,
-        pageSizes: [10, 20, 50, 100],
-        currentPage: 1,
-        layout: 'total, sizes, prev, pager, next, jumper',
-        class: 'agel-pagination',
-        total: 0
-      };
-      const eventsApi = {
-        sortChange: ({ column, prop, order }) => {
-          if (column.sortable !== 'custom') return;
-          this.value.order = order;
-          this.value.orderColumn = prop;
-          this.value.getData();
-        },
-        sizeChange: size => {
-          this.value.page.pageSize = size;
-          this.value.getData();
-        },
-        // 重名事件 currentChange
-        currentChange: (...params) => {
-          if (isNaN(params[0])) {
-            // emit table currentChange event
-            return 'currentChange';
-          } else {
-            // emit page pageChange event
-            this.value.page.currentPage = params[0];
-            this.value.getData();
-            return 'pageChange';
-          }
-        }
-      };
-
-      const config = this.$agelTableConfig || {};
-      const globalApi = config.table || {};
-      const globalPageApi = config.page || {};
-      const globalColumnApi = config.column || {};
-      const localApi = this.value || {};
-      const localPageApi = localApi.page || {};
-      const localEventsApi = localApi.on || {};
-      return {
-        // 默认配置
-        extendApi,
-        defaultApi,
-        eventsApi,
-        pageApi,
-        // 全局配置
-        globalApi,
-        globalPageApi,
-        globalColumnApi,
-        // 局部配置
-        localApi,
-        localPageApi,
-        localEventsApi
-      };
-    },
     getColumns(columns = [], globalColumnApi) {
       return columns.map(v => {
-        let o = {
+        const o = {
           ...globalColumnApi,
           ...v,
           key: v.key == undefined ? guid() : v.key,
           display: v.display === undefined ? true : v.display
         };
-        if (v.children) {
+        if (v.children && v.children.length > 0) {
           v.children = this.getColumns(v.children, globalColumnApi);
         }
         return o;
       });
     },
     renderColumns() {
+      if (this.value.columns.length == 0) return;
       this.$slots.columns = getColumnsVnode(
         this.$createElement,
         this.$scopedSlots,
         this.value.columns
       );
       this.$nextTick(() => {
-        this.value.$ref.doLayout();
+        this.$refs.table.doLayout();
       });
     },
     registerResize(isResize = this.value.isResize) {
@@ -292,7 +175,6 @@ export default {
   height: auto;
   overflow: hidden;
 }
-
 .agel-table .agel-pagination {
   overflow: hidden;
   padding: 10px;
