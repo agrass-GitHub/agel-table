@@ -29,7 +29,7 @@
 | order       | String   | 当前排序状态                                                                                   |
 | orderColumn | String   | 当前排序列名称                                                                                 |
 | page        | Object   | Page 组件相关配置                                                                              |
-| on          | Object   | Table Page 组件的 Event 事件                                                                   |
+| on          | Object   | Table 和 Page 组件的 Event 事件                                                                |
 | queryProps  | Object   | 指定传递给 request 方法的的参数属性值 `{page,pageSize,order,orderColumn}`                      |
 | getQuery    | Function | 返回 query 参数 `{page,pageSize,order,orderColumn}`                                            |
 | request     | Function | 获取列表数据的接口函数,参数:`(query, resolve)`,返回:`resolve({data,total})`或者`resolve(data)` |
