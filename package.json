@@ -16,7 +16,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/lib/index.js && npm publish",
+    "lib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/package/index.js && npm publish",
     "dist": "vue-cli-service build && gh-pages -d dist"
   },
   "dependencies": {},
