@@ -49,16 +49,18 @@ export default {
   props: {
     value: {
       required: true,
-      type: Object
+      type: Object,
+      default: () => new Object()
     },
     attach: {
-      type: Object
+      type: Object,
+      default: () => new Object()
     }
   },
   data() {
     return {
-      pageHeight: 0,
-      LOAD: false
+      LOAD: false,
+      pageHeight: 0
     };
   },
   computed: {
@@ -93,8 +95,8 @@ export default {
   watch: {
     attach: {
       deep: true,
-      handler(v) {
-        this.$emit('input', { ...this.value, ...v });
+      handler() {
+        this.initApi();
       }
     },
     'value.isResize': 'registerResize'
@@ -119,15 +121,16 @@ export default {
           ...api.pageApi,
           ...api.globalPageApi,
           ...api.localPageApi
-        },
-        ...api.attachApi
+        }
       };
       this.$emit('input', table);
+      if (this.LOAD) return;
       this.$nextTick(() => {
         this.LOAD = true;
         this.$nextTick(() => {
-          this.value.$ref = this.$refs.table;
-          this.pageHeight = this.$refs.page.$el.clientHeight;
+          let { page, table } = this.$refs;
+          this.pageHeight = page ? page.$el.clientHeight : 0;
+          this.value.$ref = table;
           this.registerResize();
         });
       });
@@ -147,11 +150,12 @@ export default {
       });
     },
     renderColumns() {
-      if (this.value.columns.length == 0) return;
+      let { columns } = this.value;
+      if (!columns || columns.length === 0) return;
       this.$slots.columns = getColumnsVnode(
         this.$createElement,
         this.$scopedSlots,
-        this.value.columns
+        columns
       );
       this.$nextTick(() => {
         this.$refs.table.doLayout();

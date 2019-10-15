@@ -30,9 +30,11 @@ export default function() {
       this.loading = true;
       new Promise((resolve) => this.request(this.getQuery(), resolve))
         .then((res) => {
-          let { data, total } = Array.isArray(res) ? { data: res } : res;
-          this.data = data || this.data;
-          this.page.total = total || this.page.total;
+          let { data, total } = Array.isArray(res)
+            ? { data: res, total: res.length }
+            : res;
+          this.data = data;
+          this.page.total = total;
           this.loading = false;
         })
         .catch((err) => {
@@ -45,7 +47,7 @@ export default function() {
       let lightweightResize = () => {
         let { container } = this.$refs;
         let containerH = container ? container.parentNode.clientHeight : 0;
-        if (containerH <= 0) return;
+        if (!containerH || containerH <= 0) return;
         table.height = containerH;
       };
       let heavylweightResize = () => {
@@ -84,9 +86,9 @@ export default function() {
     // 重名事件 currentChange
     currentChange: (...params) => {
       // emit table currentChange event
-      if (params.length == 2) return 'currentChange';
+      if (params.length === 2) return 'currentChange';
       // emit page pageChange event
-      if (params.length == 1) {
+      if (params.length === 1) {
         this.value.page.currentPage = params[0];
         this.value.getData();
         return 'pageChange';
@@ -98,10 +100,9 @@ export default function() {
   const globalApi = config.table || {};
   const globalPageApi = config.page || {};
   const globalColumnApi = config.column || {};
-  const localApi = this.value || {};
+  const localApi = { ...this.value, ...this.attach };
   const localPageApi = localApi.page || {};
   const localEventsApi = localApi.on || {};
-  const attachApi = this.attach || {};
   return {
     // 默认配置
     extendApi,
@@ -115,8 +116,7 @@ export default function() {
     // 局部配置
     localApi,
     localPageApi,
-    localEventsApi,
-    attachApi
+    localEventsApi
     // 覆盖顺序由下往上⬆
   };
 }

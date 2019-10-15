@@ -8,7 +8,7 @@
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
 
-- 更少的代码量，更简单的思想，更快的开发速度
+- 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
 - 添加额外的扩展功能
   - 集成分页
@@ -147,12 +147,12 @@ Vue.component('agel-table', agelTable);
 - page 组件的`current-change`,`prev-click`,`next-click`合并为 pageChange
 - 当分页或者排序（sortable 为 custom）发生变化，table 会自动触发 `getData` 事件
 
-| 属性       | 注释说明                               |
-| ---------- | -------------------------------------- |
-| ......     | All Element-ui Table Pagination Events |
-| pageChange | 当 page.currentPage 发生变化时触发     |
-| sizeChange | 当 page.pageSize 发生变化时触发        |
-| sortChange | 当 排序发生变化时触发                  |
+| 属性       | 注释说明                                   |
+| ---------- | ------------------------------------------ |
+| ......     | All Element-ui Table and Pagination Events |
+| pageChange | 当 page.currentPage 发生变化时触发         |
+| sizeChange | 当 page.pageSize 发生变化时触发            |
+| sortChange | 当 排序发生变化时触发                      |
 
 ## Slot 插槽
 
