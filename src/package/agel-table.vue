@@ -2,31 +2,37 @@
   <div
     v-if="LOAD"
     v-loading="value.loading"
-    :style="{'height':value.height?value.height+'px':'auto'}"
-    ref="container"
+    :style="styles.container"
     class="agel-table"
+    ref="container"
   >
     <!-- el-table -->
     <el-table v-bind="attrs" v-on="events" ref="table" style="width:100%">
       <!-- append  -->
       <template v-slot:append>
-        <slot name="append"></slot>
+        <slot name="append" />
       </template>
 
       <!-- empty  -->
       <template v-slot:empty>
-        <slot name="empty"></slot>
+        <slot name="empty" />
       </template>
 
       <!-- columns  -->
       <template v-slot:default>
         {{renderColumns()}}
-        <slot name="columns"></slot>
+        <slot name="columns" />
       </template>
     </el-table>
 
     <!-- el-pagination -->
-    <el-pagination ref="page" v-if="value.isPage" v-bind="value.page" v-on="events"></el-pagination>
+    <el-pagination
+      v-if="value.isPage"
+      v-bind="value.page"
+      v-on="events"
+      :style="styles.page"
+      ref="page"
+    ></el-pagination>
   </div>
 </template>
  
@@ -40,12 +46,6 @@ export default {
     vue.prototype.$agelTableConfig = opts;
     vue.component(opts.name || this.name, this);
   },
-  provide() {
-    return {
-      table: this
-    };
-  },
-  components: {},
   props: {
     value: {
       required: true,
@@ -59,8 +59,7 @@ export default {
   },
   data() {
     return {
-      LOAD: false,
-      pageHeight: 0
+      LOAD: false
     };
   },
   computed: {
@@ -72,7 +71,7 @@ export default {
         if (!extend.hasOwnProperty(key)) attrs[key] = this.value[key];
       }
       if (attrs.height && this.value.isPage) {
-        let proxyH = Number(attrs.height) - this.pageHeight;
+        let proxyH = Number(attrs.height) - this.value.page.height;
         attrs.height = proxyH < 0 ? 0 : proxyH;
       }
       return attrs;
@@ -90,19 +89,24 @@ export default {
         };
       }
       return events;
+    },
+    styles() {
+      let { height, page } = this.value;
+      return {
+        container: { height: height ? height + 'px' : 'auto' },
+        page: { height: page.height ? page.height + 'px' : 'auto' }
+      };
     }
   },
   watch: {
     attach: {
       deep: true,
-      handler() {
-        this.initApi();
-      }
+      handler: 'initApi'
     },
     'value.isResize': 'registerResize'
   },
   created() {
-    this.value && this.initApi();
+    this.initApi();
   },
   beforeDestroy() {
     this.registerResize(false);
@@ -127,10 +131,9 @@ export default {
       if (this.LOAD) return;
       this.$nextTick(() => {
         this.LOAD = true;
+        table.immediate && table.getData();
         this.$nextTick(() => {
-          let { page, table } = this.$refs;
-          this.pageHeight = page ? page.$el.clientHeight : 0;
-          this.value.$ref = table;
+          this.value.$ref = this.$refs.table;
           this.registerResize();
         });
       });
@@ -179,9 +182,9 @@ export default {
   height: auto;
   overflow: hidden;
 }
-.agel-table .agel-pagination {
-  overflow: hidden;
-  padding: 10px;
+.agel-pagination {
+  display: flex;
+  align-items: center;
 }
 .agel-table .el-table__empty-text {
   position: absolute;

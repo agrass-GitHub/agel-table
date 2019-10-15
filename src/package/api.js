@@ -2,6 +2,7 @@ export default function() {
   const extendApi = {
     $ref: undefined,
     loading: false,
+    immediate: false,
     isPage: true,
     isResize: false,
     columns: [],
@@ -65,6 +66,7 @@ export default function() {
     height: undefined
   };
   const pageApi = {
+    height: 45,
     pageSize: 20,
     pageSizes: [10, 20, 50, 100],
     currentPage: 1,

@@ -7,6 +7,12 @@
 
 # 版本更新日志
 
+## v.0.0.9
+
+- [x] `新增` 为了更好的计算高度，page 参数添加 height 属性
+- [x] `新增` table 参数添加 immediate 属性，初始化完成自动调用 getData
+- [ ] `新增` 完善在线文档，用 vuepress 展示 api 和 例子
+
 ## v.0.0.8
 
 - [x] `修复` attach 参数对属性 columns page 合并失败

@@ -23,6 +23,7 @@
 | data        | Array    | 数据                                                                                           |
 | columns     | Array    | 列配置                                                                                         |
 | loading     | Boolean  | 开启加载状态                                                                                   |
+| immediate   | Boolean  | 初始化完成之后自动调用 getData                                                                 |
 | isPage      | Boolean  | 显示分页组件                                                                                   |
 | isResize    | Boolean  | 是否自适应父容器高度，跟随窗口调整而变化                                                       |
 | class       | String   | Table 的 Class 名称                                                                            |
@@ -55,6 +56,7 @@
 | ----------- | ----------------------------------------- |
 | ......      | All Element-ui Pagination Attributes      |
 | class       | 'agel-pagination''                        |
+| height      | 48                                        |
 | layout      | 'total, sizes, prev, pager, next, jumper' |
 | pageSizes   | [10, 20, 50, 100]                         |
 | pageSizes   | 20                                        |
