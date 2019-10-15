@@ -67,12 +67,12 @@
 - page 组件的`current-change`,`prev-click`,`next-click`合并为 pageChange
 - 当分页或者排序（sortable 为 custom）发生变化，table 会自动触发 `getData` 事件
 
-| 属性       | 注释说明                               |
-| ---------- | -------------------------------------- |
-| ......     | All Element-ui Table Pagination Events |
-| pageChange | 当 page.currentPage 发生变化时触发     |
-| sizeChange | 当 page.pageSize 发生变化时触发        |
-| sortChange | 当 排序发生变化时触发                  |
+| 属性       | 注释说明                                   |
+| ---------- | ------------------------------------------ |
+| ......     | All Element-ui Table and Pagination Events |
+| pageChange | 当 page.currentPage 发生变化时触发         |
+| sizeChange | 当 page.pageSize 发生变化时触发            |
+| sortChange | 当 排序发生变化时触发                      |
 
 ## Slot 插槽
 
