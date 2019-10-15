@@ -83,11 +83,10 @@ export default function() {
     },
     // 重名事件 currentChange
     currentChange: (...params) => {
-      if (isNaN(params[0])) {
-        // emit table currentChange event
-        return 'currentChange';
-      } else {
-        // emit page pageChange event
+      // emit table currentChange event
+      if (params.length == 2) return 'currentChange';
+      // emit page pageChange event
+      if (params.length == 1) {
         this.value.page.currentPage = params[0];
         this.value.getData();
         return 'pageChange';
