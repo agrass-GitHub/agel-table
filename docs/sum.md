@@ -24,15 +24,15 @@ props: {
 
 但这样会导致一个问题，父组件参数过于分散，参考如下场景：
 
-在使用一个 table 组件时，通常会在 data 函数中定义 table 状态的变量 data，loading，order，orderColumn，currentPage，pageSize，pageSizes，pagetotal，同时还需要在 mehotd 中定义一个 getData 的函数，里面的过程也是重复的，加载 loading->获取分页排序参数->获取数据->回填数据分页->关闭 loading，变量定义过多会显得杂乱不好维护，如果页面上有一个 table 尚且如此，如果有三四个 table，那岂不是 data1，data2，data3...
+> 在使用一个 table 组件时，通常会在 data 函数中定义 table 状态的变量 data，loading，order，orderColumn，currentPage，pageSize，pageSizes，pagetotal，同时还需要在 mehotd 中定义一个 getData 的函数，里面的过程也是重复的，加载 loading->获取分页排序参数->获取数据->回填数据分页->关闭 loading，变量定义过多会显得杂乱不好维护，如果页面上有一个 table 尚且如此，如果有三四个 table，那岂不是 data1，data2，data3...
 
-所以选择了只定义一个对象参树 `value`，由`v-model` 传递，用户只需要传递自己要覆盖的的配置，其他额外参数由组件内部初始化之后自动添加在`value`中。
+所以选择了只定义一个对象参数 table，由`v-model` 传递，用户只需要传递自己要覆盖的的配置，其他额外参数由组件内部初始化之后自动添加在 table 中。
 
 用户不需要手动定义通用分页排序加载等参数，也可直接通过 `this.table.xxxx` 来进行使用。
 
 ## 遇到哪些比较难的问题？
 
-### 1.多级表头 slot 无法穿透 , 多级表头显隐列展示异常
+### 多级表头 slot 无法穿透 , 多级表头显隐列展示异常
 
 这是漫长的踩坑之路，有以下几个阶段。
 
@@ -46,21 +46,21 @@ props: {
 
 5. 无奈只有判断当前列中是否存在多级表头，如果存在，当列属性发生变化，更新列 key，重新渲染所有的列，这倒是可以解决问题，只不过性能上不太合理，而且重新渲染会出现列表闪烁的情况。
 
-6. 最终版：把 agel-column 用 jsx 改写成函数，直接递归生成 el-table-column vnode，直接渲染在 el-table 下，就不存在嵌套，解决了问题。
+6. 把 agel-column 用 jsx 改写成函数，直接递归生成 el-table-column vnode，直接渲染在 el-table 下，就不存在嵌套，解决问题。
 
-### 2.element-ui table 在特定情况下显示合计异常
+7. 又发现多级表头在显示隐藏子列时，当 children 为空时候，显示列异常。
 
-[演示](https://codepen.io/agrass-github/pen/ExxjXVO)，版本 2.12，触发条件：固定高度，异步加载数据，因为高度不够原因，合计行会被盖住不会显示出来。
+8. 把过滤数组逻辑从 jsx getColumnsVnode 函数抽离出来，由 getColumns 函数执行，把 value.columns 抽离到计算属独立维护，解决。
+
+### element-ui table 一些潜在问题
+
+- [显示合计异常 bug 重现](https://codepen.io/agrass-github/pen/ExxjXVO)
+
+- [列无法对齐 bug 重现](https://codepen.io/agrass-github/pen/BaaNRae)
 
 在渲染列时候自动调用 table doLayout 解决。
 
-### 3.element-ui table 在特定情况下列无法对齐
-
-[演示](https://codepen.io/agrass-github/pen/BaaNRae)，版本 2.12，触发条件:固定高度同时出现横向滚动条 -> 异步加载数据 -> 数据超出，出现竖向滚动条 -> 拉横向滚动条至最右侧。
-
-在渲染列时候自动调用 table doLayout 解决。
-
-### 5.参数无法定义在计算属性上
+### 参数无法定义在计算属性上
 
 由于在 api 的设计上，table 参数是由 v-model 传递，再由组件内部向上传递其他内置参数，就导致了 table 参数无法设置为计算属性。如何解决 table 属性是动态变化的场景呢？解决办法有两个:
 

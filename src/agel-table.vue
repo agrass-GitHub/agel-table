@@ -1,13 +1,13 @@
 <template>
   <div
+    ref="container"
     v-if="LOAD"
     v-loading="value.loading"
     :style="styles.container"
     class="agel-table"
-    ref="container"
   >
     <!-- el-table -->
-    <el-table v-bind="attrs" v-on="events" ref="table" style="width:100%">
+    <el-table ref="table" v-bind="attrs" v-on="events" style="width:100%">
       <!-- append  -->
       <template v-slot:append>
         <slot name="append" />
@@ -27,11 +27,11 @@
 
     <!-- el-pagination -->
     <el-pagination
+      ref="page"
       v-if="value.isPage"
       v-bind="value.page"
       v-on="events"
       :style="styles.page"
-      ref="page"
     ></el-pagination>
   </div>
 </template>
@@ -83,12 +83,16 @@ export default {
       for (let key in { ...a, ...b }) {
         // 事件拦截，在提交event之前可以做点什么...
         events[kebabcase(key)] = (...params) => {
-          let customKey = key;
-          if (a[key]) customKey = a[key](...params);
+          let customKey;
+          if (a[key]) customKey = a[key](...params) || key;
           if (b[customKey]) b[customKey](...params);
         };
       }
       return events;
+    },
+    columns() {
+      let api = this.getApi();
+      return this.getColumns(api.localApi.columns, api.globalColumnApi);
     },
     styles() {
       let { height, page } = this.value;
@@ -120,7 +124,6 @@ export default {
         ...api.extendApi,
         ...api.globalApi,
         ...api.localApi,
-        columns: this.getColumns(api.localApi.columns, api.globalColumnApi),
         page: {
           ...api.pageApi,
           ...api.globalPageApi,
@@ -139,27 +142,22 @@ export default {
       });
     },
     getColumns(columns = [], globalColumnApi) {
-      return columns.map(v => {
-        const o = {
-          ...globalColumnApi,
-          ...v,
-          key: v.key == undefined ? guid() : v.key,
-          display: v.display === undefined ? true : v.display
-        };
-        if (v.children && v.children.length > 0) {
-          v.children = this.getColumns(v.children, globalColumnApi);
-        }
-        return o;
-      });
+      return columns
+        .map(v => {
+          v.key = v.key == undefined ? guid() : v.key;
+          v.display = v.display === undefined ? true : v.display;
+          const o = { ...globalColumnApi, ...v };
+          if (o.children && o.children.length > 0) {
+            o.children = this.getColumns(o.children, globalColumnApi);
+          }
+          return o;
+        })
+        .filter(v => v.display);
     },
     renderColumns() {
-      let { columns } = this.value;
+      let columns = this.columns;
       if (!columns || columns.length === 0) return;
-      this.$slots.columns = getColumnsVnode(
-        this.$createElement,
-        this.$scopedSlots,
-        columns
-      );
+      this.$slots.columns = getColumnsVnode.call(this, columns);
       this.$nextTick(() => {
         this.$refs.table.doLayout();
       });
@@ -176,16 +174,19 @@ export default {
 };
 </script>
  
-<style >
+<style lang="stylus" >
 .agel-table {
   width: 100%;
   height: auto;
   overflow: hidden;
 }
+
 .agel-pagination {
   display: flex;
   align-items: center;
+  padding: 0px 10px;
 }
+
 .agel-table .el-table__empty-text {
   position: absolute;
   left: 50%;
