@@ -12,8 +12,8 @@
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
-- 解决 element-ui table [一些潜在问题](/sum.md#element-ui-table-一些潜在问题)
-- 添加额外的[扩展功能](http://localhost:8080/agel-table/guide.html)
+- 解决 element-ui table [一些潜在问题](https://agrass.gitee.io/agel-table/sum.html#element-ui-table-一些潜在问题)
+- 添加额外的[扩展功能](https://agrass.gitee.io/agel-table/guide.html)
 
 # 使用
 
