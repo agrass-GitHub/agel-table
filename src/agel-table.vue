@@ -109,7 +109,7 @@ export default {
     },
     'value.isResize': 'registerResize'
   },
-  created() {
+  mounted() {
     this.initApi();
   },
   beforeDestroy() {
@@ -144,13 +144,14 @@ export default {
     getColumns(columns = [], globalColumnApi) {
       return columns
         .map(v => {
+          let o = {};
+          if (v.children && v.children.length > 0) {
+            o.children = this.getColumns(v.children, globalColumnApi);
+            if (o.children.length == 0) v.key = guid();
+          }
           v.key = v.key == undefined ? guid() : v.key;
           v.display = v.display === undefined ? true : v.display;
-          const o = { ...globalColumnApi, ...v };
-          if (o.children && o.children.length > 0) {
-            o.children = this.getColumns(o.children, globalColumnApi);
-          }
-          return o;
+          return { ...globalColumnApi, ...v, ...o };
         })
         .filter(v => v.display);
     },

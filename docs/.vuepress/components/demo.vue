@@ -9,14 +9,14 @@
     >
       <div class="input-item">
         <div class="lablel">功能切换</div>
-        <el-checkbox v-model="table.showHeader">表头</el-checkbox>
+        <!-- <el-checkbox v-model="table.showHeader">表头</el-checkbox> -->
         <el-checkbox v-model="table.isPage">分页</el-checkbox>
-        <el-checkbox v-model="table.loading">加载</el-checkbox>
         <el-checkbox v-model="table.showSummary">合计</el-checkbox>
         <el-checkbox v-model="table.isResize">自适应</el-checkbox>
-        <el-checkbox v-model="table.stripe">斑马纹</el-checkbox>
         <el-checkbox v-model="table.columns[0].fixed">固定列</el-checkbox>
         <el-checkbox v-model="table.highlightCurrentRow">单选高亮行</el-checkbox>
+        <el-checkbox v-model="table.loading">加载</el-checkbox>
+        <el-checkbox v-model="table.stripe">斑马纹</el-checkbox>
       </div>
       <div class="input-item">
         <div class="lablel">动态显示列</div>
@@ -41,6 +41,7 @@
       </div>
     </el-drawer>
     <div>
+      <el-button @click="$router.go(-1)">返回文档</el-button>
       <el-button @click="drawer=!drawer">功能区</el-button>
       <span v-if="table.isResize">盒子高度60vh，表格会自适应变化</span>
       <span v-else>盒子高度 auto</span>
@@ -68,14 +69,17 @@
 </template>
  
 <script>
+import Vue from 'vue';
+import Element from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import agelTable from '../../../src/index';
+Vue.use(Element);
+Vue.use(agelTable);
 export default {
   name: 'demo',
   data() {
     return {
       drawer: false,
-      isSlotAppend: false,
-      isSlotEmpty: false,
-      isCustomIndex: false,
       table: {
         isResize: true,
         isPage: true,
@@ -86,7 +90,6 @@ export default {
         highlightCurrentRow: true,
         rowKey: 'id',
         sumText: '合',
-        height: 500,
         columns: [
           {
             label: '多选',
@@ -101,14 +104,14 @@ export default {
             type: 'index',
             display: true,
             align: 'center',
-            width: 80,
+            width: 120,
             index: v => {
               let { currentPage, pageSize } = this.table.page;
               return `index-${(currentPage - 1) * pageSize + v}`;
             }
           },
           { label: '展开', type: 'expand', display: true, width: 60 },
-          { label: '懒加载', minWidth: 100, prop: 'user', display: true },
+          { label: '懒加载', minWidth: 150, prop: 'user', display: true },
           {
             label: '多级表头',
             width: 250,
@@ -127,7 +130,7 @@ export default {
               {
                 label: '自定义表头',
                 display: true,
-                width: 150,
+                width: 250,
                 slotHeader: 'cutomHeader',
                 slotColumn: 'cutomColumn'
               }
@@ -221,15 +224,14 @@ export default {
 
 
 
-<style lang='scss' >
+<style lang='stylus' >
 .demo-page-panel {
   .el-drawer__body {
     overflow: auto;
     padding: 0px 20px;
   }
 
-  .button-box,
-  .check-box {
+  .button-box, .check-box {
     margin-bottom: 20px;
   }
 
@@ -237,15 +239,39 @@ export default {
     white-space: nowrap;
     margin-bottom: 10px;
   }
+
   .input-item {
     margin-bottom: 20px;
   }
+
   button {
     margin-right: 20px;
   }
 }
 
 .demo-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 50px 20px;
+
+  // cover default table css
+  table {
+    margin: 0 0;
+
+    tr {
+      border-top: 0px;
+    }
+
+    tr:nth-child(2n) {
+      background-color: transparent;
+    }
+
+    th, td {
+      border-top: 0px;
+      border-left: 0px;
+    }
+  }
+
   .append-slot {
     text-align: center;
     padding: 10px;
@@ -263,6 +289,7 @@ export default {
   .table-box .customRowClass-2 {
     background: #f0f9eb;
   }
+
   .table-box .customRowClass-3 {
     background: #f56c6c33;
   }

@@ -4,11 +4,11 @@ actionText: 起步 →
 actionLink: /guide/
 features:
   - title: 极简的思想
-    details: 以一个 table 对象来完成所有的操作
+    details: 面向对象, 参数集中处理, 以一个 table 对象来完成所有的操作
   - title: 高度的灵活
-    details: 支持 element-ui table 组件的所有 api, slot, event, method
-  - title: 好用的扩展
-    details: 集成分页，数据代理，动态显隐列，自适应容器大小...
+    details: 支持 element-ui table 组件的所有 api, slot, event
+  - title: 快捷的使用
+    details: 解决了 element-ui table 的潜在 bug, 集成了更方便好用的扩展
 footer: MIT Licensed | Copyright © 2019-present
 ---
 

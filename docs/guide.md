@@ -9,12 +9,13 @@
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
-
 - 支持 element-ui table 组件的所有 api, slot, event, method
-
-- 添加额外的扩展功能
-
 - 解决 element-ui table [一些潜在问题](/sum.md#element-ui-table-一些潜在问题)
+- 添加了额外的扩展功能
+  - 动态显隐列
+  - 集成分页组件
+  - 自适应容器高度
+  - 数据代理
 
 # 使用
 
@@ -22,7 +23,28 @@
 
 `npm install agel-table --save`
 
-## 全局注册
+## 简单使用
+
+```html
+<template>
+  <agel-table v-model="table"> </agel-table>
+</template>
+<script>
+  export default {
+    data() {
+      return {
+        table: {
+          // ... All attrs
+          data: [],
+          columns: [{ label: '姓名', prop: 'name' }]
+        }
+      };
+    }
+  };
+</script>
+```
+
+## 全局配置
 
 ```js
 import agelTable from 'agel-table';
@@ -40,29 +62,4 @@ Vue.use(agelTable, conigf);
 
 Vue.prototype.$agelTableConfig = config;
 Vue.component('agel-table', agelTable);
-```
-
-## 局部注册
-
-```html
-<template>
-  <agel-table v-model="table"> </agel-table>
-</template>
-<script>
-  import agelTable from 'agel-table';
-  export default {
-    components: {
-      agelTable
-    },
-    data() {
-      return {
-        table: {
-          // ... All attrs
-          data: [],
-          columns: [{ label: '姓名', prop: 'name' }]
-        }
-      };
-    }
-  };
-</script>
 ```

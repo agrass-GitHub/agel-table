@@ -2,9 +2,7 @@
 
 ## 为什么要写这个组件?
 
-自己在写项目的过程中，经常因为项目需求二次封装一些 ui 组件或者方法，这些二次封装都拥有较强的针对性，在写新项目的时候，移植这些组件的时候，往往又会针对新项目又修修改改，如此一来，一个组件最后修改成了 n 个版本，一旦发现某个 bug，很难每个项目去修改维护。
-
-解决办法就是在 npm 发布一个共通性，包容度较强的 el-table 组件，在提高效率的情况下要达到两个基本需求：
+自己在后台管理项目中, 经常性的使用 table 组件并进行二次封装, 但封装层度比较浅显太有针对性, 移植组件到新项目不好维护, 于是干脆自己写一个发布到 npm 上吧, 基本要求就是两点:
 
 - 支持 element-ui table 的所有 api
 - 额外添加扩展功能
@@ -14,12 +12,7 @@
 在常见的组件 api 设计中，都是把参数分散定义在 `props`中，如
 
 ```js
-props: {
-  page: {},
-  data: {},
-  columns:{},
-  // ....
-}
+props: ['page','data','columns',...]
 ```
 
 但这样会导致一个问题，父组件参数过于分散，参考如下场景：
@@ -31,6 +24,13 @@ props: {
 用户不需要手动定义通用分页排序加载等参数，也可直接通过 `this.table.xxxx` 来进行使用。
 
 ## 遇到哪些比较难的问题？
+
+### 参数无法定义在计算属性上
+
+由于在 api 的设计上，table 参数是由 v-model 传递，再由组件内部向上传递其他内置参数，就导致了 table 参数无法设置为计算属性。如何解决 table 属性是动态变化的场景呢？解决办法有两个:
+
+1. 在发生变化时手动赋值覆盖
+2. 添加了 `attach` 参数,可以为计算属性，attach 发生变化，会同步合并到 table 对象里
 
 ### 多级表头 slot 无法穿透 , 多级表头显隐列展示异常
 
@@ -48,21 +48,20 @@ props: {
 
 6. 把 agel-column 用 jsx 改写成函数，直接递归生成 el-table-column vnode，直接渲染在 el-table 下，就不存在嵌套，解决问题。
 
-7. 又发现多级表头在显示隐藏子列时，当 children 为空时候，显示列异常。
-
-8. 把过滤数组逻辑从 jsx getColumnsVnode 函数抽离出来，由 getColumns 函数执行，把 value.columns 抽离到计算属独立维护，解决。
+7. 又发现多级表头在显示隐藏子列时，当 children 为空时候，显示列异常, 重新为父级设置新的 key 值, 强制使其重新渲染, 解决。
 
 ### element-ui table 一些潜在问题
 
-- [显示合计异常 bug 重现](https://codepen.io/agrass-github/pen/ExxjXVO)
+- [显示合计异常 bug 重现](https://codepen.io/agrass-github/pen/ExxjXVO), 调用 doLayot 可解决
 
-- [列无法对齐 bug 重现](https://codepen.io/agrass-github/pen/BaaNRae)
+- [列无法对齐 bug 重现](https://codepen.io/agrass-github/pen/BaaNRae), 调用 doLayot 可解决
 
-在渲染列时候自动调用 table doLayout 解决。
+- [多级表头显隐列 bug 重现](https://codepen.io/agrass-github/pen/eYYBBPX), 强制重新渲染当前列可解决
 
-### 参数无法定义在计算属性上
+- [隐藏表头控制台报错 bug 重现](https://codepen.io/agrass-github/pen/zYYowvm),暂无解决
 
-由于在 api 的设计上，table 参数是由 v-model 传递，再由组件内部向上传递其他内置参数，就导致了 table 参数无法设置为计算属性。如何解决 table 属性是动态变化的场景呢？解决办法有两个:
+### vuepress 相关问题
 
-1. 在发生变化时手动赋值覆盖
-2. 添加了 `attach` 参数,可以为计算属性，attach 发生变化，会同步合并到 table 对象里
+- 官网对特定页面的自定义布局给出的说明是`如果你希望使用完全自定义的组件代替页面（同时只保留导航栏）`, 可实际上并不会保留导航栏, 参考 [issus:NavBar missing with Custom Layout](https://github.com/vuejs/vuepress/issues/1469)
+
+- 在 md 文件中使用 vue 组件刷新后报错卡死, 开发环境正常, 生成环境报错, 参考 [issue: Failed to execute 'appendChild' on 'Node'](https://github.com/vuejs/vuepress/issues/1692), 目前临时采用 customy layout 渲染组件无此问题

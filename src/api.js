@@ -39,8 +39,8 @@ export default function() {
           this.loading = false;
         })
         .catch((err) => {
+          console.error('数据代理失败:' + err);
           this.loading = false;
-          console.error('获取数据失败' + err);
         });
     },
     resize: (e) => {

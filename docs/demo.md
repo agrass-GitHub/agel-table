@@ -1,6 +1,7 @@
 ---
 sidebar: false
 pageClass: demo-page-class
+layout: demo
 ---
 
 该例子包含了 Elment-ui Table 大多数例子。
@@ -41,12 +42,10 @@ export default {
         isPage: true,
         showSummary: true,
         immediate: true,
-        showHeader: true,
         lazy: true,
         highlightCurrentRow: true,
         rowKey: 'id',
         sumText: '合',
-        height: 500,
         columns: [
           {
             label: '多选',
