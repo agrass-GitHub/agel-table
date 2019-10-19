@@ -4,8 +4,6 @@
 [![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
 [![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
 
-> 更多信息，请参阅 [agel-table 的使用文档](https://agrass.gitee.io/agel-table/).
-
 ## 特性
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
@@ -61,3 +59,5 @@ Vue.use(agelTable, conigf);
 Vue.prototype.$agelTableConfig = config;
 Vue.component('agel-table', agelTable);
 ```
+
+> 更多信息，请参阅 [agel-table 的使用文档](https://agrass.gitee.io/agel-table/).
