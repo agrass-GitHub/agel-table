@@ -6,7 +6,7 @@ module.exports = {
   title: 'agel-table | 使用文档',
   description: '基于 element-ui table 的二次封装组件',
   dest: './dist',
-  base: production ? './' : '/',
+  base: '/agel-table/',
   themeConfig: {
     updatePopup: true,
     nav: [

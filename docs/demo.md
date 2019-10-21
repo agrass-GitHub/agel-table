@@ -1,4 +1,5 @@
 ---
+navbar: true
 sidebar: false
 pageClass: demo-page-class
 layout: demo

@@ -18,7 +18,7 @@
     "build": "vuepress build docs",
     "lint": "vue-cli-service lint",
     "publish": "vue-cli-service build --target lib --name agel-table --dest lib ./src/index.js && npm publish",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {},
   "peerDependencies": {
