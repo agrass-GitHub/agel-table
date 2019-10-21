@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
 [![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
 
-## [agel-table | 使用文档](https://agrass.gitee.io/agel-table/)
+## [agel-table | 使用文档 | 更多信息](https://agrass.gitee.io/agel-table/)
 
 ## 特性
 
@@ -49,14 +49,14 @@
 ```js
 import agelTable from 'agel-table';
 
-const conigf = {
+const config = {
   name: 'agel-table', // component name,use() 生效
   table: {}, // table attrs
   column: {} // column attrs
   page: {}, // page attrs
 }
 
-Vue.use(agelTable, conigf);
+Vue.use(agelTable, config);
 
 // or
 
