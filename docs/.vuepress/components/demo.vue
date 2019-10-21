@@ -9,7 +9,6 @@
     >
       <div class="input-item">
         <div class="lablel">功能切换</div>
-        <!-- <el-checkbox v-model="table.showHeader">表头</el-checkbox> -->
         <el-checkbox v-model="table.isPage">分页</el-checkbox>
         <el-checkbox v-model="table.showSummary">合计</el-checkbox>
         <el-checkbox v-model="table.isResize">自适应</el-checkbox>
@@ -41,9 +40,8 @@
       </div>
     </el-drawer>
     <div>
-      <el-button @click="$router.go(-1)">返回文档</el-button>
       <el-button @click="drawer=!drawer">功能区</el-button>
-      <span v-if="table.isResize">盒子高度60vh，表格会自适应变化</span>
+      <span v-if="table.isResize">盒子高度 60vh, 表格会自适应变化</span>
       <span v-else>盒子高度 auto</span>
     </div>
     <div class="table-box" :style="{height:table.isResize?'60vh':'auto'}">
@@ -85,7 +83,6 @@ export default {
         isPage: true,
         showSummary: true,
         immediate: true,
-        showHeader: true,
         lazy: true,
         highlightCurrentRow: true,
         rowKey: 'id',
@@ -138,8 +135,8 @@ export default {
           }
         ],
         page: {
-          pageSize: 5,
-          pageSizes: [5, 10]
+          pageSize: 3,
+          pageSizes: [3, 10]
         },
         request: (params, resolve) => {
           this.http(params).then(data => {
@@ -252,7 +249,6 @@ export default {
 .demo-page {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 50px 20px;
 
   // cover default table css
   table {
@@ -275,6 +271,10 @@ export default {
   .append-slot {
     text-align: center;
     padding: 10px;
+  }
+
+  .el-button {
+    margin-right: 10px;
   }
 
   .table-box {

@@ -2,12 +2,14 @@
 navbar: true
 sidebar: false
 pageClass: demo-page-class
-layout: demo
+# layout: demo
 ---
 
-该例子包含了 Elment-ui Table 大多数例子。
+:::tip 演示
+包含了 element-ui table 大多数基础使用例子，[完整代码](https://github.com/agrass-GitHub/agel-table/blob/master/docs/.vuepress/components/demo.vue)
+:::
 
-<demo></demo>
+<ClientOnly><demo></demo> </ClientOnly>
 
 ```html
 <agel-table v-model="table">
@@ -31,13 +33,8 @@ layout: demo
 
 ```js
 export default {
-  name: 'demo',
   data() {
     return {
-      drawer: false,
-      isSlotAppend: false,
-      isSlotEmpty: false,
-      isCustomIndex: false,
       table: {
         isResize: true,
         isPage: true,
@@ -61,14 +58,14 @@ export default {
             type: 'index',
             display: true,
             align: 'center',
-            width: 80,
+            width: 120,
             index: (v) => {
               let { currentPage, pageSize } = this.table.page;
               return `index-${(currentPage - 1) * pageSize + v}`;
             }
           },
           { label: '展开', type: 'expand', display: true, width: 60 },
-          { label: '懒加载', minWidth: 100, prop: 'user', display: true },
+          { label: '懒加载', minWidth: 150, prop: 'user', display: true },
           {
             label: '多级表头',
             width: 250,
@@ -87,7 +84,7 @@ export default {
               {
                 label: '自定义表头',
                 display: true,
-                width: 150,
+                width: 250,
                 slotHeader: 'cutomHeader',
                 slotColumn: 'cutomColumn'
               }
@@ -95,8 +92,8 @@ export default {
           }
         ],
         page: {
-          pageSize: 5,
-          pageSizes: [5, 10]
+          pageSize: 3,
+          pageSizes: [3, 10]
         },
         request: (params, resolve) => {
           this.http(params).then((data) => {
@@ -129,31 +126,12 @@ export default {
       }
     };
   },
-  computed: {
-    displayColumns() {
-      let arr = this.table.columns;
-      return [
-        ...arr.filter((v) => !v.children),
-        ...arr.find((v) => v.children).children
-      ];
-    }
-  },
   watch: {
     'table.isResize'(v) {
       if (!v) this.table.height = '';
     }
   },
   methods: {
-    getData() {
-      this.table.getData();
-    },
-    removeData() {
-      this.http({ page: 1, pageSize: 0 }).then((data) => {
-        this.table.data = data;
-        this.table.page.total = 0;
-        this.table.page.currentPage = 1;
-      });
-    },
     // 模拟数据
     http({ page, pageSize, level = 1 }) {
       return new Promise((resolve) => {
