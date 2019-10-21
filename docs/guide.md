@@ -36,7 +36,9 @@
         table: {
           // ... All attrs
           data: [],
-          columns: [{ label: '姓名', prop: 'name' }]
+          columns: [{ label: '姓名', prop: 'name' }],
+          page: {},
+          on: {}
         }
       };
     }
@@ -49,14 +51,14 @@
 ```js
 import agelTable from 'agel-table';
 
-const conigf = {
+const config = {
   name: 'agel-table', // component name,use() 生效
   table: {}, // table attrs
   column: {} // column attrs
   page: {}, // page attrs
 }
 
-Vue.use(agelTable, conigf);
+Vue.use(agelTable, config);
 
 // or
 
