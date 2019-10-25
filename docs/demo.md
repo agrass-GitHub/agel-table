@@ -10,7 +10,7 @@ pageClass: demo-page-class
 :::
 
 <ClientOnly>
-  <test/>
+  <demo/>
 </ClientOnly>
 
 ```html
@@ -72,7 +72,7 @@ pageClass: demo-page-class
               width: 60
             },
             {
-              label: '懒加载',
+              label: '名称',
               minWidth: 250,
               prop: 'name',
               display: true
