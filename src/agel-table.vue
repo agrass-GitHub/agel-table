@@ -59,16 +59,76 @@ export default {
   },
   data() {
     return {
+      API: {},
       LOAD: false
     };
   },
   computed: {
+    styles() {
+      return this.getStyles();
+    },
     attrs() {
-      if (!this.LOAD) return {};
+      return this.getAttrs();
+    },
+    events() {
+      return this.getEvents();
+    },
+    columns() {
+      return this.getColumns(this.value.columns);
+    },
+    flatColumns() {
+      return this.getFlatColumns(this.columns);
+    },
+    mergeKeys() {
+      return this.getMergeKeys(this.flatColumns);
+    },
+    mergeSpans() {
+      return this.getMergeSpans();
+    }
+  },
+  watch: {
+    attach: {
+      deep: true,
+      handler: 'initApi'
+    },
+    'value.isResize': 'registerResize'
+  },
+  created() {
+    this.initApi();
+  },
+  beforeDestroy() {
+    this.registerResize(false);
+  },
+  methods: {
+    initApi() {
+      let api = getApi.call(this);
+      this.$emit('input', {
+        ...api.defaultApi,
+        ...api.extendApi,
+        ...api.globalApi,
+        ...api.localApi,
+        page: {
+          ...api.pageApi,
+          ...api.globalPageApi,
+          ...api.localPageApi
+        }
+      });
+      this.API = api;
+      if (this.LOAD) return;
+      this.$nextTick()
+        .then(() => (this.LOAD = true))
+        .then(() => {
+          this.value.$ref = this.$refs.table;
+          this.value.immediate && this.value.getData();
+          this.registerResize();
+        });
+    },
+    getAttrs() {
       let attrs = {};
-      let extend = this.getApi().extendApi;
       for (const key in this.value) {
-        if (!extend.hasOwnProperty(key)) attrs[key] = this.value[key];
+        if (!this.API.extendApi.hasOwnProperty(key)) {
+          attrs[key] = this.value[key];
+        }
       }
       if (attrs.height && this.value.isPage) {
         let proxyH = Number(attrs.height) - this.value.page.height;
@@ -76,10 +136,9 @@ export default {
       }
       return attrs;
     },
-    events() {
-      if (!this.LOAD) return {};
+    getEvents() {
       let events = {};
-      let { eventsApi: a, localEventsApi: b } = this.getApi();
+      let { eventsApi: a, localEventsApi: b } = this.API;
       for (let key in { ...a, ...b }) {
         // 事件拦截，在提交event之前可以做点什么...
         events[kebabcase(key)] = (...params) => {
@@ -90,70 +149,80 @@ export default {
       }
       return events;
     },
-    columns() {
-      let api = this.getApi();
-      return this.getColumns(api.localApi.columns, api.globalColumnApi);
-    },
-    styles() {
+    getStyles() {
       let { height, page } = this.value;
       return {
         container: { height: height ? height + 'px' : 'auto' },
         page: { height: page.height ? page.height + 'px' : 'auto' }
       };
-    }
-  },
-  watch: {
-    attach: {
-      deep: true,
-      handler: 'initApi'
     },
-    'value.isResize': 'registerResize'
-  },
-  mounted() {
-    this.initApi();
-  },
-  beforeDestroy() {
-    this.registerResize(false);
-  },
-  methods: {
-    getApi: getApi,
-    initApi() {
-      let api = this.getApi();
-      let table = {
-        ...api.defaultApi,
-        ...api.extendApi,
-        ...api.globalApi,
-        ...api.localApi,
-        page: {
-          ...api.pageApi,
-          ...api.globalPageApi,
-          ...api.localPageApi
-        }
-      };
-      this.$emit('input', table);
-      if (this.LOAD) return;
-      this.$nextTick(() => {
-        this.LOAD = true;
-        table.immediate && table.getData();
-        this.$nextTick(() => {
-          this.value.$ref = this.$refs.table;
-          this.registerResize();
+    getColumns(columns) {
+      let config = columns;
+      if (!Array.isArray(config)) {
+        config = Object.keys(columns).map(k => {
+          let v = columns[k];
+          if (v.prop == undefined) this.$set(v, 'prop', k);
+          return v;
         });
-      });
-    },
-    getColumns(columns = [], globalColumnApi) {
-      return columns
+      }
+      return config
         .map(v => {
           let o = {};
-          if (v.children && v.children.length > 0) {
-            o.children = this.getColumns(v.children, globalColumnApi);
+          let attrs = { ...this.API.globalColumnApi, key: guid() };
+          for (const key in attrs) {
+            if (v[key] == undefined) this.$set(v, key, attrs[key]);
+          }
+          if (v.children) {
+            o.children = this.getColumns(v.children);
             if (o.children.length == 0) v.key = guid();
           }
-          v.key = v.key == undefined ? guid() : v.key;
-          v.display = v.display === undefined ? true : v.display;
-          return { ...globalColumnApi, ...v, ...o };
+          return { ...v, ...o };
         })
         .filter(v => v.display);
+    },
+    getFlatColumns(columns) {
+      return columns.reduce((result, v) => {
+        return result.concat(
+          Array.isArray(v.children) && v.children.length > 0
+            ? this.getFlatColumns(v.children)
+            : v
+        );
+      }, []);
+    },
+    getMergeKeys() {
+      let { isMerge, rowKey } = this.value;
+      if (rowKey) return [];
+      return this.flatColumns
+        .filter(v => {
+          let merge = v.merge === undefined ? isMerge : v.merge;
+          return v.prop && merge && !v.type;
+        })
+        .map(v => v.key);
+    },
+    getMergeSpans() {
+      let spanArr = [];
+      let spanIndex = -1;
+      this.mergeKeys.forEach(k => {
+        this.value.data.forEach((cur, i) => {
+          let next = this.value.data[i + 1];
+          let prev = this.value.data[i - 1];
+          if (spanArr[i] == undefined) spanArr[i] = {};
+          spanArr[i][k] = { rowspan: 1, colspan: 1 };
+          if (next && cur[k] == next[k]) {
+            if (spanIndex == -1) {
+              spanIndex = i;
+              spanArr[spanIndex][k].rowspan++;
+            } else {
+              spanArr[spanIndex][k].rowspan++;
+              spanArr[i][k].rowspan = 0;
+            }
+          } else {
+            spanIndex = -1;
+            spanArr[i][k].rowspan = prev && prev[k] == cur[k] ? 0 : 1;
+          }
+        });
+      });
+      return spanArr;
     },
     renderColumns() {
       let columns = this.columns;
@@ -185,7 +254,8 @@ export default {
 .agel-pagination {
   display: flex;
   align-items: center;
-  padding: 0px 10px;
+  padding: 0px 25px;
+  justify-content: flex-end;
 }
 
 .agel-table .el-table__empty-text {

@@ -12,7 +12,7 @@ features:
 footer: MIT Licensed | Copyright © 2019-present
 ---
 
-![demo](https://gitee.com/agrass/agel-table/raw/master/public/demo.png)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg)](https://opensource.org/licenses/mit-license.php)
 [![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
 [![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
+![gizp](http://img.badgesize.io/https://unpkg.com/agel-table?compression=gzip)

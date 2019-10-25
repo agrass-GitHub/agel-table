@@ -1,28 +1,5 @@
 # API 文档
 
-## 优先级
-
-::: tip 覆盖策略
-
-- 请按需配置进行覆盖，谨慎覆盖内置属性
-- 可在全局灵活的为 table 自定义配置你需要的属性或者方法
-  :::
-
-```js
-let table = {
-  ...api.defaultApi, // 默认配置
-  ...api.extendApi, // 扩展配置
-  ...api.globalApi, // 全局配置
-  ...api.localApi, // 局部配置 {...table,...attach}
-  columns: this.getColumns(api.localApi.columns, api.globalColumnApi), // 合并列配置
-  page: {
-    ...api.pageApi, //默认分页配置
-    ...api.globalPageApi, //全局分页配置
-    ...api.localPageApi //局部分页配置
-  }
-};
-```
-
 ## props
 
 ::: tip
@@ -79,6 +56,7 @@ export default {
 | immediate   | Boolean  | false  | 初始化完成之后自动调用 getData       | -                                    |
 | isPage      | Boolean  | true   | 显示分页组件                         | -                                    |
 | isResize    | Boolean  | false  | 自适应父容器高度，跟随窗口调整而变化 | -                                    |
+| isMerge     | Boolean  | false  | 所有列相同行自动合并                 | -                                    |
 | class       | String   | -      | Table 的 Class 名称                  | -                                    |
 | order       | String   | -      | 当前排序状态                         | -                                    |
 | orderColumn | String   | -      | 当前排序列名称                       | -                                    |
@@ -107,6 +85,7 @@ export default {
 | slotColumn | String  | -      | 自定义表列的插槽名称             |
 | slotHeader | String  | -      | 自定义表头的插槽名称             |
 | display    | Boolean | true   | 是否显示该列                     |
+| merge      | Boolean | false  | 该列相同行是否自动合并           |
 | `key`      | String  | 内置   | 列的唯一 key 值                  |
 
 ## page

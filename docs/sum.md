@@ -52,6 +52,8 @@ props: ['page','data','columns',...]
 
 ### element-ui table 一些潜在问题
 
+自己在封装的过程中，发现了不少 element table 自身存在的 bug
+
 - [v.2.12 显示合计异常 bug 重现](https://codepen.io/agrass-github/pen/ExxjXVO), 调用 doLayot 可解决
 - [v.2.12 列无法对齐 bug 重现](https://codepen.io/agrass-github/pen/BaaNRae), 调用 doLayot 可解决
 - [v.2.12 多级表头显隐列 bug 重现](https://codepen.io/agrass-github/pen/eYYBBPX), 强制重新渲染当前列可解决
@@ -61,4 +63,4 @@ props: ['page','data','columns',...]
 
 - 官网对特定页面的自定义布局给出的说明是`如果你希望使用完全自定义的组件代替页面（同时只保留导航栏）`, 可实际上并不会保留导航栏, 参考 [issus:NavBar missing with Custom Layout](https://github.com/vuejs/vuepress/issues/1469)
 
-- 在 md 文件中使用 vue 组件刷新后报错卡死, 开发环境正常, 生成环境报错, 参考 [issue: Failed to execute 'appendChild' on 'Node'](https://github.com/vuejs/vuepress/issues/1692), 目前临时采用 customy layout 渲染组件无此问题
+- 在 md 文件中使用 vue 组件刷新后报错卡死, 开发环境正常, 生成环境报错, 参考 [issue: Failed to execute 'appendChild' on 'Node'](https://github.com/vuejs/vuepress/issues/1692), 使用 ClientOnly 组件包裹可解决

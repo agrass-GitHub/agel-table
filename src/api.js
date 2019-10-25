@@ -5,6 +5,7 @@ export default function() {
     immediate: false,
     isPage: true,
     isResize: false,
+    isMerge: false,
     columns: [],
     order: '',
     orderColumn: '',
@@ -63,7 +64,11 @@ export default function() {
   };
   const defaultApi = {
     data: [],
-    height: undefined
+    height: undefined,
+    spanMethod: ({ rowIndex, columnIndex }) => {
+      if (this.mergeSpans.length == 0) return;
+      return this.mergeSpans[rowIndex][this.flatColumns[columnIndex].key];
+    }
   };
   const pageApi = {
     height: 45,
@@ -101,7 +106,7 @@ export default function() {
   const config = this.$agelTableConfig || {};
   const globalApi = config.table || {};
   const globalPageApi = config.page || {};
-  const globalColumnApi = config.column || {};
+  const globalColumnApi = { display: true, ...(config.column || {}) };
   const localApi = { ...this.value, ...this.attach };
   const localPageApi = localApi.page || {};
   const localEventsApi = localApi.on || {};
