@@ -70,6 +70,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import agelTable from '../../../src/index';
 Vue.use(Element);
 Vue.use(agelTable);
+
 export default {
   name: 'demo',
   data() {

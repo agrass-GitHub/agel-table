@@ -1,14 +1,5 @@
 # agel-table | 使 element-ui table 组件更简单
 
-[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg)](https://opensource.org/licenses/mit-license.php)
-[![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
-[![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
-
-## 文档
-
-- [官网 - 使用文档 ](https://agrass-github.github.io/agel-table/)，github 提供服务
-- [官网 - 使用文档](https://agrass.gitee.io/agel-table/)，gitee 提供服务，国内访问速度较快
-
 ## 特性
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。

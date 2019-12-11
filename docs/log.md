@@ -8,6 +8,10 @@
 - `考虑` columns render 来实现自定义列和表头
 - `否决` 单元格编辑（用户可以很方便自定义列来实现）
 
+## v.0.1.1
+
+- `新增` slotExpand,slotColumn,slotHeader 属性可配置为函数渲染
+
 ## v.0.1.0
 
 - `修复` column api 全局配置后无法响应式更新
@@ -42,8 +46,8 @@
 - `修复` 局部引用组件报错
 - `修复` 解决 el-table 和 el-pagination 组件拥有同名事件 current-change 的冲突问题
 - `新增` 可配置全局属性
-- `修复` `补丁` 多级表头自定义 slotColum，SlotHeader 失败问题
-- `修复` `补丁` 多级表头列添加添加属性 display 为 false，渲染异常
+- `修复` 多级表头自定义 slotColum，SlotHeader 失败问题
+- `修复` 多级表头列添加添加属性 display 为 false，渲染异常
 - `修复` 添加 request，getData 属性 api，方便和接口对接
 - `新增` 添加 isReisze，riseze ，自适应父容器功能
 - `新增` 集成分页组件

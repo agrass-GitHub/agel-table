@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       is: true,
-      table: { columns: [{ label: '姓名', prop: 'name' }] }
+      table: { columns: [{ label: "姓名", prop: "name" }] }
     };
   },
   computed: {
@@ -48,27 +48,27 @@ export default {
 
 :::
 
-| 属性        | 类型     | 默认值 | 说明                                 | 锚点                                 |
-| ----------- | -------- | ------ | ------------------------------------ | ------------------------------------ |
-| ......      | ......   | ...... | All Element-ui Table Attributes      | ......                               |
-| \$ref       | Object   | 内置   | Element-ui Table Vue 实例            | -                                    |
-| loading     | Boolean  | false  | 是否开启加载状态                     | -                                    |
-| immediate   | Boolean  | false  | 初始化完成之后自动调用 getData       | -                                    |
-| isPage      | Boolean  | true   | 显示分页组件                         | -                                    |
-| isResize    | Boolean  | false  | 自适应父容器高度，跟随窗口调整而变化 | -                                    |
-| isMerge     | Boolean  | false  | 所有列相同行自动合并                 | -                                    |
-| class       | String   | -      | Table 的 Class 名称                  | -                                    |
-| order       | String   | -      | 当前排序状态                         | -                                    |
-| orderColumn | String   | -      | 当前排序列名称                       | -                                    |
-| data        | Array    | [ ]    | 数据                                 | -                                    |
-| columns     | Array    | [ ]    | 列配置                               | [参考](/api.md#column)               |
-| page        | Object   | { }    | Page 组件相关配置                    | [参考](/api.md#page)                 |
-| on          | Object   | { }    | Table 和 Page 组件的 Event 事件      | [参考](/api.md#on)                   |
-| queryProps  | Object   | { }    | 指定 query 的的参数键名              | [参考](/api.md#queryprops，getquery) |
-| getQuery    | Function | 内置   | 返回 query 参数                      | [参考](/api.md#queryprops，getquery) |
-| request     | Function | null   | 接口数据代理函数                     | [参考](/api.md#request，getdata)     |
-| getData     | Function | 内置   | 工作流程代理函数                     | [参考](/api.md#request，getdata)     |
-| resize      | Function | 内置   | 自适应父容器高度                     | -                                    |
+| 属性        | 类型         | 默认值 | 说明                                 | 锚点                                 |
+| ----------- | ------------ | ------ | ------------------------------------ | ------------------------------------ |
+| ......      | ......       | ...... | All Element-ui Table Attributes      | ......                               |
+| \$ref       | Object       | 内置   | Element-ui Table Vue 实例            | -                                    |
+| loading     | Boolean      | false  | 是否开启加载状态                     | -                                    |
+| immediate   | Boolean      | false  | 初始化完成之后自动调用 getData       | -                                    |
+| isPage      | Boolean      | true   | 显示分页组件                         | -                                    |
+| isResize    | Boolean      | false  | 自适应父容器高度，跟随窗口调整而变化 | -                                    |
+| isMerge     | Boolean      | false  | 所有列相同行自动合并                 | -                                    |
+| class       | String       | -      | Table 的 Class 名称                  | -                                    |
+| order       | String       | -      | 当前排序状态                         | -                                    |
+| orderColumn | String       | -      | 当前排序列名称                       | -                                    |
+| data        | Array        | [ ]    | 数据                                 | -                                    |
+| columns     | Array/Object | [ ]    | 列配置                               | [参考](/api.md#column)               |
+| page        | Object       | { }    | Page 组件相关配置                    | [参考](/api.md#page)                 |
+| on          | Object       | { }    | Table 和 Page 组件的 Event 事件      | [参考](/api.md#on)                   |
+| queryProps  | Object       | { }    | 指定 query 的的参数键名              | [参考](/api.md#queryprops，getquery) |
+| getQuery    | Function     | 内置   | 返回 query 参数                      | [参考](/api.md#queryprops，getquery) |
+| request     | Function     | null   | 接口数据代理函数                     | [参考](/api.md#request，getdata)     |
+| getData     | Function     | 内置   | 工作流程代理函数                     | [参考](/api.md#request，getdata)     |
+| resize      | Function     | 内置   | 自适应父容器高度                     | -                                    |
 
 ## column
 
@@ -78,15 +78,16 @@ export default {
 - 支持所有 Element-ui [Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-column-attributes)
   :::
 
-| 属性       | 类型    | 默认值 | 说明                             |
-| ---------- | ------- | ------ | -------------------------------- |
-| ......     | ......  | ...... | All Element-ui Column Attributes |
-| children   | Array   | -      | 配置多级表头                     |
-| slotColumn | String  | -      | 自定义表列的插槽名称             |
-| slotHeader | String  | -      | 自定义表头的插槽名称             |
-| display    | Boolean | true   | 是否显示该列                     |
-| merge      | Boolean | false  | 该列相同行是否自动合并           |
-| `key`      | String  | 内置   | 列的唯一 key 值                  |
+| 属性       | 类型            | 默认值   | 说明                               |
+| ---------- | --------------- | -------- | ---------------------------------- |
+| ......     | ......          | ......   | All Element-ui Column Attributes   |
+| key        | String          | 内置     | 列的唯一 key 值                    |
+| display    | Boolean         | true     | 是否显示该列                       |
+| merge      | Boolean         | false    | 该列相同行是否自动合并             |
+| children   | Array           | -        | 配置多级表头                       |
+| slotColumn | String/Function | -        | 自定义表列的插槽名称 / render 函数 |
+| slotHeader | String/Function | -        | 自定义表头的插槽名称 / render 函数 |
+| slotExpand | String/Function | 'expand' | 自定展开行的插槽名称 / render 函数 |
 
 ## page
 
@@ -156,9 +157,9 @@ export default {
   data() {
     return {
       table: {
-        columns: [{ label: '姓名', prop: 'name' }],
+        columns: [{ label: "姓名", prop: "name" }],
         request(query, resolve) {
-          this.$http(query).then((res) => {
+          this.$http(query).then(res => {
             resolve({ data: res.data, total: res.pageToal });
             // 如果没有分页信息可直接返回数组 resolve(res.data);
           });
@@ -183,7 +184,7 @@ export default {
 | ------ | ------------------------------------------------------------ |
 | empty  | 没有数据展示                                                 |
 | append | 插入至表格最后一行之后的内容                                 |
-| expand | 展开行的内容                                                 |
+| expand | 展开行的内容，可在 column 的 slotExpand 属性重新定义插槽名称 |
 | -      | 自定义列的内容，需要在 column 的 slotColumn 属性指定插槽名称 |
 | -      | 自定义表头内容，需要在 column 的 slotHeader 属性指定插槽名称 |
 
@@ -192,17 +193,17 @@ export default {
   <template v-slot:append>
     <p>table slot append .... loading ...</p>
   </template>
+  <template v-slot:expand="scope">
+    <p>展开行内容</p>
+  </template>
   <template v-slot:empty>
     <p>table slot empty .... 暂无数据 ...</p>
   </template>
   <template v-slot:cutomHeader="scope">
-    <p>自定义表头</p>
+    <p>模板自定义表头</p>
   </template>
   <template v-slot:cutomColumn="scope">
-    <p>自定义列</p>
-  </template>
-  <template v-slot:expand="scope">
-    <p>展开行内容</p>
+    <p>模板自定义列</p>
   </template>
 </agel-table>
 ```
@@ -213,11 +214,16 @@ export default {
     return {
       table: {
         columns: [
-          { label: '展开', type: 'expand' },
+          { label: "展开", type: "expand" },
           {
-            label: '姓名',
-            slotHeader: 'cutomHeader',
-            slotColumn: 'cutomColumn'
+            label: "模板自定义",
+            slotHeader: "cutomHeader",
+            slotColumn: "cutomColumn"
+          },
+          {
+            label: "render自定义",
+            slotHeader: (h, { column }) => <div>render自定义表头</div>,
+            slotColumn: (h, { row }) => <div>render自定义列</div>
           }
         ]
       }

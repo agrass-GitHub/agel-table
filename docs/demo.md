@@ -36,7 +36,7 @@ pageClass: demo-page-class
 
 <script>
   export default {
-    name: 'demo',
+    name: "demo",
     data() {
       return {
         drawer: false,
@@ -45,60 +45,60 @@ pageClass: demo-page-class
           isPage: true,
           showSummary: true,
           immediate: true,
-          sumText: '合',
+          sumText: "合",
           columns: [
             {
-              label: '多选',
-              type: 'selection',
-              align: 'center',
+              label: "多选",
+              type: "selection",
+              align: "center",
               display: true,
               width: 50
             },
             {
-              label: '自定义索引',
-              type: 'index',
+              label: "自定义索引",
+              type: "index",
               display: true,
-              align: 'center',
+              align: "center",
               width: 120,
-              index: (v) => {
+              index: v => {
                 let { currentPage, pageSize } = this.table.page;
                 return `index-${(currentPage - 1) * pageSize + v}`;
               }
             },
             {
-              label: '展开',
-              type: 'expand',
+              label: "展开",
+              type: "expand",
               display: true,
               width: 60
             },
             {
-              label: '名称',
+              label: "名称",
               minWidth: 250,
-              prop: 'name',
+              prop: "name",
               display: true
             },
             {
-              label: '多级表头',
+              label: "多级表头",
               width: 250,
-              prop: 'name',
+              prop: "name",
               // 多级表头必须出现 border
               children: [
                 {
-                  label: '合并行',
-                  prop: 'merge',
+                  label: "合并行",
+                  prop: "merge",
                   width: 150,
                   display: true,
                   merge: true,
-                  sortable: 'custom',
-                  filters: [{ text: 'index == 1', value: 1 }],
+                  sortable: "custom",
+                  filters: [{ text: "index == 1", value: 1 }],
                   filterMethod: (v, row) => row.index == v
                 },
                 {
-                  label: '自定义表头',
+                  label: "自定义表头",
                   display: true,
                   width: 250,
-                  slotHeader: 'cutomHeader',
-                  slotColumn: 'cutomColumn'
+                  slotHeader: "cutomHeader",
+                  slotColumn: "cutomColumn"
                 }
               ]
             }
@@ -108,27 +108,27 @@ pageClass: demo-page-class
             pageSizes: [3, 10]
           },
           request: (params, resolve) => {
-            this.http(params).then((data) => {
+            this.http(params).then(data => {
               resolve({ data, total: params.pageSize * 5 });
             });
           },
           summaryMethod: () => [
-            '合',
+            "合",
             ...this.table.columns.map((v, i) => i + 1)
           ],
           rowClassName: ({ rowIndex }) => `customRowClass-${rowIndex + 1}`,
           on: {
-            sortChange: (sort) => {
-              console.log('触发sortChange:', sort);
+            sortChange: sort => {
+              console.log("触发sortChange:", sort);
             },
-            currentChange: (row) => {
-              console.log('触发currentChange:', row);
+            currentChange: row => {
+              console.log("触发currentChange:", row);
             },
-            pageChange: (page) => {
-              console.log('触发pageChange:' + page);
+            pageChange: page => {
+              console.log("触发pageChange:" + page);
             },
-            sizeChange: (size) => {
-              console.log('触发sizeChange:' + size);
+            sizeChange: size => {
+              console.log("触发sizeChange:" + size);
             }
           }
         }
@@ -138,14 +138,14 @@ pageClass: demo-page-class
       displayColumns() {
         let arr = this.table.columns;
         return [
-          ...arr.filter((v) => !v.children),
-          ...arr.find((v) => v.children).children
+          ...arr.filter(v => !v.children),
+          ...arr.find(v => v.children).children
         ];
       }
     },
     watch: {
-      'table.isResize'(v) {
-        if (!v) this.table.height = '';
+      "table.isResize"(v) {
+        if (!v) this.table.height = "";
       }
     },
     methods: {
@@ -153,7 +153,7 @@ pageClass: demo-page-class
         this.table.getData();
       },
       removeData() {
-        this.http({ page: 1, pageSize: 0 }).then((data) => {
+        this.http({ page: 1, pageSize: 0 }).then(data => {
           this.table.data = data;
           this.table.page.total = 0;
           this.table.page.currentPage = 1;
@@ -161,7 +161,7 @@ pageClass: demo-page-class
       },
       // 模拟数据
       http({ page, pageSize, level = 1 }) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           setTimeout(() => {
             let data = [];
             for (let i = 0; i < pageSize; i++) {
@@ -169,7 +169,7 @@ pageClass: demo-page-class
               data.push({
                 id: Math.random(),
                 name: `agel-table`,
-                merge: '自动合并',
+                merge: "自动合并",
                 index: index
               });
             }

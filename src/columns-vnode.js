@@ -1,7 +1,21 @@
+const getColumnSlots = function(slots) {
+  const o = {};
+  const table = this.$scopedSlots;
+  slots.forEach((v) => {
+    let { 0: name, 1: slot, 2: condition } = v;
+    if (condition === false) return;
+    if (typeof slot === 'function') {
+      o[name] = (scoped) => slot(this.$createElement, scoped);
+    } else if (typeof slot === 'string' && table[slot] !== undefined) {
+      o[name] = (scoped) => table[slot]({ ...scoped });
+    }
+  });
+  return o;
+};
+
 const getColumnsVnode = function(columns) {
   // eslint-disable-next-line no-unused-vars
   const h = this.$createElement;
-  const scopedSlots = this.$scopedSlots;
   return columns.map((v) => {
     if (v.children && v.children.length > 0) {
       return (
@@ -10,16 +24,11 @@ const getColumnsVnode = function(columns) {
         </el-table-column>
       );
     }
-    const slots = {};
-    const isSlot = (name) => name && scopedSlots[name] !== undefined;
-    if (isSlot(v.slotHeader)) {
-      slots.header = (scoped) => scopedSlots[v.slotHeader]({ ...scoped });
-    }
-    if (isSlot(v.slotColumn)) {
-      slots.default = (scoped) => scopedSlots[v.slotColumn]({ ...scoped });
-    } else if (v.type == 'expand' && isSlot('expand')) {
-      slots.default = (scoped) => scopedSlots.expand({ ...scoped });
-    }
+    const slots = getColumnSlots.call(this, [
+      ['header', v.slotHeader],
+      ['default', v.slotColumn],
+      ['default', v.slotExpand || 'expand', v.type == 'expand']
+    ]);
     return (
       <el-table-column {...{ attrs: v }} key={v.key} scopedSlots={slots} />
     );
