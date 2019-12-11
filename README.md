@@ -43,7 +43,7 @@
         table: {
           // ... All attrs
           data: [],
-          columns: [{ label: '姓名', prop: 'name' }],
+          columns: [{ label: "姓名", prop: "name" }],
           page: {},
           on: {}
         }
