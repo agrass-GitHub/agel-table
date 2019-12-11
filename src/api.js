@@ -7,15 +7,15 @@ export default function() {
     isResize: false,
     isMerge: false,
     columns: [],
-    order: '',
-    orderColumn: '',
+    order: "",
+    orderColumn: "",
     page: {},
     on: {},
     queryProps: {
-      page: 'page',
-      pageSize: 'pageSize',
-      order: 'order',
-      orderColumn: 'orderColumn'
+      page: "page",
+      pageSize: "pageSize",
+      order: "order",
+      orderColumn: "orderColumn"
     },
     request: null,
     getQuery() {
@@ -30,8 +30,8 @@ export default function() {
     getData() {
       if (!this.request) return;
       this.loading = true;
-      new Promise((resolve) => this.request(this.getQuery(), resolve))
-        .then((res) => {
+      new Promise(resolve => this.request(this.getQuery(), resolve))
+        .then(res => {
           let { data, total } = Array.isArray(res)
             ? { data: res, total: res.length }
             : res;
@@ -39,12 +39,11 @@ export default function() {
           this.page.total = total;
           this.loading = false;
         })
-        .catch((err) => {
-          console.error('数据代理失败:' + err);
+        .catch(() => {
           this.loading = false;
         });
     },
-    resize: (e) => {
+    resize: e => {
       let table = this.value;
       let lightweightResize = () => {
         let { container } = this.$refs;
@@ -59,7 +58,7 @@ export default function() {
         });
       };
       // windowResize use lightweight
-      e && e.type == 'resize' ? lightweightResize() : heavylweightResize();
+      e && e.type == "resize" ? lightweightResize() : heavylweightResize();
     }
   };
   const defaultApi = {
@@ -75,30 +74,30 @@ export default function() {
     pageSize: 20,
     pageSizes: [10, 20, 50, 100],
     currentPage: 1,
-    layout: 'total, sizes, prev, pager, next, jumper',
-    class: 'agel-pagination',
+    layout: "total, sizes, prev, pager, next, jumper",
+    class: "agel-pagination",
     total: 0
   };
   const eventsApi = {
     sortChange: ({ column, prop, order }) => {
-      if (column.sortable !== 'custom') return;
+      if (column.sortable !== "custom") return;
       this.value.order = order;
       this.value.orderColumn = prop;
       this.value.getData();
     },
-    sizeChange: (size) => {
+    sizeChange: size => {
       this.value.page.pageSize = size;
       this.value.getData();
     },
     // 重名事件 currentChange
     currentChange: (...params) => {
       // emit table currentChange event
-      if (params.length === 2) return 'currentChange';
+      if (params.length === 2) return "currentChange";
       // emit page pageChange event
       if (params.length === 1) {
         this.value.page.currentPage = params[0];
         this.value.getData();
-        return 'pageChange';
+        return "pageChange";
       }
     }
   };
