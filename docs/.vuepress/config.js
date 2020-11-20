@@ -22,7 +22,10 @@ module.exports = {
   },
   plugins: {
     run: {
-      jsLabs: ['https://unpkg.com/element-ui/lib/index.js'],
+      jsLabs: [
+        'https://unpkg.com/element-ui/lib/index.js',
+        "https://cdn.jsdelivr.net/gh/agrass-GitHub/agel-table@0.11/dist/agel-table.umd.min.js"
+      ],
       cssLabs: ['https://unpkg.com/element-ui/lib/theme-chalk/index.css'],
       reverse: true,
     }

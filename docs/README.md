@@ -28,15 +28,13 @@ footer: MIT Licensed | Copyright © 2019-present
   };
 </script>
 ```
-<ClientOnly>
-  <basics/>
-</ClientOnly>
+
 
 ::: run {title: '基础 table'}
 ```html
 <template>
-  <div>
-   111111111111111
+  <div style="height:500px">
+  <agel-table v-model="table"></agel-table>
   </div>
 </template>
 <script>
@@ -44,7 +42,15 @@ footer: MIT Licensed | Copyright © 2019-present
     data() {
       return {
         table: {
-          name:11
+          border:true,
+          columns:[
+            {label:"基础表格",prop:"base",width:100},
+            {label:"简单使用",prop:"use",minWidth:100},
+          ],
+          data:[
+            {base:"基础表格",use:"简单使用"},
+            {base:"基础表格",use:"简单使用"},
+          ]
         }
       };
     }
