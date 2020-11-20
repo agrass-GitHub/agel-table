@@ -1,7 +1,7 @@
 {
   "name": "agel-table",
   "version": "0.1.1",
-  "main": "lib/agel-table.umd.min.js",
+  "main": "dist/agel-table.umd.min.js",
   "description": "a easy table of element-ui table",
   "homepage": "https://github.com/agrass-GitHub/agel-table",
   "private": false,
@@ -16,10 +16,10 @@
   ],
   "scripts": {
     "serve": "vuepress dev docs",
-    "build": "vuepress build docs",
+    "build": "vue-cli-service build --target lib --name agel-table --dest dist ./src/index.js",
+    "builddocs": "vuepress build docs",
     "lint": "vue-cli-service lint",
-    "buildlib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/index.js",
-    "publish": "vue-cli-service build --target lib --name agel-table --dest lib ./src/index.js && npm publish",
+    "publish": "vue-cli-service build --target lib --name agel-table --dest dist ./src/index.js && npm publish",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {},

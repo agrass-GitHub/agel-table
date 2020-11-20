@@ -22,7 +22,9 @@ export default {
     let extendObj = props();
     let api = Object.assign(props(), this.$agelTableConfig.table || {}, this.value);
     Object.keys(api).forEach(key => {
+      // if (!this.value.hasOwnProperty(key)) {
       this.extendApi(key, api[key], extendObj.hasOwnProperty(key))
+      // }
     })
     this.extendApi("getQuery", this.getQuery);
     this.extendApi("getData", this.getData);

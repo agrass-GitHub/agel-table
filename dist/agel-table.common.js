@@ -373,12 +373,12 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
-// CONCATENATED MODULE: ./node_modules/_cache-loader@2.0.1@cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"ced83f66-vue-loader-template"}!./node_modules/_vue-loader@15.9.5@vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/_cache-loader@2.0.1@cache-loader/dist/cjs.js??ref--0-0!./node_modules/_vue-loader@15.9.5@vue-loader/lib??vue-loader-options!./src/agel-table.vue?vue&type=template&id=0d24d59c&
+// CONCATENATED MODULE: ./node_modules/_cache-loader@2.0.1@cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"ced83f66-vue-loader-template"}!./node_modules/_vue-loader@15.9.5@vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/_cache-loader@2.0.1@cache-loader/dist/cjs.js??ref--0-0!./node_modules/_vue-loader@15.9.5@vue-loader/lib??vue-loader-options!./src/agel-table.vue?vue&type=template&id=d6d9a48e&
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{directives:[{name:"loading",rawName:"v-loading",value:(_vm.value.loading),expression:"value.loading"}],ref:"container",staticClass:"agel-table",style:({height:_vm.styles.containerHeight})},[_c('el-table',_vm._g(_vm._b({ref:"table",staticStyle:{"width":"100%"},attrs:{"data":_vm.data,"height":_vm.styles.tableHeight},scopedSlots:_vm._u([{key:"append",fn:function(){return [_vm._t("append")]},proxy:true},{key:"empty",fn:function(){return [_vm._t("empty")]},proxy:true},{key:"default",fn:function(){return [_vm._v("\n      "+_vm._s(_vm.renderColumns())+"\n      "),_vm._t("columns")]},proxy:true}],null,true)},'el-table',_vm.attrs,false),_vm.events)),(_vm.value.page.enable)?_c('el-pagination',_vm._g(_vm._b({ref:"page",style:({height:_vm.styles.pageHeight})},'el-pagination',_vm.value.page,false),_vm.events)):_vm._e()],1)}
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/agel-table.vue?vue&type=template&id=0d24d59c&
+// CONCATENATED MODULE: ./src/agel-table.vue?vue&type=template&id=d6d9a48e&
 
 // EXTERNAL MODULE: ./node_modules/_core-js@2.6.11@core-js/modules/es7.object.get-own-property-descriptors.js
 var es7_object_get_own_property_descriptors = __webpack_require__("5ab2");
@@ -451,6 +451,8 @@ var props = function props() {
     rowHeight: 0,
     // 总高度
     totalHeight: 0,
+    // 渲染区域高度
+    renderHeight: 0,
     // 开始渲染位置
     indexStart: 0,
     // 结束渲染位置
@@ -459,8 +461,6 @@ var props = function props() {
     renderNum: 0,
     // 渲染数量偏移量
     offsetNum: 10,
-    // 滚动距离
-    scrollTop: 0,
     // 容器
     warppers: [],
     // 动态渲染数据      
@@ -474,25 +474,12 @@ var props = function props() {
     this.extendApi('virtual', api);
     this.extendApi('virtualScrollToRow', this.virtualScrollToRow);
   },
-  mounted: function mounted() {
-    if (this.value.virtual.enable) this.createVirtualScroll();
-  },
   watch: {
-    "value.data": function valueData() {
-      this.createVirtualScroll();
+    'value.$ref.layout.bodyHeight': function value$refLayoutBodyHeight(v) {
+      v != null && this.createVirtualScroll();
     },
-    'value.$ref.layout.bodyHeight': function value$refLayoutBodyHeight() {
+    'value.data': function valueData() {
       this.createVirtualScroll();
-    }
-  },
-  computed: {
-    // 虚拟滚动是否成立
-    isVirtualScroll: function isVirtualScroll() {
-      var data = this.value.data;
-      var a = this.value.virtual.enable;
-      var b = data && data.length > 0;
-      var c = data && data.length > this.value.virtual.renderNum * 2;
-      return a && b && c;
     }
   },
   methods: {
@@ -500,9 +487,10 @@ var props = function props() {
     createVirtualScroll: function createVirtualScroll() {
       var _this = this;
 
-      if (!this.value.virtual.enable) return;
+      if (!this.value.virtual.enable || !this.$refs.table) return;
       setTimeout(function () {
-        var el = _this.value.$ref.$el;
+        var data = _this.value.data;
+        var el = _this.$refs.table.$el;
         var warpper = el.querySelector('.el-table__body-wrapper');
         var fixedWrapper = el.querySelector(".el-table__fixed .el-table__fixed-body-wrapper");
         var rightFixedWrapper = el.querySelector(".el-table__fixed-right .el-table__fixed-body-wrapper");
@@ -511,12 +499,14 @@ var props = function props() {
         });
         var rowHeight = _this.value.virtual.rowHeight;
         var renderHeight = warpper.clientHeight;
-        var totalHeight = _this.value.data.length * rowHeight;
+        var totalHeight = data.length * rowHeight;
 
         var renderNum = Math.ceil(renderHeight / rowHeight) + _this.value.virtual.offsetNum;
 
+        renderNum = data.length < renderNum ? data.length : renderNum;
         if (rowHeight == 0 || !rowHeight) throw "rowHeight 不可为空"; // 记录虚拟滚动参数
 
+        _this.value.virtual.renderHeight = renderHeight;
         _this.value.virtual.rowHeight = rowHeight;
         _this.value.virtual.totalHeight = totalHeight;
         _this.value.virtual.renderNum = renderNum;
@@ -529,9 +519,8 @@ var props = function props() {
 
         if (indexColumn && indexColumn.index == undefined) {
           _this.$set(indexColumn, 'index', _this.getVirtualScrollIndex);
-        }
+        } // 创建容器
 
-        if (!_this.isVirtualScroll) return; // 添加 event 创建虚拟滚动占位容器
 
         warpper.removeEventListener("scroll", _this.onVirtualScroll);
         warpper.addEventListener("scroll", _this.onVirtualScroll);
@@ -553,7 +542,7 @@ var props = function props() {
     },
     // scroll event
     onVirtualScroll: function onVirtualScroll(e) {
-      if (!this.isVirtualScroll) return;
+      if (!this.value.virtual.enable) return;
       var _this$value$virtual = this.value.virtual,
           rowHeight = _this$value$virtual.rowHeight,
           renderNum = _this$value$virtual.renderNum,
@@ -565,8 +554,7 @@ var props = function props() {
       if (indexStart < 0) indexStart = 0;
       if (indexStart > max - renderNum) indexStart = max - renderNum;
       this.value.virtual.indexStart = indexStart;
-      this.value.virtual.indexEnd = indexStart + renderNum;
-      this.value.virtual.scrollTop = indexStart * rowHeight; // 计算容器偏移
+      this.value.virtual.indexEnd = indexStart + renderNum; // 计算容器偏移
 
       warppers.forEach(function (el) {
         var warppersBody = el.querySelector('.el-table__body');
@@ -576,26 +564,20 @@ var props = function props() {
     },
     // 计算当前渲染的数据
     setVirtualScrollData: function setVirtualScrollData() {
-      if (!this.isVirtualScroll) return; // 放到计算属性中会有延迟 
-
+      if (!this.value.virtual.enable) return;
       this.value.virtual.data = this.value.data.slice(this.value.virtual.indexStart, this.value.virtual.indexEnd);
-    },
-    // 获取当前 index 位置
-    getVirtualScrollIndex: function getVirtualScrollIndex(index) {
-      return this.isVirtualScroll ? index + this.value.virtual.indexStart + 1 : index + 1;
     },
     // 滚动到指定行
     virtualScrollToRow: function virtualScrollToRow(indexStart) {
-      if (!this.isVirtualScroll) return;
-      var _this$value$virtual2 = this.value.virtual,
-          rowHeight = _this$value$virtual2.rowHeight,
-          warppers = _this$value$virtual2.warppers;
+      var rowHeight = this.value.virtual.rowHeight;
       indexStart = indexStart - 1 < 0 ? 0 : indexStart - 1;
-      warppers.forEach(function (el) {
-        var warppersBody = el.querySelector('.el-table__body');
+      this.value.virtual.warppers.forEach(function (el) {
         el.scrollTop = indexStart * rowHeight;
-        warppersBody.style.transform = "translateY(".concat(indexStart * rowHeight, "px)");
       });
+    },
+    // 获取当前 index 位置
+    getVirtualScrollIndex: function getVirtualScrollIndex(index) {
+      return this.value.virtual.enable ? index + this.value.virtual.indexStart + 1 : index + 1;
     }
   }
 });
@@ -782,7 +764,9 @@ var base_props = function props() {
     var extendObj = base_props();
     var api = Object.assign(base_props(), this.$agelTableConfig.table || {}, this.value);
     Object.keys(api).forEach(function (key) {
-      _this.extendApi(key, api[key], extendObj.hasOwnProperty(key));
+      // if (!this.value.hasOwnProperty(key)) {
+      _this.extendApi(key, api[key], extendObj.hasOwnProperty(key)); // }
+
     });
     this.extendApi("getQuery", this.getQuery);
     this.extendApi("getData", this.getData);
@@ -953,7 +937,7 @@ function guid() {
       if (!columns || columns.length === 0) return;
       this.$slots.columns = this.getColumnsVnode(columns);
       this.$nextTick(function () {
-        _this4.$refs.table.doLayout();
+        _this4.$refs.table && _this4.$refs.table.doLayout();
       });
     }
   }
@@ -1084,7 +1068,7 @@ var kebabcase = function kebabcase(v) {
       return events;
     },
     data: function data() {
-      return this.isVirtualScroll ? this.value.virtual.data : this.value.data;
+      return this.value.virtual.enable ? this.value.virtual.data : this.value.data;
     }
   },
   watch: {
@@ -4002,7 +3986,7 @@ exports = module.exports = __webpack_require__("690e")(false);
 
 
 // module
-exports.push([module.i, ".agel-table{width:100%;height:auto;overflow:hidden}.agel-pagination{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:end;-ms-flex-align:end;align-items:flex-end;padding:0 0;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end}.agel-table .el-table__empty-text{position:absolute;left:50%;-webkit-transform:translateX(-50%);transform:translateX(-50%)}", ""]);
+exports.push([module.i, ".agel-table{width:100%;height:auto;overflow:hidden}.agel-pagination{display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-align:center;-ms-flex-align:center;align-items:center;padding:0 0;-webkit-box-pack:end;-ms-flex-pack:end;justify-content:flex-end}.agel-table .el-table__empty-text{position:absolute;left:50%;-webkit-transform:translateX(-50%);transform:translateX(-50%)}", ""]);
 
 // exports
 

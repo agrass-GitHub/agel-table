@@ -95,7 +95,9 @@ export default {
       return events;
     },
     data() {
-      return this.isVirtualScroll ? this.value.virtual.data : this.value.data;
+      return this.value.virtual.enable
+        ? this.value.virtual.data
+        : this.value.data;
     },
   },
   watch: {
@@ -130,7 +132,7 @@ export default {
 
 .agel-pagination {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   padding: 0px 0px;
   justify-content: flex-end;
 }

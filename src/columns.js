@@ -81,7 +81,7 @@ export default {
       if (!columns || columns.length === 0) return;
       this.$slots.columns = this.getColumnsVnode(columns);
       this.$nextTick(() => {
-        this.$refs.table.doLayout();
+        this.$refs.table && this.$refs.table.doLayout();
       });
     },
   }
