@@ -1,13 +1,7 @@
 <template>
-  <div
-    ref="container"
-    v-if="LOAD"
-    v-loading="value.loading"
-    :style="styles.container"
-    class="agel-table"
-  >
+  <div ref="container" v-loading="value.loading" class="agel-table" :style="{height:styles.containerHeight}">
     <!-- el-table -->
-    <el-table ref="table" v-bind="attrs" v-on="events" style="width:100%">
+    <el-table ref="table" v-bind="attrs" :data="data" :height="styles.tableHeight" v-on="events" style="width:100%">
       <!-- append  -->
       <template v-slot:append>
         <slot name="append" />
@@ -26,221 +20,104 @@
     </el-table>
 
     <!-- el-pagination -->
-    <el-pagination
-      ref="page"
-      v-if="value.isPage"
-      v-bind="value.page"
-      v-on="events"
-      :style="styles.page"
-    ></el-pagination>
+    <el-pagination v-if="value.page.enable" ref="page" v-bind="value.page" v-on="events" :style="{height:styles.pageHeight}"></el-pagination>
   </div>
 </template>
  
 <script>
-import { guid, kebabcase } from './tool';
-import getApi from './api';
-import getColumnsVnode from './columns-vnode';
+import virtualScroll from "./virtual-scroll";
+import mergeCell from "./merge-cell";
+import page from "./page";
+import base from "./base";
+import columns from "./columns";
+
+export const kebabcase = (v) => v.replace(/([A-Z])/g, "-$1").toLowerCase();
+
 export default {
-  name: 'agel-table',
   install(vue, opts = {}) {
     vue.prototype.$agelTableConfig = opts;
     vue.component(opts.name || this.name, this);
   },
+  name: "agel-table",
+  mixins: [base, columns, page, virtualScroll, mergeCell],
   props: {
     value: {
       required: true,
       type: Object,
-      default: () => new Object()
+      default: () => new Object(),
     },
     attach: {
       type: Object,
-      default: () => new Object()
-    }
+      default: () => new Object(),
+    },
   },
   data() {
     return {
-      API: {},
-      LOAD: false
+      interceptEvent: {},
+      extendKeys: new Set([]),
     };
   },
   computed: {
     styles() {
-      return this.getStyles();
+      let { height, page = {} } = this.value;
+      return {
+        containerHeight: height,
+        pageHeight: page.height + "px",
+        tableHeight: height
+          ? page.enable
+            ? `calc(100% - ${page.height}px)`
+            : "100%"
+          : height,
+      };
     },
+    // 过滤出扩展 api 以外的属性
     attrs() {
-      return this.getAttrs();
-    },
-    events() {
-      return this.getEvents();
-    },
-    columns() {
-      return this.getColumns(this.value.columns);
-    },
-    flatColumns() {
-      return this.getFlatColumns(this.columns);
-    },
-    mergeKeys() {
-      return this.getMergeKeys(this.flatColumns);
-    },
-    mergeSpans() {
-      return this.getMergeSpans();
-    }
-  },
-  watch: {
-    attach: {
-      deep: true,
-      handler: 'initApi'
-    },
-    'value.isResize': 'registerResize'
-  },
-  created() {
-    this.initApi();
-  },
-  beforeDestroy() {
-    this.registerResize(false);
-  },
-  methods: {
-    initApi() {
-      let api = getApi.call(this);
-      this.$emit('input', {
-        ...api.defaultApi,
-        ...api.extendApi,
-        ...api.globalApi,
-        ...api.localApi,
-        page: {
-          ...api.pageApi,
-          ...api.globalPageApi,
-          ...api.localPageApi
-        }
-      });
-      this.API = api;
-      if (this.LOAD) return;
-      this.$nextTick()
-        .then(() => (this.LOAD = true))
-        .then(() => {
-          this.value.$ref = this.$refs.table;
-          this.value.immediate && this.value.getData();
-          this.registerResize();
-        });
-    },
-    getAttrs() {
       let attrs = {};
+      let extendKeys = Array.from(this.extendKeys);
       for (const key in this.value) {
-        if (!this.API.extendApi.hasOwnProperty(key)) {
-          attrs[key] = this.value[key];
-        }
-      }
-      if (attrs.height && this.value.isPage) {
-        let proxyH = Number(attrs.height) - this.value.page.height;
-        attrs.height = proxyH < 0 ? 0 : proxyH;
+        if (!extendKeys.includes(key)) attrs[key] = this.value[key];
       }
       return attrs;
     },
-    getEvents() {
+    // 事件代理层
+    events() {
       let events = {};
-      let { eventsApi: a, localEventsApi: b } = this.API;
+      let a = this.interceptEvent;
+      let b = this.value.on;
       for (let key in { ...a, ...b }) {
         // 事件拦截，在提交event之前可以做点什么...
-        events[kebabcase(key)] = (...params) => {
-          let customKey;
-          if (a[key]) customKey = a[key](...params) || key;
-          if (b[customKey]) b[customKey](...params);
+        events[kebabcase(key)] = (...p) => {
+          let cusotmKey = key;
+          if (a[key]) cusotmKey = a[key](...p) || key;
+          if (b[cusotmKey]) b[cusotmKey](...p);
         };
       }
       return events;
     },
-    getStyles() {
-      let { height, page } = this.value;
-      return {
-        container: { height: height ? height + 'px' : 'auto' },
-        page: { height: page.height ? page.height + 'px' : 'auto' }
-      };
+    data() {
+      return this.isVirtualScroll ? this.value.virtual.data : this.value.data;
     },
-    getColumns(columns) {
-      let config = columns;
-      if (!Array.isArray(config)) {
-        config = Object.keys(columns).map(k => {
-          let v = columns[k];
-          if (v.prop == undefined) this.$set(v, 'prop', k);
-          return v;
-        });
-      }
-      return config
-        .map(v => {
-          let o = {};
-          let attrs = { ...this.API.globalColumnApi, key: guid() };
-          for (const key in attrs) {
-            if (v[key] == undefined) this.$set(v, key, attrs[key]);
+  },
+  watch: {
+    // 实时同步到 value，解决 value 不能为计算属性的弊端
+    attach: {
+      deep: true,
+      immediate: true,
+      handler: function () {
+        for (let key in this.attach) {
+          if (this.attach[key] !== undefined) {
+            this.$set(this.value, key, this.attach[key]);
           }
-          if (v.children) {
-            o.children = this.getColumns(v.children);
-            if (o.children.length == 0) v.key = guid();
-          }
-          return { ...v, ...o };
-        })
-        .filter(v => v.display);
+        }
+      },
     },
-    getFlatColumns(columns) {
-      return columns.reduce((result, v) => {
-        return result.concat(
-          Array.isArray(v.children) && v.children.length > 0
-            ? this.getFlatColumns(v.children)
-            : v
-        );
-      }, []);
+  },
+  methods: {
+    extendApi(key, value, add = true) {
+      add && this.extendKeys.add(key);
+      this.$set(this.value, key, value);
     },
-    getMergeKeys() {
-      let { isMerge, rowKey } = this.value;
-      if (rowKey) return [];
-      return this.flatColumns
-        .filter(v => {
-          let merge = v.merge === undefined ? isMerge : v.merge;
-          return v.prop && merge && !v.type;
-        })
-        .map(v => v.key);
-    },
-    getMergeSpans() {
-      let spanArr = [];
-      let spanIndex = -1;
-      this.mergeKeys.forEach(k => {
-        this.value.data.forEach((cur, i) => {
-          let next = this.value.data[i + 1];
-          let prev = this.value.data[i - 1];
-          if (spanArr[i] == undefined) spanArr[i] = {};
-          spanArr[i][k] = { rowspan: 1, colspan: 1 };
-          if (next && cur[k] == next[k]) {
-            if (spanIndex == -1) {
-              spanIndex = i;
-              spanArr[spanIndex][k].rowspan++;
-            } else {
-              spanArr[spanIndex][k].rowspan++;
-              spanArr[i][k].rowspan = 0;
-            }
-          } else {
-            spanIndex = -1;
-            spanArr[i][k].rowspan = prev && prev[k] == cur[k] ? 0 : 1;
-          }
-        });
-      });
-      return spanArr;
-    },
-    renderColumns() {
-      let columns = this.columns;
-      if (!columns || columns.length === 0) return;
-      this.$slots.columns = getColumnsVnode.call(this, columns);
-      this.$nextTick(() => {
-        this.$refs.table.doLayout();
-      });
-    },
-    registerResize(isResize = this.value.isResize) {
-      if (isResize) {
-        this.value.resize();
-        window.addEventListener('resize', this.value.resize);
-      } else {
-        window.removeEventListener('resize', this.value.resize);
-      }
-    }
-  }
+  },
 };
 </script>
  
@@ -253,8 +130,8 @@ export default {
 
 .agel-pagination {
   display: flex;
-  align-items: center;
-  padding: 0px 25px;
+  align-items: flex-end;
+  padding: 0px 0px;
   justify-content: flex-end;
 }
 

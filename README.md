@@ -44,7 +44,7 @@
           // ... All attrs
           data: [],
           columns: [{ label: "姓名", prop: "name" }],
-          page: {},
+          page: {enable:true},
           on: {}
         }
       };
@@ -78,20 +78,4 @@ Vue.component('agel-table', agelTable);
 ::: tip
 
 - 请按需配置进行覆盖，谨慎覆盖内置属性
-- 可在全局灵活的为 table 自定义配置你需要的属性或者方法
-  :::
-
-```js
-let table = {
-  ...api.defaultApi, // 默认配置
-  ...api.extendApi, // 扩展配置
-  ...api.globalApi, // 全局配置
-  ...api.localApi, // 局部配置 {...table,...attach}
-  columns: this.getColumns(api.localApi.columns, api.globalColumnApi), // 合并列配置
-  page: {
-    ...api.pageApi, //默认分页配置
-    ...api.globalPageApi, //全局分页配置
-    ...api.localPageApi //局部分页配置
-  }
-};
-```
+- 可在全局灵活的为 table 自定义配置你需要的属性或者方

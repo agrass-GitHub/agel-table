@@ -11,18 +11,19 @@
     "element-ui",
     "element-ui table",
     "easy table",
+    "bigData table",
     "vue"
   ],
   "scripts": {
     "serve": "vuepress dev docs",
     "build": "vuepress build docs",
     "lint": "vue-cli-service lint",
+    "buildlib": "vue-cli-service build --target lib --name agel-table --dest lib ./src/index.js",
     "publish": "vue-cli-service build --target lib --name agel-table --dest lib ./src/index.js && npm publish",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {},
   "peerDependencies": {
-    "core-js": ">=2.6.5",
     "element-ui": ">=2.12.0",
     "vue": ">=2.6.10"
   },
@@ -31,12 +32,12 @@
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-service": "^3.11.0",
     "babel-eslint": "^10.0.1",
-    "element-ui": "^2.13.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "gh-pages": "^2.1.1",
     "vue-template-compiler": "^2.6.10",
-    "vuepress": "^1.2.0"
+    "vuepress": "^1.7.1",
+    "vuepress-plugin-run": "^1.0.2"
   },
   "postcss": {
     "plugins": {

@@ -28,3 +28,26 @@ footer: MIT Licensed | Copyright © 2019-present
   };
 </script>
 ```
+<ClientOnly>
+  <basics/>
+</ClientOnly>
+
+::: run {title: '基础 table'}
+```html
+<template>
+  <div>
+   111111111111111
+  </div>
+</template>
+<script>
+  export default {
+    data() {
+      return {
+        table: {
+          name:11
+        }
+      };
+    }
+  };
+</script>
+` ` `

@@ -1,7 +1,3 @@
-const path = require('path');
-const resolve = (dir) => path.join(__dirname, dir);
-const production = process.env.NODE_ENV === 'production';
-
 module.exports = {
   title: 'agel-table | 使用文档',
   description: '基于 element-ui table 的二次封装组件',
@@ -20,12 +16,15 @@ module.exports = {
           { text: '日志', link: '/log' }
         ]
       },
-      { text: '演示', link: '/demo' },
       { text: 'Github', link: 'https://github.com/agrass-GitHub/agel-table' }
     ],
     sidebar: [['/guide', '介绍'], '/api', '/sum', '/log']
   },
-  chainWebpack: (config) => {
-    config.resolve.alias.set('@', resolve('src'));
-  }
+  plugins: {
+    run: {
+      jsLabs: ['https://unpkg.com/element-ui/lib/index.js'],
+      cssLabs: ['https://unpkg.com/element-ui/lib/theme-chalk/index.css'],
+      reverse: true,
+    }
+  },
 };
