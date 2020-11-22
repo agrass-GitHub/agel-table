@@ -25,21 +25,15 @@
 </template>
  
 <script>
-import virtualScroll from "./virtual-scroll";
-import mergeCell from "./merge-cell";
-import page from "./page";
-import base from "./base";
+import core from "./core";
 import columns from "./columns";
-
-export const kebabcase = (v) => v.replace(/([A-Z])/g, "-$1").toLowerCase();
+import query from "./query";
+import mergeCell from "./merge-cell";
+import virtualScroll from "./virtual-scroll";
 
 export default {
-  install(vue, opts = {}) {
-    vue.prototype.$agelTableConfig = opts;
-    vue.component(opts.name || this.name, this);
-  },
   name: "agel-table",
-  mixins: [base, columns, page, virtualScroll, mergeCell],
+  mixins: [core, columns, query, mergeCell, virtualScroll],
   props: {
     value: {
       required: true,
@@ -51,57 +45,17 @@ export default {
       default: () => new Object(),
     },
   },
+  install(vue, opts = {}) {
+    vue.prototype.$agelTableConfig = opts;
+    vue.component(opts.name || this.name, this);
+  },
   data() {
     return {
       interceptEvent: {},
       extendKeys: new Set([]),
     };
   },
-  computed: {
-    styles() {
-      let { height, page = {} } = this.value;
-      return {
-        containerHeight: height,
-        pageHeight: page.height + "px",
-        tableHeight: height
-          ? page.enable
-            ? `calc(100% - ${page.height}px)`
-            : "100%"
-          : height,
-      };
-    },
-    // 过滤出扩展 api 以外的属性
-    attrs() {
-      let attrs = {};
-      let extendKeys = Array.from(this.extendKeys);
-      for (const key in this.value) {
-        if (!extendKeys.includes(key)) attrs[key] = this.value[key];
-      }
-      return attrs;
-    },
-    // 事件代理层
-    events() {
-      let events = {};
-      let a = this.interceptEvent;
-      let b = this.value.on;
-      for (let key in { ...a, ...b }) {
-        // 事件拦截，在提交event之前可以做点什么...
-        events[kebabcase(key)] = (...p) => {
-          let cusotmKey = key;
-          if (a[key]) cusotmKey = a[key](...p) || key;
-          if (b[cusotmKey]) b[cusotmKey](...p);
-        };
-      }
-      return events;
-    },
-    data() {
-      return this.value.virtual.enable
-        ? this.value.virtual.data
-        : this.value.data;
-    },
-  },
   watch: {
-    // 实时同步到 value，解决 value 不能为计算属性的弊端
     attach: {
       deep: true,
       immediate: true,

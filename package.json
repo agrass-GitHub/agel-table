@@ -16,10 +16,10 @@
   ],
   "scripts": {
     "serve": "vuepress dev docs",
-    "build": "vue-cli-service build --target lib --name agel-table --dest dist ./src/index.js",
+    "build": "vue-cli-service build --target lib --name agelTable --dest dist ./src/index.js",
     "builddocs": "vuepress build docs",
     "lint": "vue-cli-service lint",
-    "publish": "vue-cli-service build --target lib --name agel-table --dest dist ./src/index.js && npm publish",
+    "publish": "vue-cli-service build --target lib --name agelTable --dest dist ./src/index.js && npm publish",
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {},

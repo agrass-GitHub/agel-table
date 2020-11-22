@@ -1,16 +1,8 @@
 # 更新日志
 
-## v.x.x.x
-
-- `考虑` 列查询功能
-- `考虑` 列拖动功能
-- `考虑` 大数据展示
-- `考虑` columns render 来实现自定义列和表头
-- `否决` 单元格编辑（用户可以很方便自定义列来实现）
-
 ## v.0.1.1
 
-- `新增` slotExpand,slotColumn,slotHeader 属性可配置为函数渲染
+- `新增` slotExpand,slotColumn,slotHeader 属性可配置为 render 函数渲染
 
 ## v.0.1.0
 

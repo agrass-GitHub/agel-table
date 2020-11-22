@@ -15,9 +15,9 @@ const props = function () {
 
 export default {
   created() {
-    let api = Object.assign(props(), this.value.merge || {})
-    this.extendApi('merge', api)
-    if (this.value.spanMethod === undefined) {
+    let merge = Object.assign(props(), this.value.merge || {})
+    this.extendApi('merge', merge)
+    if (this.value.spanMethod === undefined && merge.enable) {
       this.$set(this.value, 'spanMethod', this.spanMethod);
     }
   },
@@ -34,7 +34,7 @@ export default {
     spanMethod({ rowIndex, columnIndex }) {
       if (!this.value.merge.enable) return;
       if (this.mergeSpans.length == 0) return;
-      return this.mergeSpans[rowIndex][this.flatColumns[columnIndex].key];
+      return this.mergeSpans[rowIndex][this.flatColumns[columnIndex].prop];
     },
     // 把数组扩展成一维数组
     getFlatColumns(columns) {
@@ -50,15 +50,14 @@ export default {
     // 拿到要合并的列 key
     getMergeKeys() {
       if (!this.value.merge.enable) return [];
-      let { merge, rowKey, } = this.value;
       // 树形数据不支持合并
-      if (rowKey) return [];
+      if (this.value.rowKey) return [];
       return this.flatColumns
         .filter((v) => {
-          let ismerge = v.merge === undefined ? merge.auto : v.merge;
+          let ismerge = v.merge === undefined ? this.value.merge.auto : v.merge;
           return v.prop && ismerge && !v.type;
         })
-        .map((v) => v.key);
+        .map((v) => v.prop);
     },
     // 拿到要合并列 colspan rowspan
     getMergeSpans() {
