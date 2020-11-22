@@ -10,6 +10,7 @@
 <!-- - [官网 - 使用文档](https://agrass.gitee.io/agel-table/)，gitee 提供服务，国内访问速度较快 -->
 等待中
 
+
 ## 特性
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
@@ -24,59 +25,10 @@
   - 自适应容器高度
   - 数据代理
   - 自动合并相同行
+  - 虚拟滚动支持大数据渲染 10w+
 
-# 使用
 
-## 安装
+## 安装使用
 
-`npm install agel-table --save`
+`cnpm install agel-table --save`
 
-## 简单使用
-
-```html
-<template>
-  <agel-table v-model="table"> </agel-table>
-</template>
-<script>
-  export default {
-    data() {
-      return {
-        table: {
-          // ... All attrs
-          data: [],
-          columns: [{ label: "姓名", prop: "name" }],
-          page: {enable:true},
-          on: {}
-        }
-      };
-    }
-  };
-</script>
-```
-
-## 全局配置
-
-```js
-import agelTable from 'agel-table';
-
-const config = {
-  name: 'agel-table', // component name,use() 生效
-  table: {}, // table attrs
-  column: {} // column attrs
-  page: {}, // page attrs
-}
-
-Vue.use(agelTable, config);
-
-// or
-
-Vue.prototype.$agelTableConfig = config;
-Vue.component('agel-table', agelTable);
-```
-
-## 覆盖策略
-
-::: tip
-
-- 请按需配置进行覆盖，谨慎覆盖内置属性
-- 可在全局灵活的为 table 自定义配置你需要的属性或者方
