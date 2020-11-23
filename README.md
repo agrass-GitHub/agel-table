@@ -30,3 +30,23 @@
 
 `cnpm install agel-table --save`
 
+
+### 如此简单
+
+```html
+<template>
+  <agel-table v-model="table"></agel-table>
+</template>
+ 
+<script>
+export default {
+  data() {
+    return {
+      table: {
+        // ...
+      },
+    };
+  },
+};
+</script>
+```
