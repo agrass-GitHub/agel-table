@@ -7,21 +7,16 @@ module.exports = {
     updatePopup: true,
     nav: [
       { text: '首页', link: '/' },
-      { text: '演示教程', link: '/example' },
+      { text: '教程', link: '/example' },
       { text: 'API', link: '/api' },
-      { text: '总结', link: '/sum' },
+      {
+        text: '其他',
+        items: [
+          { text: '随便总结', link: '/sum' },
+          { text: '更新日志', link: '/log' }
+        ]
+      },
       { text: 'Github', link: 'https://github.com/agrass-GitHub/agel-table' }
     ],
-  },
-  plugins: {
-    run: {
-      jsLabs: [
-        "https://unpkg.com/element-ui/lib/index.js",
-        "https://cdn.jsdelivr.net/gh/agrass-GitHub/agel-table@0.11/dist/agel-table.umd.min.js"
-      ],
-      cssLabs: ['https://unpkg.com/element-ui/lib/theme-chalk/index.css'],
-      css: ".el-table__column-resize-proxy {display:none}",
-      reverse: true,
-    }
   },
 };

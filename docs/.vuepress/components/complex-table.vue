@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="demo">
+    <el-button @click="clearSelection">清空选中</el-button>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -7,8 +8,19 @@
 <script>
 export default {
   data() {
+    let data = [];
+    for (let i = 0; i < 10; i++) {
+      data.push({
+        date: "2016-05-01 10:20",
+        name: "王小虎" + i,
+        sex: i % 2 == 0 ? "男" : "女",
+        address: "上海市普陀区金沙江路 1518 弄",
+        hasChildren: i == 0,
+      });
+    }
     return {
       table: {
+        data,
         border: true,
         stripe: true,
         height: 300,
@@ -16,8 +28,8 @@ export default {
         "highlight-current-row": true,
         "show-summary": true,
         "sum-text": "合计",
-        "row-key": "date",
-        "default-sort": { prop: "date", order: "ascending" },
+        "row-key": "name",
+        "default-sort": { prop: "name", order: "ascending" },
         "tree-props": { children: "children", hasChildren: "hasChildren" },
         "summary-method": () => ["合", "计", "也", "还", "可", "以"],
         "row-class-name": ({ rowIndex }) => {
@@ -42,13 +54,13 @@ export default {
             type: "index",
             align: "center",
             width: 50,
-            index: (index) => index * 2,
+            index: (index) => "#" + (index + 1),
           },
-          { label: "日期", prop: "date", width: 200, sortable: true },
+          { label: "日期", prop: "date", width: 200 },
           {
             label: "配送信息",
             children: [
-              { label: "姓名", prop: "name", width: 80 },
+              { label: "姓名", prop: "name", width: 80, sortable: true },
               {
                 label: "性别",
                 prop: "sex",
@@ -65,59 +77,18 @@ export default {
             ],
           },
         ],
-        data: [
-          {
-            date: "2016-05-01",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1518 弄",
-            hasChildren: true,
+        on: {
+          "selection-change": () => {
+            this.$message.success("选择项发送变化");
           },
-          {
-            date: "2016-05-02",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-03",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-04",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-05",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-06",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-07",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-08",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-        ],
+        },
       },
     };
+  },
+  methods: {
+    clearSelection() {
+      this.table.$ref.clearSelection();
+    },
   },
 };
 </script>

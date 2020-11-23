@@ -62,7 +62,12 @@ export default {
 
 ## 复杂的 Table
 
-展示了 element-ui 官网 el-table 的[大多数例子](https://element.eleme.cn/#/zh-CN/component/table)
+:::tip
+1. 支持所有的 Table Event，相关事件函数都写在 `table.on` 对象里
+2. 支持所有的 Table Method，table 实例会自动挂载到 `table.$ref` 上
+:::
+
+下面的 Demo 展示了 element-ui 官网 el-table 的[大多数例子](https://element.eleme.cn/#/zh-CN/component/table)
 
 <el-tag style="margin:0px 5px 5px 0px" type="success" v-for="text in ['基础表格','带斑马纹表格','带边框表格','带状态表格','固定列','固定表头','单选','多选','排序','表尾合计行','自定义索引','树形数据与懒加载']" :key="text">{{text}}</el-tag>
 
@@ -71,7 +76,8 @@ export default {
 ::: details 点击查看代码
 ```html
 <template>
-  <div>
+  <div class="demo">
+    <el-button @click="clearSelection">清空选中</el-button>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -79,8 +85,19 @@ export default {
 <script>
 export default {
   data() {
+    let data = [];
+    for (let i = 0; i < 10; i++) {
+      data.push({
+        date: "2016-05-01 10:20",
+        name: "王小虎" + i,
+        sex: i % 2 == 0 ? "男" : "女",
+        address: "上海市普陀区金沙江路 1518 弄",
+        hasChildren: i == 0,
+      });
+    }
     return {
       table: {
+        data,
         border: true,
         stripe: true,
         height: 300,
@@ -88,41 +105,39 @@ export default {
         "highlight-current-row": true,
         "show-summary": true,
         "sum-text": "合计",
-        "row-key": "date",
-        "default-sort": { prop: "date", order: "ascending" },
+        "row-key": "name",
+        "default-sort": { prop: "name", order: "ascending" },
         "tree-props": { children: "children", hasChildren: "hasChildren" },
         "summary-method": () => ["合", "计", "也", "还", "可", "以"],
         "row-class-name": ({ rowIndex }) => {
           return rowIndex == 0 ? "success-row" : "";
         },
+        load: (tree, treeNode, resolve) => {
+          setTimeout(() => {
+            resolve([
+              {
+                date: "2016-05-01 10:20",
+                name: "王小虎",
+                sex: "男",
+                address: "上海市普陀区金沙江路 1517 弄",
+              },
+            ]);
+          }, 1000);
+        },
         columns: [
-          {
-            type: "selection",
-            width: 50,
-            align: "center",
-            fixed: true
-          },
+          { type: "selection", width: 50, align: "center", fixed: true },
           {
             label: "#",
             type: "index",
             align: "center",
             width: 50,
-            index: (index) => index * 2,
+            index: (index) => "#" + (index + 1),
           },
-          {
-            label: "日期", 
-            prop: "date", 
-            width: 200, 
-            sortable: true 
-          },
+          { label: "日期", prop: "date", width: 200 },
           {
             label: "配送信息",
             children: [
-              { 
-                label: "姓名",
-                prop: "name",
-                width: 80 
-              },
+              { label: "姓名", prop: "name", width: 80, sortable: true },
               {
                 label: "性别",
                 prop: "sex",
@@ -139,62 +154,26 @@ export default {
             ],
           },
         ],
-        data: [
-          {
-            date: "2016-05-01",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1518 弄",
-            hasChildren: true,
+        on: {
+          "selection-change": () => {
+            this.$message.success("选择项发送变化");
           },
-          {
-            date: "2016-05-02",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-03",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-04",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-05",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-06",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-07",
-            name: "王小虎",
-            sex: "男",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-          {
-            date: "2016-05-08",
-            name: "王小虎",
-            sex: "女",
-            address: "上海市普陀区金沙江路 1517 弄",
-          },
-        ],
+        },
       },
     };
   },
+  methods: {
+    clearSelection() {
+      this.table.$ref.clearSelection();
+    },
+  },
 };
 </script>
+<style>
+.el-table .success-row {
+  background: #f0f9eb;
+}
+</style>
 ```
 :::
 
@@ -555,7 +534,7 @@ export default {
 ## attach 属性的用法
 
 :::tip
-在设计上，秉着聚拢所有的参数为一个 table 对象，在组件初始化完成后会为 table 参数添加额外的内置属性和方法，因此该参数必须使用 `v-model`，且不可设为计算属性
+在设计上，主张的是聚拢所有的参数为一个 table 对象，在组件初始化完成后会为 table 参数添加额外的内置属性和方法，因此该参数必须使用 `v-model`，且不可设为计算属性
 
 为了保持其灵活性，特地添加了 `attach` 参数，配置项与 table 一致，不仅可聚拢也可打散，也可为计算属性，当其发生变化时候，会同步合并到 table 对象中
 
@@ -612,7 +591,7 @@ export default {
 ## query 配置的用法
 
 :::tip
-你可以设置成你项目中所需要的 table `queyrProps`，也可以使用 `formatter` 再进行格式化，建议这一步放在全局配置里面
+你可以设置成你项目中所需要的 table `query.props`，也可以使用 `formatter` 再进行格式化，建议这一步放在全局配置里面
 :::
 
 <ClientOnly><query-table/></ClientOnly>
@@ -673,7 +652,7 @@ export default {
 ## 全局配置的用法
 
 :::tip
-以下配置将应用到每个表格上，支持所有属性配置
+以下配置将应用到每个表格上，支持所有属性配置，注意的是某些内置属性和方法，请勿覆盖
 :::
 
 ```js

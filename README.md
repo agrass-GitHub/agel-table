@@ -6,9 +6,8 @@
 
 ## 文档
 
-<!-- - [官网 - 使用文档 ](https://agrass-github.github.io/agel-table/)，github 提供服务 -->
-<!-- - [官网 - 使用文档](https://agrass.gitee.io/agel-table/)，gitee 提供服务，国内访问速度较快 -->
-等待中
+- [官网 - 使用文档 ](https://agrass-github.github.io/agel-table/)，github 提供服务
+- [官网 - 使用文档](https://agrass.gitee.io/agel-table/)，gitee 提供服务，国内访问速度较快
 
 
 ## 特性
@@ -22,7 +21,6 @@
   - 纯数据配置
   - 动态显隐列
   - 集成分页组件
-  - 自适应容器高度
   - 数据代理
   - 自动合并相同行
   - 虚拟滚动支持大数据渲染 10w+
