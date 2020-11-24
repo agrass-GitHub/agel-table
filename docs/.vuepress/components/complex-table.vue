@@ -79,7 +79,7 @@ export default {
         ],
         on: {
           "selection-change": () => {
-            this.$message.success("选择项发送变化");
+            this.$message.success("选择项发生变化");
           },
         },
       },

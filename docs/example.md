@@ -155,7 +155,7 @@ export default {
         ],
         on: {
           "selection-change": () => {
-            this.$message.success("选择项发送变化");
+            this.$message.success("选择项发生变化");
           },
         },
       },
@@ -686,6 +686,10 @@ const config = {
       order: "order",
       orderColumn: "orderName"
     }
+    formatter: (query) => {
+      query.order = query.order == "descending" ? 1 : 0;
+      return query;
+    },
   }
 }
 

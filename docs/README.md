@@ -1,7 +1,7 @@
 ---
 home: true
 actionText: 起步 →
-actionLink: /guide/
+actionLink: /example/
 features:
   - title: 极简的思想
     details: 面向对象, 参数集中处理, 以一个 table 对象来完成所有的操作

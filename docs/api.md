@@ -81,10 +81,6 @@ sidebar: auto
 | props       | Object   | {currentPage: "currentPage", pageSize: "pageSize", order: "order",orderColumn: "orderColumn"} | 键值配置选项     |
 | formatter   | Function | -           | 对参数进行格式化     |
 
-```js
-// 使用
-const query = this.table.getQuery();
-```
 
 ## page
 
@@ -114,7 +110,7 @@ const query = this.table.getQuery();
 | ----------- | ------  | --------------| ---------------                    | 
 | enable      | Boolean | false         | 是否开启合并     
 | auto        | Boolean | false         | 是否自动合并相同单元格                         |
-| auto        | String  | vertical      | 纵向合并横向合并，可选 vertical,horizontal         |
+| direction   | String  | vertical      | 纵向合并横向合并，可选 vertical,horizontal         |
 
 ## virtual
 
