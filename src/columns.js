@@ -68,11 +68,6 @@ export default {
           if (!extendKeys.includes(key)) attrs[key] = v[key];
         }
         if (v.children && v.children.length > 0) {
-          // return (
-          //   <el-table-column {...{ attrs }} key={v.key}>
-          //     {this.getColumnsVnode(v.children)}
-          //   </el-table-column>
-          // );
           return h("el-table-column", { props: attrs, key: v.key, }, this.getColumnsVnode(v.children))
         }
         const slots = this.getColumnSlots([
@@ -80,9 +75,6 @@ export default {
           ['default', v.slotColumn, true],
           ['default', v.slotExpand || 'expand', v.type == 'expand']
         ]);
-        // return (
-        //   <el-table-column {...{ attrs }} key={v.key} scopedSlots={slots} />
-        // );
         return h("el-table-column", { props: attrs, key: v.key, scopedSlots: slots })
       });
     },
