@@ -23,10 +23,7 @@
     "deploydocs": "npm run builddocs && gh-pages -d distdocs"
   },
   "dependencies": {},
-  "peerDependencies": {
-    "element-ui": ">=2.12.0",
-    "vue": ">=2.6.10"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
