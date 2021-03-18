@@ -28,6 +28,7 @@
 <script>
 import mergeCell from "./merge-cell";
 import virtualScroll from "./virtual-scroll";
+
 import {
   kebabcase,
   guid,
@@ -105,9 +106,7 @@ export default {
       return events;
     },
     data() {
-      return this.value.virtual.enable
-        ? this.value.virtual.data
-        : this.value.data;
+      return this.value.data;
     },
     columns() {
       return this.getColumns(this.value.columns);

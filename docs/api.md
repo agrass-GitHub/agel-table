@@ -110,7 +110,7 @@ sidebar: auto
 | ----------- | ------  | --------------| ---------------                    | 
 | enable      | Boolean | false         | 是否开启合并     
 | auto        | Boolean | false         | 是否自动合并相同单元格                         |
-| direction   | String  | vertical      | 纵向合并横向合并，可选 vertical,horizontal         |
+| direction   | String  | vertical      | 合并方向       |
 
 ## virtual
 

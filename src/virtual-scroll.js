@@ -19,6 +19,13 @@ export default {
       this.createVirtualScroll();
     }
   },
+  computed: {
+    data() {
+      return this.value.virtual.enable
+        ? this.value.virtual.data
+        : this.value.data;
+    },
+  },
   methods: {
     // 创建虚拟滚动
     createVirtualScroll() {
