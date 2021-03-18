@@ -1,40 +1,15 @@
 /**
  * @description 创建虚拟滚动，维持大数据 table 渲染
- * todo  1.checkbox  列 
+ * todo  1.checkbox  列  2. 排序
  */
 
-
-const props = function () {
-  return {
-    // 是否开启
-    enable: false,
-    // 行高度
-    rowHeight: 0,
-    // 总高度
-    totalHeight: 0,
-    // 渲染区域高度
-    renderHeight: 0,
-    // 开始渲染位置
-    indexStart: 0,
-    // 结束渲染位置
-    indexEnd: 0,
-    // 可视区域渲染数量
-    renderNum: 0,
-    // 渲染数量偏移量
-    offsetNum: 10,
-    // 容器
-    warppers: [],
-    // 动态渲染数据      
-    data: [],
-  }
-}
-
+import { virtualProps } from "./props";
 
 export default {
   created() {
-    let api = Object.assign(props(), this.value.virtual || {});
-    this.extendApi('virtual', api)
-    this.extendApi('virtualScrollToRow', this.virtualScrollToRow)
+    const virtual = Object.assign(virtualProps(), this.value.virtual || {});
+    this.$set(this.value, 'virtual', virtual);
+    this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
   },
   watch: {
     'value.$ref.layout.bodyHeight'(v) {

@@ -22,7 +22,6 @@ sidebar: auto
 | 属性        | 类型         | 默认值  | 说明                                 | 
 | ----------- | ------------ | ------ | ------------------------------------ | 
 | ......      | ......       | ...... | All Element-ui Table Attributes      | 
-| \$ref       | Object       | 内置   | Element-ui Table Vue 实例             | 
 | loading     | Boolean      | false  | 是否开启加载状态                       | 
 | data        | Array        | [ ]    | 数据                                 | 
 | columns     | Array/Object | [ ]    | 列配置                               | 
@@ -34,6 +33,7 @@ sidebar: auto
 | request     | Function     | null   | 接口数据代理函数                     |
 | getQuery    | Function     | 内置   | 返回 query 参数                      | 
 | getData     | Function     | 内置   | 工作流程代理函数                     | 
+| getRef      | Function(prop:string)     | 内置   | 获取 table 或 page组件实例   | 
 | virtualScrollToRow     | Function     | 内置   | 滚动到指定行，开启虚拟滚动生效  |
 
 ## column

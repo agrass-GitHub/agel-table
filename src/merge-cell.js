@@ -2,22 +2,14 @@
  * @description 合并相同单元格
  */
 
-const props = function () {
-  return {
-    // 是否开启
-    enable: false,
-    // 是否自动合并相同单元格
-    auto: false,
-    // 合并方向  horizontal  vertical 暂支持纵向
-    direction: "vertical",
-  }
-}
+
+import { mergeProps } from "./props";
 
 export default {
   created() {
-    let merge = Object.assign(props(), this.value.merge || {})
-    this.extendApi('merge', merge)
-    if (this.value.spanMethod === undefined && merge.enable) {
+    const merge = Object.assign(mergeProps(), this.value.merge || {})
+    this.$set(this.value, 'merge', merge)
+    if ((!this.value.spanMethod || !this.value['span-method']) && merge.enable) {
       this.$set(this.value, 'spanMethod', this.spanMethod);
     }
   },

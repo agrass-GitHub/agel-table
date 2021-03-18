@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     clearSelection() {
-      this.table.$ref.clearSelection();
+      this.table.getRef().clearSelection();
     },
   },
 };
