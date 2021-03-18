@@ -24,13 +24,13 @@ export default {
   methods: {
     // 合并函数
     spanMethod({ rowIndex, columnIndex }) {
-      if (!this.value.merge || this.value.merge.enable) return;
+      if (!this.value.merge || !this.value.merge.enable) return;
       if (this.mergeSpans.length == 0) return;
       return this.mergeSpans[rowIndex][this.flatColumns[columnIndex].prop];
     },
     // 把数组扩展成一维数组
     getFlatColumns(columns) {
-      if (!this.value.merge || this.value.merge.enable) return [];
+      if (!this.value.merge || !this.value.merge.enable) return [];
       return columns.reduce((result, v) => {
         return result.concat(
           Array.isArray(v.children) && v.children.length > 0
@@ -41,7 +41,7 @@ export default {
     },
     // 拿到要合并的列 key
     getMergeKeys() {
-      if (!this.value.merge || this.value.merge.enable) return [];
+      if (!this.value.merge || !this.value.merge.enable) return [];
       // 树形数据不支持合并
       if (this.value.rowKey) return [];
       return this.flatColumns
@@ -53,7 +53,7 @@ export default {
     },
     // 拿到要合并列 colspan rowspan
     getMergeSpans() {
-      if (!this.value.merge || this.value.merge.enable) return [];
+      if (!this.value.merge || !this.value.merge.enable) return [];
       let spanArr = [];
       let spanIndex = -1;
       let mergeKeys = this.getMergeKeys();
