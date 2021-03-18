@@ -16,11 +16,11 @@ export const guid = function () {
 
 export const tableProps = function () {
   return {
-    loading: false,
     columns: [],
-    selection: [],
     data: [],
-    on: {},
+    selection: [],
+    loading: false,
+    on: undefined,
     request: undefined,
     getData: this.getData,
     getQuery: this.getQuery,

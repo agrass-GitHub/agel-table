@@ -13,7 +13,7 @@ footer: MIT Licensed | Copyright ©agrss
 ---
 
 
-<!-- <ClientOnly><test-table/></ClientOnly> -->
+<ClientOnly><test-table/></ClientOnly>
 
 
 

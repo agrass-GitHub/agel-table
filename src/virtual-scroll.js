@@ -6,10 +6,17 @@
 import { virtualProps } from "./props";
 
 export default {
+  data() {
+    return {
+      virtualEnable: false,
+    }
+  },
   created() {
     const virtual = Object.assign(virtualProps(), this.value.virtual || {});
-    this.$set(this.value, 'virtual', virtual);
-    this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
+    if (virtual.enable) {
+      this.$set(this.value, 'virtual', virtual);
+      this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
+    }
   },
   watch: {
     'value.$ref.layout.bodyHeight'(v) {
@@ -19,17 +26,10 @@ export default {
       this.createVirtualScroll();
     }
   },
-  computed: {
-    data() {
-      return this.value.virtual.enable
-        ? this.value.virtual.data
-        : this.value.data;
-    },
-  },
   methods: {
     // 创建虚拟滚动
     createVirtualScroll() {
-      if (!this.value.virtual.enable || !this.$refs.table) return;
+      if (!this.value.virtual || !this.value.virtual.enable || !this.$refs.table) return;
       setTimeout(() => {
         let data = this.value.data;
         let el = this.$refs.table.$el;
@@ -79,7 +79,7 @@ export default {
     },
     // scroll event
     onVirtualScroll(e) {
-      if (!this.value.virtual.enable) return;
+      if (!this.value.virtual || !this.value.virtual.enable) return;
       let { rowHeight, renderNum, warppers } = this.value.virtual;
       let scrollTop = e.target.scrollTop;
 
@@ -101,7 +101,7 @@ export default {
     },
     // 计算当前渲染的数据
     setVirtualScrollData() {
-      if (!this.value.virtual.enable) return;
+      if (!this.value.virtual || !this.value.virtual.enable) return;
       this.value.virtual.data = this.value.data.slice(
         this.value.virtual.indexStart,
         this.value.virtual.indexEnd

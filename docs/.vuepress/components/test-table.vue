@@ -11,11 +11,11 @@ export default {
   data() {
     return {
       table: {
-        maxHeight: "14vh",
-        xx: [{ x: 1 }],
         border: true,
         "highlight-current-row": true,
         columns: [
+          { type: "selection", width: 50, align: "center" },
+          { label: "姓名", prop: "name", width: 200 },
           { label: "日期1s", prop: "date", width: 200, sortable: "custom" },
           { label: "姓名", prop: "name", width: 200 },
           { label: "地址", prop: "address", minWidth: 300 },
@@ -24,7 +24,7 @@ export default {
           { date: "2016-05-02", name: "王小虎", address: "上海市" },
           { date: "2016-05-04", name: "王小虎", address: "上海市" },
         ],
-        page: { enable: true, total: 100 },
+        // page: { enable: true, total: 100 },
         on: {
           "page-change"(v) {
             console.log("0", v);
@@ -37,6 +37,9 @@ export default {
           },
           "sort-change"(v) {
             console.log(v);
+          },
+          "selection-change": () => {
+            console.log(this.table.selection);
           },
         },
         request: (query, doen) => {

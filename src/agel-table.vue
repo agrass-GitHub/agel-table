@@ -20,7 +20,8 @@
     </el-table>
 
     <!-- el-pagination -->
-    <el-pagination v-if="value.page.enable" ref="page" v-bind="value.page" :style="{height:styles.pageHeight}" v-on="events"></el-pagination>
+    <el-pagination v-if="value.page && value.page.enable" ref="page" v-bind="value.page" :style="{height:styles.pageHeight}" v-on="events">
+    </el-pagination>
 
   </div>
 </template>
@@ -28,6 +29,7 @@
 <script>
 import mergeCell from "./merge-cell";
 import virtualScroll from "./virtual-scroll";
+import page from "./page";
 
 import {
   kebabcase,
@@ -35,14 +37,13 @@ import {
   defaultProps,
   tableProps,
   queryProps,
-  pageProps,
   columnProps,
 } from "./props";
 
 export default {
   name: "agel-table",
   inheritAttrs: false,
-  mixins: [mergeCell, virtualScroll],
+  mixins: [page, mergeCell, virtualScroll],
   props: {
     value: {
       required: true,
@@ -97,8 +98,9 @@ export default {
         "current-change": this.currentChange,
         "sort-change": this.sortChange,
         "size-change": this.sizeChange,
+        "selection-change": this.selectionChange,
       };
-      for (let key in this.value.on) {
+      for (let key in this.value.on || {}) {
         if (!events[kebabcase(key)]) {
           events[kebabcase(key)] = this.value.on[key];
         }
@@ -106,34 +108,35 @@ export default {
       return events;
     },
     data() {
-      return this.value.data;
+      let { data, enable } = this.value.virtual || {};
+      return enable ? data : this.value.data;
     },
     columns() {
       return this.getColumns(this.value.columns);
     },
   },
   methods: {
+    selectionChange(selection) {
+      this.value.selection = selection;
+      if (this.value.on && this.value.on["selection-change"]) {
+        this.value.on["selection-change"](selection);
+      }
+    },
     sortChange({ column, prop, order }) {
       if (column.sortable !== "custom") return;
       this.value.query.order = order;
       this.value.query.orderColumn = prop;
       this.value.getData();
-      if (this.value.on["sort-change"]) {
+      if (this.value.on && this.value.on["sort-change"]) {
         this.value.on["sort-change"]({ column, prop, order });
       }
     },
     currentChange(...params) {
       // emit page pageChange event
-      if (params.length === 1) {
-        this.value.page.currentPage = params[0];
-        this.value.getData();
-        if (this.value.on["page-change"]) {
-          this.value.on["page-change"](...params);
-        }
-      }
+      if (params.length === 1) this.pageChange(params[0]);
       // emit table currentChange event
       if (params.length === 2) {
-        if (this.value.on["current-change"]) {
+        if (this.value.on && ["current-change"]) {
           this.value.on["current-change"](...params);
         }
       }
@@ -142,18 +145,26 @@ export default {
       this.value.page.currentPage = 1;
       this.value.page.pageSize = size;
       this.value.getData();
-      if (this.value.on["size-change"]) {
+      if (this.value.on && this.value.on["size-change"]) {
         this.value.on["size-change"](size);
       }
     },
     getQuery() {
       let { props, formatter, ...queryObj } = this.value.query;
       let { order, orderColumn, ...otherQuery } = queryObj;
-      return formatter({
-        [props.currentPage]: this.value.page.currentPage,
-        [props.pageSize]: this.value.page.pageSize,
+      let orderQuery = {
         [props.order]: order,
         [props.orderColumn]: orderColumn,
+      };
+      let pageQuery = this.value.page
+        ? {
+            [props.currentPage]: this.value.page.currentPage,
+            [props.pageSize]: this.value.page.pageSize,
+          }
+        : {};
+      return formatter({
+        ...orderQuery,
+        ...pageQuery,
         ...otherQuery,
       });
     },
@@ -173,7 +184,7 @@ export default {
             : res;
           this.value.loading = false;
           this.value.data = data;
-          this.value.page.total = total;
+          this.value.page && (this.value.page.total = total);
         })
         .catch(() => {
           this.value.loading = false;
@@ -260,18 +271,14 @@ export default {
       this.$agelTableConfig.table || {},
       this.value
     );
-    const page = Object.assign(
-      pageProps(),
-      this.$agelTableConfig.page || {},
-      this.value.page || {}
-    );
     const query = Object.assign(
       queryProps(),
       this.$agelTableConfig.query || {},
       this.value.query || {}
     );
-    Object.keys(table).forEach((key) => this.$set(this.value, key, table[key]));
-    this.$set(this.value, "page", page);
+    Object.keys(table).forEach((key) => {
+      table[key] != undefined && this.$set(this.value, key, table[key]);
+    });
     this.$set(this.value, "query", query);
   },
   install(vue, opts = {}) {
