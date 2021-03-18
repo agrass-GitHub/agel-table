@@ -141,14 +141,6 @@ export default {
         }
       }
     },
-    sizeChange(size) {
-      this.value.page.currentPage = 1;
-      this.value.page.pageSize = size;
-      this.value.getData();
-      if (this.value.on && this.value.on["size-change"]) {
-        this.value.on["size-change"](size);
-      }
-    },
     getQuery() {
       let { props, formatter, ...queryObj } = this.value.query;
       let { order, orderColumn, ...otherQuery } = queryObj;
