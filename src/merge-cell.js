@@ -15,9 +15,9 @@ const props = function () {
 
 export default {
   created() {
-    let merge = Object.assign(props(), this.value.merge || {})
-    this.extendApi('merge', merge)
-    if (this.value.spanMethod === undefined && merge.enable) {
+    const merge = Object.assign(props(), this.value.merge || {})
+    this.$set(this.value, 'merge', merge)
+    if ((!this.value.spanMethod || !this.value['span-method']) && merge.enable) {
       this.$set(this.value, 'spanMethod', this.spanMethod);
     }
   },

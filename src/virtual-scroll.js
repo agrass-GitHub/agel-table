@@ -32,9 +32,9 @@ const props = function () {
 
 export default {
   created() {
-    let api = Object.assign(props(), this.value.virtual || {});
-    this.extendApi('virtual', api)
-    this.extendApi('virtualScrollToRow', this.virtualScrollToRow)
+    const virtual = Object.assign(props(), this.value.virtual || {});
+    this.$set(this.value, 'virtual', virtual);
+    this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
   },
   watch: {
     'value.$ref.layout.bodyHeight'(v) {

@@ -12,6 +12,11 @@ features:
 footer: MIT Licensed | Copyright ©agrss 
 ---
 
+
+<ClientOnly><test-table/></ClientOnly>
+
+
+
 ### 如此简单
 
 ```html

@@ -63,7 +63,7 @@ export default {
 
 :::tip
 1. 支持所有的 Table Event，相关事件函数都写在 `table.on` 对象里
-2. 支持所有的 Table Method，table 实例会自动挂载到 `table.$ref` 上
+2. 支持所有的 Table Method，table 实例会自动挂载到 `table.getRef` 获取
 :::
 
 下面的 Demo 展示了 element-ui 官网 el-table 的[大多数例子](https://element.eleme.cn/#/zh-CN/component/table)
@@ -163,7 +163,7 @@ export default {
   },
   methods: {
     clearSelection() {
-      this.table.$ref.clearSelection();
+      this.table.getRef().clearSelection();
     },
   },
 };
