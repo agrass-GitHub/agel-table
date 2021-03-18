@@ -1,3 +1,8 @@
+/**
+ * @description props api参数
+ */
+
+
 export const kebabcase = (v) => v.replace(/([A-Z])/g, "-$1").toLowerCase();
 
 export const guid = function () {
@@ -60,6 +65,57 @@ export const columnProps = function () {
     children: undefined,
   };
 };
+
+const virtualProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 行高度
+    rowHeight: 0,
+    // 总高度
+    totalHeight: 0,
+    // 渲染区域高度
+    renderHeight: 0,
+    // 开始渲染位置
+    indexStart: 0,
+    // 结束渲染位置
+    indexEnd: 0,
+    // 可视区域渲染数量
+    renderNum: 0,
+    // 渲染数量偏移量
+    offsetNum: 10,
+    // 容器
+    warppers: [],
+    // 动态渲染数据      
+    data: [],
+  }
+}
+
+const mergeProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 行高度
+    rowHeight: 0,
+    // 总高度
+    totalHeight: 0,
+    // 渲染区域高度
+    renderHeight: 0,
+    // 开始渲染位置
+    indexStart: 0,
+    // 结束渲染位置
+    indexEnd: 0,
+    // 可视区域渲染数量
+    renderNum: 0,
+    // 渲染数量偏移量
+    offsetNum: 10,
+    // 容器
+    warppers: [],
+    // 动态渲染数据      
+    data: [],
+  }
+}
+
 
 export const defaultProps = [
   "data",
