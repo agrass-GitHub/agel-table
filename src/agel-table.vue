@@ -29,21 +29,21 @@
 <script>
 import mergeCell from "./merge-cell";
 import virtualScroll from "./virtual-scroll";
-import page from "./page";
 
 import {
   kebabcase,
   guid,
   defaultProps,
   tableProps,
-  queryProps,
   columnProps,
+  queryProps,
+  pageProps,
 } from "./props";
 
 export default {
   name: "agel-table",
   inheritAttrs: false,
-  mixins: [page, mergeCell, virtualScroll],
+  mixins: [mergeCell, virtualScroll],
   props: {
     value: {
       required: true,
@@ -108,8 +108,9 @@ export default {
       return events;
     },
     data() {
-      let { data, enable } = this.value.virtual || {};
-      return enable ? data : this.value.data;
+      return this.getProps("virtual")
+        ? this.value.virtual.data
+        : this.value.data;
     },
     columns() {
       return this.getColumns(this.value.columns);
@@ -123,10 +124,15 @@ export default {
       }
     },
     sortChange({ column, prop, order }) {
-      if (column.sortable !== "custom") return;
-      this.value.query.order = order;
-      this.value.query.orderColumn = prop;
-      this.value.getData();
+      if (typeof column.sortable == "string") {
+        this.value.query.order = order;
+        this.value.query.orderColumn = prop;
+        if (column.sortable == "custom-by-virtual") {
+          this.getVirtualSortData();
+        } else {
+          this.value.getData();
+        }
+      }
       if (this.value.on && this.value.on["sort-change"]) {
         this.value.on["sort-change"]({ column, prop, order });
       }
@@ -136,36 +142,46 @@ export default {
       if (params.length === 1) this.pageChange(params[0]);
       // emit table currentChange event
       if (params.length === 2) {
-        if (this.value.on && ["current-change"]) {
+        if (this.value.on && this.value.on["current-change"]) {
           this.value.on["current-change"](...params);
         }
       }
     },
+    pageChange(page) {
+      this.value.page.currentPage = page;
+      this.setQuery("currentPage", this.value.page.currentPage);
+      this.value.getData();
+      if (this.value.on && this.value.on["page-change"]) {
+        this.value.on["page-change"](page);
+      }
+    },
+    sizeChange(size) {
+      this.value.page.currentPage = 1;
+      this.value.page.pageSize = size;
+      this.setQuery("currentPage", this.value.page.currentPage);
+      this.setQuery("pageSize", this.value.page.pageSize);
+      this.value.getData();
+      if (this.value.on && this.value.on["size-change"]) {
+        this.value.on["size-change"](size);
+      }
+    },
+    setQuery(key, value) {
+      let props = this.value.queryProps;
+      if (!props[key]) return;
+      if (typeof props[key] === "string") {
+        this.$set(this.value.query, props[key], value);
+      }
+      if (typeof props[key] === "function") {
+        let [newkey, newValue] = props[key](value);
+        this.$set(this.value.query, newkey, newValue);
+      }
+    },
     getQuery() {
-      let { props, formatter, ...queryObj } = this.value.query;
-      let { order, orderColumn, ...otherQuery } = queryObj;
-      let orderQuery = {
-        [props.order]: order,
-        [props.orderColumn]: orderColumn,
-      };
-      let pageQuery = this.value.page
-        ? {
-            [props.currentPage]: this.value.page.currentPage,
-            [props.pageSize]: this.value.page.pageSize,
-          }
-        : {};
-      return formatter({
-        ...orderQuery,
-        ...pageQuery,
-        ...otherQuery,
-      });
+      return this.value.query;
     },
     getData() {
       let request = this.value.request;
-      if (!request || typeof request != "function") {
-        console.error("缺少 request 参数，且必须为函数");
-        return;
-      }
+      if (!request || typeof request != "function") return;
       this.value.loading = true;
       return new Promise((resolve, reject) => {
         return request(this.getQuery(), resolve, reject);
@@ -176,7 +192,7 @@ export default {
             : res;
           this.value.loading = false;
           this.value.data = data;
-          this.value.page && (this.value.page.total = total);
+          if (this.getProps("page")) this.value.page.total = total;
         })
         .catch(() => {
           this.value.loading = false;
@@ -184,6 +200,11 @@ export default {
     },
     getRef(name = "table") {
       return this.$refs[name];
+    },
+    getProps(name) {
+      return this.value[name] && this.value[name].enable
+        ? this.value[name]
+        : false;
     },
     getColumns(columns) {
       let config = columns;
@@ -196,11 +217,11 @@ export default {
       }
       return config
         .map((v) => {
-          let attrs = Object.assign(
-            columnProps(),
-            this.$agelTableConfig.column || {},
-            v
-          );
+          let config = this.$agelTableConfig.column || {};
+          let attrs = Object.assign(columnProps(), config, v);
+          if (this.getProps("virtual") && attrs.sortable === true) {
+            attrs.sortable = "custom-by-virtual";
+          }
           if (attrs.children) {
             attrs.children = this.getColumns(attrs.children);
             if (attrs.children.length == 0) attrs.key = guid();
@@ -238,15 +259,14 @@ export default {
             this.getColumnsVnode(v.children)
           );
         }
-        const slots = this.getColumnSlots([
-          ["header", v.slotHeader, true],
-          ["default", v.slotColumn, true],
-          ["default", v.slotExpand || "expand", v.type == "expand"],
-        ]);
         return h("el-table-column", {
           props: attrs,
           key: v.key,
-          scopedSlots: slots,
+          scopedSlots: this.getColumnSlots([
+            ["header", v.slotHeader, true],
+            ["default", v.slotColumn, true],
+            ["default", v.slotExpand || "expand", v.type == "expand"],
+          ]),
         });
       });
     },
@@ -258,20 +278,37 @@ export default {
     },
   },
   created() {
+    // table
     const table = Object.assign(
       tableProps.call(this),
       this.$agelTableConfig.table || {},
       this.value
     );
-    const query = Object.assign(
-      queryProps(),
-      this.$agelTableConfig.query || {},
-      this.value.query || {}
-    );
     Object.keys(table).forEach((key) => {
       table[key] != undefined && this.$set(this.value, key, table[key]);
     });
-    this.$set(this.value, "query", query);
+
+    // queryProps
+    const queryPropsFormat = Object.assign(
+      queryProps(),
+      this.$agelTableConfig.queryProps || {},
+      this.value.queryProps || {}
+    );
+    this.$set(this.value, "queryProps", queryPropsFormat);
+    this.setQuery("orderColumn", "");
+    this.setQuery("order", "");
+
+    // page
+    const page = Object.assign(
+      pageProps(),
+      this.$agelTableConfig.page || {},
+      this.value.page || {}
+    );
+    if (this.value.page || this.$agelTableConfig.page) {
+      this.$set(this.value, "page", page);
+      this.setQuery("currentPage", this.value.page.currentPage);
+      this.setQuery("pageSize", this.value.page.pageSize);
+    }
   },
   install(vue, opts = {}) {
     vue.prototype.$agelTableConfig = opts;

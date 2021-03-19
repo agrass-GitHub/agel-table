@@ -8,7 +8,7 @@ import { mergeProps } from "./props";
 export default {
   created() {
     const merge = Object.assign(mergeProps(), this.value.merge || {})
-    if (merge.enable) {
+    if (this.value.merge) {
       this.$set(this.value, 'merge', merge);
       this.$set(this.value, 'spanMethod', this.spanMethod);
     }
@@ -24,13 +24,13 @@ export default {
   methods: {
     // 合并函数
     spanMethod({ rowIndex, columnIndex }) {
-      if (!this.value.merge || !this.value.merge.enable) return;
+      if (!this.getProps("merge")) return;
       if (this.mergeSpans.length == 0) return;
       return this.mergeSpans[rowIndex][this.flatColumns[columnIndex].prop];
     },
     // 把数组扩展成一维数组
     getFlatColumns(columns) {
-      if (!this.value.merge || !this.value.merge.enable) return [];
+      if (!this.getProps("merge")) return;
       return columns.reduce((result, v) => {
         return result.concat(
           Array.isArray(v.children) && v.children.length > 0
@@ -41,7 +41,7 @@ export default {
     },
     // 拿到要合并的列 key
     getMergeKeys() {
-      if (!this.value.merge || !this.value.merge.enable) return [];
+      if (!this.getProps("merge")) return;
       // 树形数据不支持合并
       if (this.value.rowKey) return [];
       return this.flatColumns
@@ -53,7 +53,7 @@ export default {
     },
     // 拿到要合并列 colspan rowspan
     getMergeSpans() {
-      if (!this.value.merge || !this.value.merge.enable) return [];
+      if (!this.getProps("merge")) return;
       let spanArr = [];
       let spanIndex = -1;
       let mergeKeys = this.getMergeKeys();

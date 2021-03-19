@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <el-button @click="()=>table.getData()">查询</el-button>
-    <el-button @click="getRef">ref</el-button>
+  <div class="demo">
+    <code v-show="queryString">{{qstr}}</code>
+    <el-input v-model="table.query.name" style="width:100px"></el-input>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -10,59 +10,36 @@
 export default {
   data() {
     return {
+      queryString: "",
       table: {
         border: true,
-        "highlight-current-row": true,
-        columns: [
-          { type: "selection", width: 50, align: "center" },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "日期1s", prop: "date", width: 200, sortable: "custom" },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address", minWidth: 300 },
-        ],
-        data: [
-          { date: "2016-05-02", name: "王小虎", address: "上海市" },
-          { date: "2016-05-04", name: "王小虎", address: "上海市" },
-        ],
-        // page: { enable: true, total: 100 },
-        on: {
-          "page-change"(v) {
-            console.log("0", v);
-          },
-          "current-change"(v) {
-            console.log("1", v);
-          },
-          "size-change"(v) {
-            console.log(v);
-          },
-          "sort-change"(v) {
-            console.log(v);
-          },
-          "selection-change": () => {
-            console.log(this.table.selection);
-          },
+        height: 200,
+        page: { enable: true, total: 1000 },
+        columns: [{ label: "日期", prop: "date", sortable: "custom" }],
+        query: {
+          userId: "admin",
+          name: "张三",
         },
-        request: (query, doen) => {
-          setTimeout(() => {
-            doen({
-              data: [
-                { date: "2016-05-102", name: "王小虎", address: "上海市" },
-                { date: "2016-05-204", name: "王小虎", address: "上海市" },
-                { date: "2016-05-302", name: "王小虎", address: "上海市" },
-                { date: "2016-05-404", name: "王小虎", address: "上海市" },
-                { date: "2016-05-502", name: "王小虎", address: "上海市" },
-                { date: "2016-05-604", name: "王小虎", address: "上海市" },
-              ],
-              total: 100,
-            });
-          }, 1000);
+        queryProps: {
+          pageSize: (v) => ["page", v],
+          currentPage: (v) => ["size", v],
+          orderColumn: (v) => ["orderColumn", v],
+          order: (v) => ["order", v == "descending" ? 1 : 0],
         },
       },
     };
   },
+  mounted() {
+    this.getQuery();
+  },
+  computed: {
+    qstr() {
+      return JSON.stringify(this.table.query);
+    },
+  },
   methods: {
-    getRef() {
-      console.log(this.table.getRef());
+    getQuery() {
+      this.queryString = JSON.stringify(this.table.getQuery());
     },
   },
 };

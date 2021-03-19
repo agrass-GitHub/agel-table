@@ -16,11 +16,12 @@ export const guid = function () {
 
 export const tableProps = function () {
   return {
-    columns: [],
-    data: [],
-    selection: [],
     loading: false,
+    data: [],
+    columns: [],
+    selection: [],
     on: undefined,
+    query: {},
     request: undefined,
     getData: this.getData,
     getQuery: this.getQuery,
@@ -30,17 +31,12 @@ export const tableProps = function () {
 
 export const queryProps = function () {
   return {
-    order: "",
-    orderColumn: "",
-    props: {
-      currentPage: "currentPage",
-      pageSize: "pageSize",
-      order: "order",
-      orderColumn: "orderColumn",
-    },
-    formatter: (query) => query,
+    pageSize: (v) => ["pageSize", v],
+    currentPage: (v) => ["currentPage", v],
+    orderColumn: (v) => ["orderColumn", v],
+    order: (v) => ["order", v],
   };
-};
+}
 
 export const pageProps = function () {
   return {
@@ -88,6 +84,8 @@ export const virtualProps = function () {
     warppers: [],
     // 动态渲染数据      
     data: [],
+    // 排序数据
+    sortData: [],
   }
 }
 

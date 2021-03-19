@@ -1,19 +1,19 @@
 /**
  * @description 创建虚拟滚动，维持大数据 table 渲染
- * todo  1.checkbox  列  2. 排序
+ * todo  1.checkbox  列  
  */
 
+import { orderBy } from 'element-ui/packages/table/src/util.js';
 import { virtualProps } from "./props";
 
+// import elTable from 'element-ui/packages/table';
+
+// console.log(elTable)
+
 export default {
-  data() {
-    return {
-      virtualEnable: false,
-    }
-  },
   created() {
     const virtual = Object.assign(virtualProps(), this.value.virtual || {});
-    if (virtual.enable) {
+    if (this.value.virtual) {
       this.$set(this.value, 'virtual', virtual);
       this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
     }
@@ -29,7 +29,9 @@ export default {
   methods: {
     // 创建虚拟滚动
     createVirtualScroll() {
-      if (!this.value.virtual || !this.value.virtual.enable || !this.$refs.table) return;
+      const virtual = this.getProps("virtual");
+      if (!virtual || !this.$refs.table) return;
+
       setTimeout(() => {
         let data = this.value.data;
         let el = this.$refs.table.$el;
@@ -37,21 +39,21 @@ export default {
         let fixedWrapper = el.querySelector(".el-table__fixed .el-table__fixed-body-wrapper");
         let rightFixedWrapper = el.querySelector(".el-table__fixed-right .el-table__fixed-body-wrapper")
         let warppers = [warpper, fixedWrapper, rightFixedWrapper].filter(v => v);
-        let rowHeight = this.value.virtual.rowHeight;
+        let rowHeight = virtual.rowHeight;
         let renderHeight = warpper.clientHeight;
         let totalHeight = data.length * rowHeight;
-        let renderNum = Math.ceil(renderHeight / rowHeight) + this.value.virtual.offsetNum;
+        let renderNum = Math.ceil(renderHeight / rowHeight) + virtual.offsetNum;
         renderNum = data.length < renderNum ? data.length : renderNum;
 
         if (rowHeight == 0 || !rowHeight) throw "rowHeight 不可为空";
 
         // 记录虚拟滚动参数
-        this.value.virtual.renderHeight = renderHeight;
-        this.value.virtual.rowHeight = rowHeight;
-        this.value.virtual.totalHeight = totalHeight;
-        this.value.virtual.renderNum = renderNum;
-        this.value.virtual.indexEnd = this.value.virtual.indexStart + renderNum;
-        this.value.virtual.warppers = warppers;
+        virtual.renderHeight = renderHeight;
+        virtual.rowHeight = rowHeight;
+        virtual.totalHeight = totalHeight;
+        virtual.renderNum = renderNum;
+        virtual.indexEnd = virtual.indexStart + renderNum;
+        virtual.warppers = warppers;
 
         // 设置 index 列函数 indexMethod
         let indexColumn = this.columns.find(v => v.type == 'index');
@@ -79,8 +81,10 @@ export default {
     },
     // scroll event
     onVirtualScroll(e) {
-      if (!this.value.virtual || !this.value.virtual.enable) return;
-      let { rowHeight, renderNum, warppers } = this.value.virtual;
+      const virtual = this.getProps("virtual");
+      if (!virtual) return;
+
+      let { rowHeight, renderNum, warppers } = virtual;
       let scrollTop = e.target.scrollTop;
 
       // 计算开始结束渲染位置
@@ -88,8 +92,8 @@ export default {
       let indexStart = Math.floor((scrollTop / rowHeight) - 2 || 0);
       if (indexStart < 0) indexStart = 0;
       if (indexStart > max - renderNum) indexStart = max - renderNum;
-      this.value.virtual.indexStart = indexStart;
-      this.value.virtual.indexEnd = indexStart + renderNum;
+      virtual.indexStart = indexStart;
+      virtual.indexEnd = indexStart + renderNum;
 
       // 计算容器偏移
       warppers.forEach(el => {
@@ -101,23 +105,33 @@ export default {
     },
     // 计算当前渲染的数据
     setVirtualScrollData() {
-      if (!this.value.virtual || !this.value.virtual.enable) return;
-      this.value.virtual.data = this.value.data.slice(
-        this.value.virtual.indexStart,
-        this.value.virtual.indexEnd
+      const virtual = this.getProps("virtual");
+      if (!virtual) return;
+      let data = virtual.sortData.length > 0 ? virtual.sortData : this.value.data;
+      virtual.data = data.slice(
+        virtual.indexStart,
+        virtual.indexEnd
       )
     },
     // 滚动到指定行
     virtualScrollToRow(indexStart) {
-      let { rowHeight } = this.value.virtual;
+      const virtual = this.getProps("virtual");
       indexStart = indexStart - 1 < 0 ? 0 : indexStart - 1;
-      this.value.virtual.warppers.forEach(el => {
-        el.scrollTop = indexStart * rowHeight;
+      virtual.warppers.forEach(el => {
+        el.scrollTop = indexStart * virtual.rowHeight;
       });
     },
     // 获取当前 index 位置
     getVirtualScrollIndex(index) {
-      return this.value.virtual.enable ? index + this.value.virtual.indexStart + 1 : index + 1;
+      const virtual = this.getProps("virtual");
+      return virtual ? index + virtual.indexStart + 1 : index + 1;
+    },
+    // 获取排序后的数据
+    getVirtualSortData() {
+      const virtual = this.getProps("virtual");
+      let sortingColumn = this.getRef().store._data.states.sortingColumn || {};
+      virtual.sortData = orderBy(this.value.data, sortingColumn.property, sortingColumn.order, sortingColumn.sortMethod, sortingColumn.sortBy);
+      this.setVirtualScrollData();
     },
   }
 }
