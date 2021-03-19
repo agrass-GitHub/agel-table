@@ -14,6 +14,9 @@ export const guid = function () {
 };
 
 
+/**
+ * @description table 扩展属性方法
+ */
 export const tableProps = function () {
   return {
     loading: false,
@@ -24,11 +27,14 @@ export const tableProps = function () {
     query: {},
     request: undefined,
     getData: this.getData,
-    getQuery: this.getQuery,
     getRef: this.getRef,
   };
 };
 
+
+/**
+ * @description query 默认存在四个基本查询属性，可设置成你项目中所需要的 table queryProps，
+ */
 export const queryProps = function () {
   return {
     pageSize: (v) => ["pageSize", v],
@@ -38,6 +44,10 @@ export const queryProps = function () {
   };
 }
 
+
+/**
+ * @description 分页 扩展 props 
+ */
 export const pageProps = function () {
   return {
     enable: false,
@@ -51,6 +61,10 @@ export const pageProps = function () {
   };
 };
 
+
+/**
+ * @description column 扩展 props 
+ */
 export const columnProps = function () {
   return {
     key: guid(),
@@ -62,6 +76,10 @@ export const columnProps = function () {
   };
 };
 
+
+/**
+ * @description 虚拟滚动功能 扩展 props
+ */
 export const virtualProps = function () {
   return {
     // 是否开启
@@ -89,6 +107,9 @@ export const virtualProps = function () {
   }
 }
 
+/**
+ * @description 合并功能 扩展 props
+ */
 export const mergeProps = function () {
   return {
     // 是否开启
@@ -100,6 +121,22 @@ export const mergeProps = function () {
   }
 }
 
+
+/**
+ * @description 自适应功能 扩展 props
+ */
+export const resizeProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 偏移位置
+    offset: 0,
+  }
+}
+
+/**
+ * @description el-table 默认 props，只有数组里的 key 可以传递到 el-table
+ */
 export const defaultProps = [
   "data",
   "height",

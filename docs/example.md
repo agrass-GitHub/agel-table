@@ -590,16 +590,18 @@ export default {
 ## query 配置的用法
 
 :::tip
-你可以设置成你项目中所需要的 table `query.props`，也可以使用 `formatter` 再进行格式化，建议这一步放在全局配置里面
+`query` 默认存在四个基本查询属性，`pageSize`，`currentPage`，`orderColumn`，`order`，你可以设置成你项目中所需要的 table `queryProps`，建议这一步放在全局配置里面
 :::
 
 <ClientOnly><query-table/></ClientOnly>
 
 ::: details 点击查看代码
-```html {18-29}
+```html {19-27}
 <template>
   <div class="demo">
-    <code v-show="queryString">{{queryString}}</code>
+    <code>{{queryString}}</code>
+    <el-input v-model="table.query.name" style="width:100px"></el-input>
+    <el-button>查询</el-button>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -608,39 +610,26 @@ export default {
 export default {
   data() {
     return {
-      queryString: "",
       table: {
         border: true,
         height: 200,
         page: { enable: true, total: 1000 },
         columns: [{ label: "日期", prop: "date", sortable: "custom" }],
         query: {
-          userId: "admin",
-          props: {
-            currentPage: "page",
-            pageSize: "size",
-            order: "order",
-            orderColumn: "orderName",
-          },
-          formatter: (query) => {
-            query.order = query.order == "descending" ? 1 : 0;
-            return query;
-          },
+          name: "张三",
         },
-        on: {
-          "sort-change": this.getQuery,
-          "page-change": this.getQuery,
-          "size-change": this.getQuery,
+        queryProps: {
+          pageSize: "page",
+          currentPage: "size",
+          orderColumn: "orderName",
+          order: (v) => ["order", v == "descending" ? 1 : 0],
         },
       },
     };
   },
-  mounted() {
-    this.getQuery();
-  },
-  methods: {
-    getQuery() {
-      this.queryString = JSON.stringify(this.table.getQuery());
+  computed: {
+    queryString() {
+      return JSON.stringify(this.table.query);
     },
   },
 };
@@ -678,19 +667,13 @@ const config = {
     pageSizes: [10, 20, 30, 40],
     layout: "total, sizes, prev, pager, next, jumper",
   }, 
-  // 设置每个表格的 query 配置
-  query:{
-    props:{
-      currentPage: "page",
-      pageSize: "size",
-      order: "order",
-      orderColumn: "orderName"
-    }
-    formatter: (query) => {
-      query.order = query.order == "descending" ? 1 : 0;
-      return query;
-    },
-  }
+  // 设置每个表格的 query props 配置，也可对 value 进行格式化
+  queryProps: {
+    pageSize: "page",
+    currentPage: "size",
+    orderColumn: "orderName",
+    order: (v) => ["order", v == "descending" ? 1 : 0],
+  },
 }
 
 Vue.use(agelTable, config);

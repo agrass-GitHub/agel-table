@@ -1,6 +1,6 @@
 {
   "name": "agel-table",
-  "version": "0.2.11",
+  "version": "0.3.0",
   "main": "dist/agelTable.umd.min.js",
   "description": "a easy table of element-ui table",
   "homepage": "https://github.com/agrass-GitHub/agel-table",

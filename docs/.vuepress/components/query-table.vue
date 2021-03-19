@@ -1,6 +1,8 @@
 <template>
   <div class="demo">
-    <code v-show="queryString">{{queryString}}</code>
+    <code>{{queryString}}</code>
+    <el-input v-model="table.query.name" style="width:100px"></el-input>
+    <el-button>查询</el-button>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -9,39 +11,26 @@
 export default {
   data() {
     return {
-      queryString: "",
       table: {
         border: true,
         height: 200,
         page: { enable: true, total: 1000 },
         columns: [{ label: "日期", prop: "date", sortable: "custom" }],
         query: {
-          userId: "admin",
-          props: {
-            currentPage: "page",
-            pageSize: "size",
-            order: "order",
-            orderColumn: "orderName",
-          },
-          formatter: (query) => {
-            query.order = query.order == "descending" ? 1 : 0;
-            return query;
-          },
+          name: "张三",
         },
-        on: {
-          "sort-change": this.getQuery,
-          "page-change": this.getQuery,
-          "size-change": this.getQuery,
+        queryProps: {
+          pageSize: "page",
+          currentPage: "size",
+          orderColumn: "orderName",
+          order: (v) => ["order", v == "descending" ? 1 : 0],
         },
       },
     };
   },
-  mounted() {
-    this.getQuery();
-  },
-  methods: {
-    getQuery() {
-      this.queryString = JSON.stringify(this.table.getQuery());
+  computed: {
+    queryString() {
+      return JSON.stringify(this.table.query);
     },
   },
 };

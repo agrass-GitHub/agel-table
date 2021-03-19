@@ -8,9 +8,10 @@ sidebar: auto
 ## v.0.3.0
 - `修复` 大数据虚拟滚动的情况下，排序异常的bug
 - `优化` 插件功需配置基础对象，相关属性才会注入到 table 对象
-- `新增` selectionChange 事件拦截，自动回填到 table.selectionChange
+- `新增` selectionChange 事件拦截，自动回填到 table.selection
 - `新增` 组件实例由自动挂载到 table 对象转通过为 getRef 函数获取
 - `优化` query 相关逻辑重做
+- `新增` 添加 reisze ，随着窗口变化自适应高度
 
 ## v.0.2.1
 - `优化` 提交到 npm 的包忽略了 docs 文档

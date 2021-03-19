@@ -25,16 +25,18 @@ sidebar: auto
 | loading     | Boolean      | false  | 是否开启加载状态                       | 
 | data        | Array        | [ ]    | 数据                                 | 
 | columns     | Array/Object | [ ]    | 列配置                               | 
-| on          | Object       | { }    | Table 和 Page 组件的 Event 事件      | 
-| page        | Object       | { }    | Page 组件相关配置                    | 
-| merge       | Object       | { }    | 自动合并单元格配置                   | 
-| virtual     | Object       | { }    | 虚拟滚动配置                         |
-| query       | Object       | { }    | 指定 query 的的参数键名              | 
-| request     | Function     | null   | 接口数据代理函数                     |
-| getQuery    | Function     | 内置   | 返回 query 参数                      | 
+| query       | Object       | { }    | table 查询参数，默认包含分页排序参数  | 
+| queryProps  | Object       | { }    | 指定 query 参数键名，格式化 value  | 
+| on          | Object       | { }    | table 和 page 组件的 Event 事件      | 
+| page        | Object       | { }    | page 组件                | 
+| merge       | Object       | { }    | 自动合并单元格                  | 
+| virtual     | Object       | { }    | 虚拟滚动                          |
+| resize      | Object        | { }   | 随窗口大小自适应能                     |
+| request     | Function     | -      | 接口数据代理函数                     |
 | getData     | Function     | 内置   | 工作流程代理函数                     | 
-| getRef      | Function(prop:string)     | 内置   | 获取 table 或 page组件实例   | 
-| virtualScrollToRow     | Function     | 内置   | 滚动到指定行，开启虚拟滚动生效  |
+| getRef      | Function(prop:string) | 内置   | 获取 table 或 page 组件实例   | 
+| virtualScrollToRow         | Function       | 内置   | 滚动到指定行，开启虚拟滚动生效  |
+| resizeTable     | Function     | 内置   | 自适应table，开启resize生效  |
 
 ## column
 
@@ -63,23 +65,9 @@ sidebar: auto
 | 属性       | 说明                                   |
 | ---------- | ------------------------------------------ |
 | ......     | All Element-ui Table and Pagination Events |
-| pageChange | page.currentPage 发生变化时触发         |
-| sizeChange | page.pageSize 发生变化时触发            |
-| sortChange | 排序发生变化时触发                      |
-
-## query
-
-:::tip
-你可以设置成你项目中所需要的 table `query.props`，也可以使用 `formatter` 再进行格式化，建议这一步放在全局配置里面
-:::
-
-| 属性        | 类型     | 默认值       | 说明                      |
-| ----------- | ------   | ----------- |-----------                |
-| ......      |  Any     | -           | 可以定义任何参数           |  
-| order       | String   | -           | ascending/descending      | 
-| orderColumn | String   | -           | 排序列的 prop              |
-| props       | Object   | {currentPage: "currentPage", pageSize: "pageSize", order: "order",orderColumn: "orderColumn"} | 键值配置选项     |
-| formatter   | Function | -           | 对参数进行格式化     |
+| page-change | page.currentPage 发生变化时触发         |
+| size-change | page.pageSize 发生变化时触发            |
+| sort-change | 排序发生变化时触发                      |
 
 
 ## page
@@ -132,7 +120,12 @@ rowHeight 必填，内置参数请勿随便覆盖修改
 | warppers    | 内置     | -             | 容器          |
 
 
+## resize
 
+| 属性        | 类型     | 默认值        | 说明    
+| ----------- | ------  | --------------| ---------------                    | 
+| enable      | Boolean | false         | 是否开启合自适应    
+| offset      | Number  | 0             | calcHeight 偏移高度                         |
 
 
 

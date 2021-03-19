@@ -6,10 +6,6 @@
 import { orderBy } from 'element-ui/packages/table/src/util.js';
 import { virtualProps } from "./props";
 
-// import elTable from 'element-ui/packages/table';
-
-// console.log(elTable)
-
 export default {
   created() {
     const virtual = Object.assign(virtualProps(), this.value.virtual || {});

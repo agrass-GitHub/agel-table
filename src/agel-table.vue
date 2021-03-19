@@ -29,6 +29,7 @@
 <script>
 import mergeCell from "./merge-cell";
 import virtualScroll from "./virtual-scroll";
+import resizeTable from "./resize-table";
 
 import {
   kebabcase,
@@ -43,7 +44,7 @@ import {
 export default {
   name: "agel-table",
   inheritAttrs: false,
-  mixins: [mergeCell, virtualScroll],
+  mixins: [resizeTable, mergeCell, virtualScroll],
   props: {
     value: {
       required: true,
@@ -83,11 +84,11 @@ export default {
     },
     attrs() {
       let attrs = {};
+      const tableAttrs = defaultProps.concat(
+        this.$agelTableConfig.attributes || []
+      );
       for (const key in this.value) {
-        if (
-          defaultProps.includes(key) ||
-          defaultProps.includes(kebabcase(key))
-        ) {
+        if (tableAttrs.includes(key) || tableAttrs.includes(kebabcase(key))) {
           attrs[key] = this.value[key];
         }
       }
@@ -127,6 +128,8 @@ export default {
       if (typeof column.sortable == "string") {
         this.value.query.order = order;
         this.value.query.orderColumn = prop;
+        this.setQuery("orderColumn", prop);
+        this.setQuery("order", order);
         if (column.sortable == "custom-by-virtual") {
           this.getVirtualSortData();
         } else {
@@ -176,15 +179,12 @@ export default {
         this.$set(this.value.query, newkey, newValue);
       }
     },
-    getQuery() {
-      return this.value.query;
-    },
     getData() {
       let request = this.value.request;
       if (!request || typeof request != "function") return;
       this.value.loading = true;
       return new Promise((resolve, reject) => {
-        return request(this.getQuery(), resolve, reject);
+        return request(this.value.query, resolve, reject);
       })
         .then((res) => {
           let { data, total } = Array.isArray(res)
