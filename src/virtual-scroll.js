@@ -161,41 +161,68 @@ export default {
       const isSelected = (row) => this.value.selection.indexOf(row) > -1;
       const isDisabled = (column, row, index) => column.selectable ? !column.selectable.call(null, row, index) : false
       const slotHeader = (h, { column }) => {
-        return <el-checkbox
-          class="virtual-scroll-checkbox"
-          value={virtual.selectAll}
-          disabled={this.value.data && this.value.data.length === 0}
-          indeterminate={this.value.selection.length > 0 && !virtual.selectAll}
-          on-input={() => {
-            virtual.selectAll = !virtual.selectAll;
-            this.value.selection = virtual.selectAll
-              ? this.value.data.filter((row, index) => !isDisabled(column, row, index))
-              : [];
-            this.selectionChange(this.value.selection);
-            if (this.value.on && this.value.on["select-all"]) {
-              this.value.on["select-all"](this.value.selection);
+        return h("el-checkbox", {
+          class: "virtual-scroll-checkbox",
+          props: {
+            value: virtual.selectAll,
+            disabled: this.value.data && this.value.data.length === 0,
+            indeterminate: this.value.selection.length > 0 && !virtual.selectAll,
+          },
+          on: {
+            input: () => {
+              virtual.selectAll = !virtual.selectAll;
+              this.value.selection = virtual.selectAll
+                ? this.value.data.filter((row, index) => !isDisabled(column, row, index))
+                : [];
+              this.selectionChange(this.value.selection);
+              if (this.value.on && this.value.on["select-all"]) {
+                this.value.on["select-all"](this.value.selection);
+              }
             }
-          }}
-        />;
+          }
+        })
       };
       const slotColumn = (h, { row, column, $index }) => {
-        return <el-checkbox
-          class="virtual-scroll-checkbox"
-          value={isSelected(row)}
-          disabled={isDisabled(column, row, $index)}
-          nativeOn-click={(event) => event.stopPropagation()}
-          on-input={() => {
-            let index = this.value.selection.indexOf(row);
-            if (index == -1) {
-              this.value.selection.push(row);
-            } else {
-              this.value.selection.splice(index, 1)
+        return h("el-checkbox", {
+          class: "virtual-scroll-checkbox",
+          props: {
+            value: isSelected(row),
+            disabled: isDisabled(column, row, $index),
+          },
+          on: {
+            input: () => {
+              let index = this.value.selection.indexOf(row);
+              if (index == -1) {
+                this.value.selection.push(row);
+              } else {
+                this.value.selection.splice(index, 1)
+              }
+              this.selectionChange(this.value.selection);
+              if (this.value.on && this.value.on["select"]) {
+                this.value.on["select"](this.value.selection, row);
+              }
             }
-            this.selectionChange(this.value.selection);
-            if (this.value.on && this.value.on["select"]) {
-              this.value.on["select"](this.value.selection, row);
-            }
-          }} />;
+          },
+          nativeOn: { click: (event) => event.stopPropagation() }
+        })
+
+        // return <el-checkbox
+        //   class="virtual-scroll-checkbox"
+        //   value={isSelected(row)}
+        //   disabled={isDisabled(column, row, $index)}
+        //   nativeOn-click={(event) => event.stopPropagation()}
+        //   on-input={() => {
+        //     let index = this.value.selection.indexOf(row);
+        //     if (index == -1) {
+        //       this.value.selection.push(row);
+        //     } else {
+        //       this.value.selection.splice(index, 1)
+        //     }
+        //     this.selectionChange(this.value.selection);
+        //     if (this.value.on && this.value.on["select"]) {
+        //       this.value.on["select"](this.value.selection, row);
+        //     }
+        //   }} />;
       };
       return { slotHeader, slotColumn }
     }

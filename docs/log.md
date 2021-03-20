@@ -12,6 +12,7 @@ sidebar: auto
 - `新增` selectionChange 事件拦截，自动回填到 table.selection
 - `新增` 组件实例由自动挂载到 table 对象转通过为 getRef 函数获取
 - `优化` query 相关逻辑重做,更加纯粹
+- `优化` 虚拟滚轮逻辑优化
 - `新增` 添加 reisze 扩展，随着窗口变化自适应高度
 
 ## v.0.2.1

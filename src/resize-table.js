@@ -31,10 +31,9 @@ export default {
   },
   methods: {
     resizeTable() {
-      let height =
-        window.innerHeight -
-        this.$refs.container.offsetTop -
-        this.value.resize.offset;
+      let resize = this.getProps("resize");
+      let container = this.$refs.container;
+      let height = container.offsetParent.clientHeight - container.offsetTop - resize.offset;
       this.$set(this.value, "height", height);
     },
   }

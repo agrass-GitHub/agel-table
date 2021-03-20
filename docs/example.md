@@ -29,7 +29,7 @@ sidebar: auto
 
 ## 简单的 Table 
 
-<ClientOnly><basics-table/></ClientOnly>
+<!-- <ClientOnly><basics-table/></ClientOnly> -->
 
 ::: details 点击查看代码
 ```html

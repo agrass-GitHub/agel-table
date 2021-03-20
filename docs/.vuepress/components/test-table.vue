@@ -25,15 +25,24 @@ export default {
             type: "selection",
             width: 50,
             align: "center",
-            selectable: (row, index) => {
-              return index % 2 == 0;
-            },
+            selectable: (row, index) => index % 2 == 0,
           },
           { label: "序号", type: "index", width: 100, align: "center" },
           { label: "日期", prop: "date", width: 200 },
           { label: "姓名", prop: "name", width: 200 },
           { label: "地址", prop: "address", minWidth: 100 },
         ],
+        on: {
+          "select-all": (v) => {
+            console.log("select-all");
+          },
+          select: (v) => {
+            console.log("select");
+          },
+          "selection-change": (v) => {
+            console.log("selection-change");
+          },
+        },
         data: [],
       },
     };

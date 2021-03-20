@@ -145,7 +145,7 @@ sidebar: auto
 ## resize
 ::: tip
 - 跟随窗口大小自适应高度扩展功能，窗口不可出现滚动条效果最佳
-- 自适应逻辑：`table.height = window.innerHeight - table.offsetTop - offset`
+- 自适应逻辑：`table.height = table.offsetParent - table.offsetTop - offset`
 :::
 
 | 属性        | 类型     | 默认值        | 说明    
