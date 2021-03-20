@@ -1,9 +1,16 @@
 /**
  * @description 合并相同单元格
  */
-
-
-import { mergeProps } from "./props";
+const mergeProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 是否自动合并
+    auto: false,
+    // 合并方向
+    direction: "vertical"
+  }
+}
 
 export default {
   created() {

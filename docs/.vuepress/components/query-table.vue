@@ -1,8 +1,7 @@
 <template>
   <div class="demo">
-    <code>{{queryString}}</code>
+    <p><code>{{queryString}}</code></p>
     <el-input v-model="table.query.name" style="width:100px"></el-input>
-    <el-button>查询</el-button>
     <agel-table v-model="table"></agel-table>
   </div>
 </template>
@@ -15,15 +14,19 @@ export default {
         border: true,
         height: 200,
         page: { enable: true, total: 1000 },
-        columns: [{ label: "日期", prop: "date", sortable: "custom" }],
+        columns: [
+          { label: "性别", prop: "sex", sortable: "custom" },
+          { label: "日期", prop: "date", sortable: "custom" },
+        ],
         query: {
           name: "张三",
         },
         queryProps: {
-          pageSize: "page",
-          currentPage: "size",
+          pageSize: "size",
+          currentPage: "page",
           orderColumn: "orderName",
-          order: (v) => ["order", v == "descending" ? 1 : 0],
+          // 也可对 value 进行格式化,
+          order: (v) => ["order", v == "descending" ? "倒序" : "正序"],
         },
       },
     };

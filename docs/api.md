@@ -5,9 +5,13 @@ sidebar: auto
 
 ## props
 
+::: tip
+  `v-model/value` 不可设置为计算属性，[使用计算属性可参考 attach 属性的用法](/example.html#attach-属性的用法)
+:::
+
 | 属性    | 类型   | 必填 | 说明                             | 锚点                  |
 | ------- | ------ | ---- | -------------------------------- | --------------------- |
-| v-model | Object | 是   | table 参数配置，必须使用 v-model | [参考](/api.md#table) |
+| v-model/value | Object | 是   | table 参数配置，建议使用 v-model | [参考](/api.md#table) |
 | attach  | Object | 否   | table 附属配置，会同步到 v-model | [参考](/api.md#table) |
 
 
@@ -15,8 +19,8 @@ sidebar: auto
 
 ::: tip
 - 支持所有 Element-ui [Table Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-attributes)
-- \$ref 可用来直接调用 Element-ui Table [Methods](https://element.eleme.cn/#/zh-CN/component/table#table-methods)
 - 所有属性都是可选，请注意的默认值为【内置】的属性，请勿传递覆盖
+- `page` 等带灰色背景的为扩展功能，只有传递了该对象，相关属性和方法才会注入到 table
 :::
 
 | 属性        | 类型         | 默认值  | 说明                                 | 
@@ -25,18 +29,32 @@ sidebar: auto
 | loading     | Boolean      | false  | 是否开启加载状态                       | 
 | data        | Array        | [ ]    | 数据                                 | 
 | columns     | Array/Object | [ ]    | 列配置                               | 
+| selection   | Array        | [ ]    | selection 发生变化会自动回填到这里| 
 | query       | Object       | { }    | table 查询参数，默认包含分页排序参数  | 
-| queryProps  | Object       | { }    | 指定 query 参数键名，格式化 value  | 
+| queryProps  | Object       | { }    | 指定默认参数键名，格式化 value  | 
 | on          | Object       | { }    | table 和 page 组件的 Event 事件      | 
-| page        | Object       | { }    | page 组件                | 
-| merge       | Object       | { }    | 自动合并单元格                  | 
-| virtual     | Object       | { }    | 虚拟滚动                          |
-| resize      | Object        | { }   | 随窗口大小自适应能                     |
 | request     | Function     | -      | 接口数据代理函数                     |
-| getData     | Function     | 内置   | 工作流程代理函数                     | 
-| getRef      | Function(prop:string) | 内置   | 获取 table 或 page 组件实例   | 
-| virtualScrollToRow         | Function       | 内置   | 滚动到指定行，开启虚拟滚动生效  |
-| resizeTable     | Function     | 内置   | 自适应table，开启resize生效  |
+| getData     | Function     | 内置   | 工作流程代理函数                     |
+| getRef      | Function(prop:string) | 内置   |参数(table,page) 获取  组件实例   |  
+| `page`        | Object       | { }    | 分页配置                | 
+| `merge`       | Object       | { }    | 自动合并单元格                  | 
+| `virtual`     | Object       | { }    | 大数据虚拟滚动                   |
+| `resize`      | Object        | { }   | 随窗口大小自适应高度              |
+| `virtualScrollToRow`         | Function       | 内置   | 滚动到指定行，开启虚拟滚动生效  |
+| `resizeTable`     | Function     | 内置   | 自适应table，开启resize生效  |
+
+## queryProps
+
+:::tip
+`query` 默认存在四个基本查询属性,可设置键名，也可对 value 进行格式化，[使用方法参考](/example.html#queryprops-属性的用法)
+:::
+
+| 属性       | 类型            | 默认值   | 说明                               |
+| ---------- | --------------- | -------- | ---------------------------------- |
+| pageSize    | String/Function | pageSize        | 页码数 |
+| currentPage | String/Function | currentPage        | 当前页 |
+| orderColumn | String/Function | orderColumn | 排序列 prop  |
+| order       | String/Function | order | 倒序正序  |
 
 ## column
 
@@ -91,7 +109,8 @@ sidebar: auto
 ## merge
 
 ::: tip
-暂只支持 vertical 纵向合并
+- 自动合并单元格扩展功能
+- 暂只支持 vertical 纵向合并
 :::
 
 | 属性        | 类型     | 默认值        | 说明    
@@ -103,24 +122,31 @@ sidebar: auto
 ## virtual
 
 ::: tip
-rowHeight 必填，内置参数请勿随便覆盖修改
+- 大数据虚构滚动扩展功能，若数据量大开启可显著提高渲染性能
+- `rowHeight` 必填，内置参数请勿随便覆盖修改
 :::
 
 | 属性        | 类型     | 默认值        | 说明    
 | ----------- | ------  | --------------| ---------------   |
 | enable      | Boolean | false         | 是否开启虚拟滚动     |
 | rowHeight   | Number  | 0             | 行高度      |
-| offsetNum   | Number  | 8             | 渲染数量偏移量      |
+| offsetNum   | Number  | 10             | 渲染数量偏移量      |
 | totalHeight | 内置    | -             | 总高度      |
 | renderHeight | 内置   | -             | 渲染区域高度      |
 | indexStart   | 内置   | -              | 开始渲染位置      |
 | indexEnd    | 内置     | -             | 结束渲染位置      |
 | renderNum   | 内置     | -             | 可视区域渲染数量      |
-| data        | 内置     | -             | 动态渲染数据      |
 | warppers    | 内置     | -             | 容器          |
+| data        | 内置     | -             | 动态渲染数据      |
+| sortData    | 内置     | -             | 排序后的数据          |
+| selectAll    | 内置    | -             | selection 列是否全选          |
 
 
 ## resize
+::: tip
+- 跟随窗口大小自适应高度扩展功能，窗口不可出现滚动条效果最佳
+- 自适应逻辑：`table.height = window.innerHeight - table.offsetTop - offset`
+:::
 
 | 属性        | 类型     | 默认值        | 说明    
 | ----------- | ------  | --------------| ---------------                    | 

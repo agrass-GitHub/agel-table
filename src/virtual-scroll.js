@@ -1,10 +1,37 @@
 /**
- * @description 创建虚拟滚动，维持大数据 table 渲染
- * todo  1.checkbox  列  
+ * @description 创建虚拟滚动，维持大数据 table 渲染 
  */
 
 import { orderBy } from 'element-ui/packages/table/src/util.js';
-import { virtualProps } from "./props";
+
+export const virtualProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 行高度
+    rowHeight: 0,
+    // 总高度
+    totalHeight: 0,
+    // 渲染区域高度
+    renderHeight: 0,
+    // 开始渲染位置
+    indexStart: 0,
+    // 结束渲染位置
+    indexEnd: 0,
+    // 可视区域渲染数量
+    renderNum: 0,
+    // 渲染数量偏移量
+    offsetNum: 10,
+    // 是否全选
+    selectAll: false,
+    // 容器
+    warppers: [],
+    // 动态渲染数据      
+    data: [],
+    // 排序数据
+    sortData: [],
+  }
+}
 
 export default {
   created() {
@@ -80,16 +107,15 @@ export default {
       const virtual = this.getProps("virtual");
       if (!virtual) return;
 
-      let { rowHeight, renderNum, warppers } = virtual;
-      let scrollTop = e.target.scrollTop;
-
       // 计算开始结束渲染位置
-      let max = this.value.data.length;
-      let indexStart = Math.floor((scrollTop / rowHeight) - 2 || 0);
+      let { rowHeight, renderNum, offsetNum, warppers } = virtual;
+      let scrollTop = e.target.scrollTop;
+      let indexStart = Math.floor((scrollTop / rowHeight) - offsetNum || 0);
+      let indexEnd = indexStart + renderNum + offsetNum;
       if (indexStart < 0) indexStart = 0;
-      if (indexStart > max - renderNum) indexStart = max - renderNum;
+      if (indexEnd > this.value.data.length) indexEnd = this.value.data.length;
       virtual.indexStart = indexStart;
-      virtual.indexEnd = indexStart + renderNum;
+      virtual.indexEnd = indexEnd;
 
       // 计算容器偏移
       warppers.forEach(el => {
@@ -129,5 +155,49 @@ export default {
       virtual.sortData = orderBy(this.value.data, sortingColumn.property, sortingColumn.order, sortingColumn.sortMethod, sortingColumn.sortBy);
       this.setVirtualScrollData();
     },
+    // 获取自定义 selection checkbox Slot
+    getVirtualSelectionSlot() {
+      const virtual = this.getProps("virtual");
+      const isSelected = (row) => this.value.selection.indexOf(row) > -1;
+      const isDisabled = (column, row, index) => column.selectable ? !column.selectable.call(null, row, index) : false
+      const slotHeader = (h, { column }) => {
+        return <el-checkbox
+          class="virtual-scroll-checkbox"
+          value={virtual.selectAll}
+          disabled={this.value.data && this.value.data.length === 0}
+          indeterminate={this.value.selection.length > 0 && !virtual.selectAll}
+          on-input={() => {
+            virtual.selectAll = !virtual.selectAll;
+            this.value.selection = virtual.selectAll
+              ? this.value.data.filter((row, index) => !isDisabled(column, row, index))
+              : [];
+            this.selectionChange(this.value.selection);
+            if (this.value.on && this.value.on["select-all"]) {
+              this.value.on["select-all"](this.value.selection);
+            }
+          }}
+        />;
+      };
+      const slotColumn = (h, { row, column, $index }) => {
+        return <el-checkbox
+          class="virtual-scroll-checkbox"
+          value={isSelected(row)}
+          disabled={isDisabled(column, row, $index)}
+          nativeOn-click={(event) => event.stopPropagation()}
+          on-input={() => {
+            let index = this.value.selection.indexOf(row);
+            if (index == -1) {
+              this.value.selection.push(row);
+            } else {
+              this.value.selection.splice(index, 1)
+            }
+            this.selectionChange(this.value.selection);
+            if (this.value.on && this.value.on["select"]) {
+              this.value.on["select"](this.value.selection, row);
+            }
+          }} />;
+      };
+      return { slotHeader, slotColumn }
+    }
   }
 }

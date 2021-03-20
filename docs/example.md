@@ -15,10 +15,11 @@ sidebar: auto
 - 添加额外的[扩展功能](https://agrass.gitee.io/agel-table/guide.html)
   - 纯数据配置
   - 动态显隐列
-  - 集成分页组件
   - 数据代理
+  - 集成分页组件
   - 自动合并相同行
   - 虚拟滚动支持大数据渲染 10w+
+  - 跟随窗口大小自适应高度
 
 
 ## 安装使用
@@ -530,6 +531,59 @@ export default {
 ```
 :::
 
+## queryProps 属性的用法
+
+:::tip
+`query` 默认存在四个基本查询属性，`pageSize`，`currentPage`，`orderColumn`，`order`，你可以设置成你项目中所需要的 table `queryProps`，建议这一步放在全局配置里面
+:::
+
+<ClientOnly><query-table/></ClientOnly>
+
+::: details 点击查看代码
+```html {24-30}
+<template>
+  <div class="demo">
+    <p><code>{{queryString}}</code></p>
+    <el-input v-model="table.query.name" style="width:100px"></el-input>
+    <agel-table v-model="table"></agel-table>
+  </div>
+</template>
+ 
+<script>
+export default {
+  data() {
+    return {
+      table: {
+        border: true,
+        height: 200,
+        page: { enable: true, total: 1000 },
+        columns: [
+          { label: "性别", prop: "sex", sortable: "custom" },
+          { label: "日期", prop: "date", sortable: "custom" },
+        ],
+        query: {
+          name: "张三",
+        },
+        queryProps: {
+          pageSize: "size",
+          currentPage: "page",
+          orderColumn: "orderName",
+          // 也可对 value 进行格式化,
+          order: (v) => ["order", v == "descending" ? "倒序" : "正序"],
+        },
+      },
+    };
+  },
+  computed: {
+    queryString() {
+      return JSON.stringify(this.table.query);
+    },
+  },
+};
+</script>
+```
+:::
+
 ## attach 属性的用法
 
 :::tip
@@ -587,55 +641,7 @@ export default {
 ```
 :::
 
-## query 配置的用法
 
-:::tip
-`query` 默认存在四个基本查询属性，`pageSize`，`currentPage`，`orderColumn`，`order`，你可以设置成你项目中所需要的 table `queryProps`，建议这一步放在全局配置里面
-:::
-
-<ClientOnly><query-table/></ClientOnly>
-
-::: details 点击查看代码
-```html {19-27}
-<template>
-  <div class="demo">
-    <code>{{queryString}}</code>
-    <el-input v-model="table.query.name" style="width:100px"></el-input>
-    <el-button>查询</el-button>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        height: 200,
-        page: { enable: true, total: 1000 },
-        columns: [{ label: "日期", prop: "date", sortable: "custom" }],
-        query: {
-          name: "张三",
-        },
-        queryProps: {
-          pageSize: "page",
-          currentPage: "size",
-          orderColumn: "orderName",
-          order: (v) => ["order", v == "descending" ? 1 : 0],
-        },
-      },
-    };
-  },
-  computed: {
-    queryString() {
-      return JSON.stringify(this.table.query);
-    },
-  },
-};
-</script>
-```
-:::
 
 ## 全局配置的用法
 
@@ -674,6 +680,8 @@ const config = {
     orderColumn: "orderName",
     order: (v) => ["order", v == "descending" ? 1 : 0],
   },
+  // 只有指定的 key 才会传递到 el-table 组件的 props，如果有额外的 prop 可在这里配置
+  attributes:[ "style", "class" ],
 }
 
 Vue.use(agelTable, config);

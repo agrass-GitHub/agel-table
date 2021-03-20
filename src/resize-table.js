@@ -1,8 +1,15 @@
 /**
- * @description resize table 随着窗口变化
+ * @description 随着窗口变化自适应高度 
  */
 
-import { resizeProps } from "./props";
+const resizeProps = function () {
+  return {
+    // 是否开启
+    enable: false,
+    // 偏移位置
+    offset: 0,
+  }
+}
 
 export default {
   created() {
