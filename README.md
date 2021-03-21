@@ -29,7 +29,7 @@
 
 ## 安装使用
 
-`cnpm install agel-table --save`
+`npm install agel-table --save`
 
 
 ### 如此简单

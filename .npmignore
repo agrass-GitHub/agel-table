@@ -4,6 +4,10 @@ distdocs/
 docs/
 public/
 
+vue.config.js
+babel.config.js
+.eslintrc.js
+
 # local env files
 .env.local
 .env.*.local
