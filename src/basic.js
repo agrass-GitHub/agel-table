@@ -100,7 +100,6 @@ export default {
       }
       return events;
     },
-
   },
   methods: {
     selectionChange(selection) {
