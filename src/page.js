@@ -23,20 +23,16 @@ export default {
     );
     if (this.value.page || this.$agelTableConfig.page) {
       this.$set(this.value, "page", page);
+      this.setQuery("currentPage", page.page);
+      this.setQuery("pageSize", page.pageSize);
     }
   },
   watch: {
-    'value.page.currentPage': {
-      immediate: true,
-      handler(v) {
-        v != undefined && this.setQuery("currentPage", v);
-      }
+    'value.page.currentPage'(v) {
+      v != undefined && this.setQuery("currentPage", v);
     },
-    'value.page.pageSize': {
-      immediate: true,
-      handler(v) {
-        v != undefined && this.setQuery("pageSize", v);
-      }
+    'value.page.pageSize'(v) {
+      v != undefined && this.setQuery("pageSize", v);
     }
   },
   methods: {
