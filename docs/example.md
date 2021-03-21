@@ -400,8 +400,7 @@ export default {
 
 ## 虚拟滚动的 Table
 :::tip
-1. 虚拟滚动，渲染 10w+ 的数据量也可以轻轻松松 :smile:
-2. 可惜目前暂不支持 type `selection` 列
+若列表数据量大, 开启可显著提高渲染性能 :smile:
 :::
 
 <ClientOnly> <virtual-scroll-table/></ClientOnly>

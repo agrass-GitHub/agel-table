@@ -52,10 +52,7 @@ export default {
       // 树形数据不支持合并
       if (this.value.rowKey) return [];
       return this.flatColumns
-        .filter((v) => {
-          let ismerge = v.merge === undefined ? this.value.merge.auto : v.merge;
-          return v.prop && ismerge && !v.type;
-        })
+        .filter((v) => v.prop && (this.value.merge.auto || v.merge) && !v.type)
         .map((v) => v.prop);
     },
     // 拿到要合并列 colspan rowspan

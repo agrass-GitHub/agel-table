@@ -27,7 +27,7 @@
 </template>
  
 <script>
-import basis from "./basis";
+import basis from "./basic";
 import columns from "./columns";
 import page from "./page";
 import virtualScroll from "./virtual-scroll";

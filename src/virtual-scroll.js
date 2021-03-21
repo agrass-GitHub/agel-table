@@ -78,12 +78,6 @@ export default {
         virtual.indexEnd = virtual.indexStart + renderNum;
         virtual.warppers = warppers;
 
-        // 设置 index 列函数 indexMethod
-        let indexColumn = this.columns.find(v => v.type == 'index');
-        if (indexColumn && indexColumn.index == undefined) {
-          this.$set(indexColumn, 'index', this.getVirtualScrollIndex);
-        }
-
         // 创建容器
         warpper.removeEventListener("scroll", this.onVirtualScroll);
         warpper.addEventListener("scroll", this.onVirtualScroll);
@@ -143,13 +137,29 @@ export default {
         el.scrollTop = indexStart * virtual.rowHeight;
       });
     },
-    // 获取当前 index 位置
-    getVirtualScrollIndex(index) {
+    // 针对虚拟滚动对某些列做特殊处理
+    handleVirtualScrollColumn(column) {
       const virtual = this.getProps("virtual");
-      return virtual ? index + virtual.indexStart + 1 : index + 1;
+      if (!virtual) return;
+      if (column.sortable === true) {
+        column.sortable = "custom-by-virtual"
+      };
+      if (column.type === "selection") {
+        const { slotHeader, slotColumn } = this.getVirtualSelectionSlot();
+        column.slotHeader = slotHeader;
+        column.slotColumn = slotColumn;
+        column.type = undefined;
+      }
+      if (column.type === "index") {
+        const indexMethod = column.index;
+        column.index = (v) => {
+          let newIndex = virtual.indexStart + v;
+          return indexMethod ? indexMethod(newIndex) : newIndex + 1
+        };
+      }
     },
-    // 获取排序后的数据
-    getVirtualSortData() {
+    // 设置排序后的数据
+    setVirtualSortData() {
       const virtual = this.getProps("virtual");
       let sortingColumn = this.getRef().store._data.states.sortingColumn || {};
       virtual.sortData = orderBy(this.value.data, sortingColumn.property, sortingColumn.order, sortingColumn.sortMethod, sortingColumn.sortBy);
@@ -205,24 +215,6 @@ export default {
           },
           nativeOn: { click: (event) => event.stopPropagation() }
         })
-
-        // return <el-checkbox
-        //   class="virtual-scroll-checkbox"
-        //   value={isSelected(row)}
-        //   disabled={isDisabled(column, row, $index)}
-        //   nativeOn-click={(event) => event.stopPropagation()}
-        //   on-input={() => {
-        //     let index = this.value.selection.indexOf(row);
-        //     if (index == -1) {
-        //       this.value.selection.push(row);
-        //     } else {
-        //       this.value.selection.splice(index, 1)
-        //     }
-        //     this.selectionChange(this.value.selection);
-        //     if (this.value.on && this.value.on["select"]) {
-        //       this.value.on["select"](this.value.selection, row);
-        //     }
-        //   }} />;
       };
       return { slotHeader, slotColumn }
     }

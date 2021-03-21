@@ -111,12 +111,10 @@ export default {
     },
     sortChange({ column, prop, order }) {
       if (typeof column.sortable == "string") {
-        this.value.query.order = order;
-        this.value.query.orderColumn = prop;
         this.setQuery("orderColumn", prop);
         this.setQuery("order", order);
         if (column.sortable == "custom-by-virtual") {
-          this.getVirtualSortData();
+          this.setVirtualSortData();
         } else {
           this.getData();
         }
