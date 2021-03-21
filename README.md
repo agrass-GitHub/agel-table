@@ -3,6 +3,7 @@
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg)](https://opensource.org/licenses/mit-license.php)
 [![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
 [![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
+[![jsdelivr](https://data.jsdelivr.com/v1/package/npm/agel-table/badge)](https://www.jsdelivr.com/package/npm/agel-table)
 
 ## 文档
 
@@ -30,6 +31,8 @@
 ## 安装使用
 
 `npm install agel-table --save`
+
+[在线引用地址](https://www.jsdelivr.com/package/npm/agel-table)
 
 
 ### 如此简单
