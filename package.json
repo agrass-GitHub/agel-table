@@ -19,7 +19,7 @@
     "build": "vue-cli-service build --target lib --name agelTable --dest dist ./src/index.js",
     "publish": "npm publish",
     "builddocs": "vuepress build docs",
-    "deploy": "git subtree push --prefix=distdocs origin gh-pages"
+    "publishdocs": "gh-pages -d distdocs"
   },
   "dependencies": {},
   "peerDependencies": {},
@@ -31,6 +31,7 @@
     "element-ui": "^2.15.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "gh-pages": "^3.1.0",
     "vue-template-compiler": "^2.6.10",
     "vuepress": "^1.7.1"
   },
