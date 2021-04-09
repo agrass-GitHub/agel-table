@@ -32,8 +32,6 @@
 
 `npm install agel-table --save`
 
-[在线引用地址](https://www.jsdelivr.com/package/npm/agel-table)
-
 
 ### 如此简单
 

@@ -20,6 +20,8 @@ export const virtualProps = function () {
     indexEnd: 0,
     // 可视区域渲染数量
     renderNum: 0,
+    moveNum: 0,
+    page: 1,
     // 渲染数量偏移量
     offsetNum: 10,
     // 是否全选
@@ -65,7 +67,7 @@ export default {
         let rowHeight = virtual.rowHeight;
         let renderHeight = warpper.clientHeight;
         let totalHeight = data.length * rowHeight;
-        let renderNum = Math.ceil(renderHeight / rowHeight) + virtual.offsetNum;
+        let renderNum = Math.ceil(renderHeight / rowHeight);
         renderNum = data.length < renderNum ? data.length : renderNum;
 
         if (rowHeight == 0 || !rowHeight) throw "rowHeight 不可为空";
@@ -93,7 +95,8 @@ export default {
           }
         })
         // 设置数据
-        this.setVirtualScrollData();
+        // this.setVirtualScrollData();
+        virtual.data = this.value.data.slice(0, virtual.renderNum * 3)
       }, 0)
     },
     // scroll event
@@ -102,32 +105,87 @@ export default {
       if (!virtual) return;
 
       // 计算开始结束渲染位置
-      let { rowHeight, renderNum, offsetNum, warppers } = virtual;
+      let { rowHeight, renderNum, warppers, page } = virtual;
       let scrollTop = e.target.scrollTop;
-      let indexStart = Math.floor((scrollTop / rowHeight) - offsetNum || 0);
-      let indexEnd = indexStart + renderNum + offsetNum;
+      let indexStart = Math.floor((scrollTop / rowHeight) || 0);
+      let indexEnd = indexStart + renderNum;
       if (indexStart < 0) indexStart = 0;
       if (indexEnd > this.value.data.length) indexEnd = this.value.data.length;
+
+      let pageHeight = renderNum * rowHeight;
+      let prevScrollTop = pageHeight * (page - 1);
+      let nextScrollTop = pageHeight * page;
+      if (scrollTop >= nextScrollTop) {
+        console.log('down翻页')
+        virtual.page += 1;
+        let sliceIndex = (virtual.page + 1) * renderNum;
+        virtual.data.splice(0, renderNum);
+        virtual.data.splice(virtual.data.length, 0, ...this.value.data.slice(sliceIndex, sliceIndex + renderNum))
+        console.log(this.value.data.slice(sliceIndex, sliceIndex + renderNum))
+        warppers.forEach(el => {
+          let warppersBody = el.querySelector('.el-table__body');
+          warppersBody.style.transform = `translateY(${indexStart * rowHeight}px)`;
+        });
+      };
+      if (scrollTop <= prevScrollTop) {
+        console.log('up 翻页')
+        virtual.page -= 1;
+        let sliceIndex = (virtual.page - 1) * renderNum;
+        virtual.data.splice(0, 0, ...this.value.data.slice(sliceIndex, sliceIndex + renderNum));
+        virtual.data.splice(virtual.data.length - renderNum, renderNum);
+        console.log(this.value.data.slice(sliceIndex, sliceIndex + renderNum))
+        warppers.forEach(el => {
+          let warppersBody = el.querySelector('.el-table__body');
+          warppersBody.style.transform = `translateY(${indexStart * rowHeight}px)`;
+        });
+      }
+
+      // let moveNum = indexStart - virtual.indexStart;
+      // if (moveNum === 0) return;
+      // virtual.moveNum += Math.abs(moveNum);
+      // // 翻页
+      // if (virtual.moveNum > renderNum) {
+      //   // down 翻页
+      //   if (moveNum > 0) {
+      //     virtual.data.splice(0, renderNum);
+      //     virtual.data.splice(virtual.data.length, 0, ...this.value.data.slice(indexEnd - 1, indexEnd - 1 + renderNum));
+      //   } else {
+      //     virtual.data.splice(0, 0, ...this.value.data.slice(indexStart - 1, indexStart - 1 + renderNum));
+      //     virtual.data.splice(virtual.data.length, 0, ...this.value.data.slice(indexEnd - 1, indexEnd - 1 + renderNum))
+      //   }
+      //   virtual.moveNum -= renderNum;
+      //   warppers.forEach(el => {
+      //     let warppersBody = el.querySelector('.el-table__body');
+      //     warppersBody.style.transform = `translateY(${indexStart * rowHeight}px)`;
+      //   });
+      // }
+
+      // if (moveNum > 0) {
+      //   console.log('down', moveNum)
+      // } else {
+      //   console.log('up', moveNum)
+      // }
+
       virtual.indexStart = indexStart;
       virtual.indexEnd = indexEnd;
 
-      // 计算容器偏移
-      warppers.forEach(el => {
-        let warppersBody = el.querySelector('.el-table__body');
-        warppersBody.style.transform = `translateY(${indexStart * rowHeight}px)`;
-      });
 
-      this.setVirtualScrollData()
+      // 计算容器偏移
+      // warppers.forEach(el => {
+      //   let warppersBody = el.querySelector('.el-table__body');
+      //   warppersBody.style.transform = `translateY(${indexStart * rowHeight}px)`;
+      // });
+
+      // this.setVirtualScrollData()
     },
     // 计算当前渲染的数据
     setVirtualScrollData() {
       const virtual = this.getProps("virtual");
       if (!virtual) return;
       let data = virtual.sortData.length > 0 ? virtual.sortData : this.value.data;
-      // 考虑用 splice  翻页实现 避免闪动频繁
       virtual.data = data.slice(
         virtual.indexStart,
-        virtual.indexEnd
+        virtual.indexEnd + virtual.renderNum * 2
       )
     },
     // 滚动到指定行

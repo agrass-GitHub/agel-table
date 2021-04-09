@@ -38,7 +38,7 @@ export default {
   methods: {
     pageChange(page) {
       this.value.page.currentPage = page;
-      this.getData();
+      this.$nextTick(this.getData);
       if (this.value.on && this.value.on["page-change"]) {
         this.value.on["page-change"](page);
       }
@@ -46,7 +46,7 @@ export default {
     sizeChange(size) {
       this.value.page.currentPage = 1;
       this.value.page.pageSize = size;
-      this.getData();
+      this.$nextTick(this.getData);
       if (this.value.on && this.value.on["size-change"]) {
         this.value.on["size-change"](size);
       }
