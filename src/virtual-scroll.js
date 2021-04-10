@@ -1,7 +1,6 @@
 /**
  * @description 创建虚拟滚动，维持大数据 table 渲染 
  */
-
 import { orderBy } from 'element-ui/packages/table/src/util.js';
 
 export const virtualProps = function () {
@@ -34,24 +33,33 @@ export const virtualProps = function () {
 }
 
 export default {
+  data() {
+    return {
+      resizeState: null,
+    }
+  },
   created() {
     const virtual = Object.assign(virtualProps(), this.value.virtual || {});
     if (this.value.virtual) {
       this.$set(this.value, 'virtual', virtual);
       this.$set(this.value, 'virtualScrollToRow', this.virtualScrollToRow);
+      this.$set(this.value, 'virtualScrollUpdate', this.virtualScrollUpdate);
     }
   },
+  mounted() {
+    this.resizeState = this.$refs.table.resizeState;
+  },
   watch: {
-    'value.$ref.layout.bodyHeight'(v) {
-      v != null && this.createVirtualScroll();
+    "resizeState.height"(v) {
+      v && this.virtualScrollUpdate();
     },
     'value.data'() {
-      this.createVirtualScroll();
+      this.virtualScrollUpdate();
     }
   },
   methods: {
     // 创建虚拟滚动
-    createVirtualScroll() {
+    virtualScrollUpdate() {
       const virtual = this.getProps("virtual");
       if (!virtual || !this.$refs.table) return;
 
@@ -124,7 +132,7 @@ export default {
       const virtual = this.getProps("virtual");
       if (!virtual) return;
       let data = virtual.sortData.length > 0 ? virtual.sortData : this.value.data;
-      // 考虑用 splice  翻页实现 避免闪动频繁
+      // 考虑用 splice  翻页实现, 或者实时修改 placeholder 高度
       virtual.data = data.slice(
         virtual.indexStart,
         virtual.indexEnd
@@ -138,7 +146,7 @@ export default {
         el.scrollTop = indexStart * virtual.rowHeight;
       });
     },
-    // 针对虚拟滚动对某些列做特殊处理
+    // 针对虚拟滚动,对某些列做特殊处理
     handleVirtualScrollColumn(column) {
       const virtual = this.getProps("virtual");
       if (!virtual) return;

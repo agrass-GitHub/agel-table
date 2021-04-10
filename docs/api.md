@@ -41,6 +41,7 @@ sidebar: auto
 | `virtual`     | Object       | { }    | 大数据虚拟滚动                   |
 | `resize`      | Object        | { }   | 随窗口大小自适应高度              |
 | `virtualScrollToRow`         | Function       | 内置   | 滚动到指定行，开启虚拟滚动生效  |
+| `virtualScrollUpdate`         | Function       | 内置   | 手动刷新状态，开启虚拟滚动生效  |
 | `resizeTable`     | Function     | 内置   | 自适应table，开启resize生效  |
 
 ## queryProps
@@ -130,7 +131,7 @@ sidebar: auto
 | ----------- | ------  | --------------| ---------------   |
 | enable      | Boolean | false         | 是否开启虚拟滚动     |
 | rowHeight   | Number  | 0             | 行高度      |
-| offsetNum   | Number  | 10             | 渲染数量偏移量      |
+| offsetNum   | 内置  | 10             | 渲染数量偏移量      |
 | totalHeight | 内置    | -             | 总高度      |
 | renderHeight | 内置   | -             | 渲染区域高度      |
 | indexStart   | 内置   | -              | 开始渲染位置      |
@@ -145,7 +146,7 @@ sidebar: auto
 ## resize
 ::: tip
 - 跟随窗口大小自适应高度扩展功能，窗口不可出现滚动条效果最佳
-- 自适应逻辑：`table.height = table.offsetParent - table.offsetTop - offset`
+- 自适应逻辑：`table.height = table.offsetParent.clientHeight - table.offsetTop - offset`
 :::
 
 | 属性        | 类型     | 默认值        | 说明    

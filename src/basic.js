@@ -21,6 +21,22 @@ const tableProps = function () {
   };
 };
 
+/**
+ * @description 分页
+ */
+const pageProps = function () {
+  return {
+    enable: false,
+    height: 45,
+    pageSize: 20,
+    pageSizes: [10, 20, 50, 100],
+    currentPage: 1,
+    layout: "total, sizes, prev, pager, next, jumper",
+    class: "agel-pagination",
+    total: 0,
+  };
+};
+
 // query 默认存在四个基本查询属性，可设置成你项目中所需要的 table queryProps，
 const queryProps = function () {
   return {
@@ -36,25 +52,26 @@ const kebabcase = (v) => v.replace(/([A-Z])/g, "-$1").toLowerCase();
 
 export default {
   created() {
+    let config = this.$agelTableConfig || {};
     // table
-    const table = Object.assign(
-      tableProps.call(this),
-      this.$agelTableConfig.table || {},
-      this.value
-    );
+    const table = Object.assign(tableProps.call(this), config.table || {}, this.value);
     Object.keys(table).forEach((key) => {
       table[key] != undefined && this.$set(this.value, key, table[key]);
     });
 
     // queryProps
-    const queryPropsFormat = Object.assign(
-      queryProps(),
-      this.$agelTableConfig.queryProps || {},
-      this.value.queryProps || {}
-    );
+    const queryPropsFormat = Object.assign(queryProps(), config.queryProps || {}, this.value.queryProps || {});
     this.$set(this.value, "queryProps", queryPropsFormat);
     this.setQuery("orderColumn", "");
     this.setQuery("order", "");
+
+    // page
+    const page = Object.assign(pageProps(), config.page || {}, this.value.page || {});
+    if (this.value.page || this.$agelTableConfig.page) {
+      this.$set(this.value, "page", page);
+      this.setQuery("currentPage", page.page);
+      this.setQuery("pageSize", page.pageSize);
+    }
   },
   computed: {
     data() {
@@ -78,7 +95,7 @@ export default {
       let { height, page = {} } = this.value;
       return {
         containerHeight: isNaN(height) ? height : height + "px",
-        pageHeight: page.height + "px",
+        pageHeight: (page.height || 0) + "px",
         tableHeight: height
           ? page.enable
             ? `calc(100% - ${page.height}px)`
@@ -101,6 +118,14 @@ export default {
       return events;
     },
   },
+  watch: {
+    'value.page.currentPage'(v) {
+      v != undefined && this.setQuery("currentPage", v);
+    },
+    'value.page.pageSize'(v) {
+      v != undefined && this.setQuery("pageSize", v);
+    }
+  },
   methods: {
     selectionChange(selection) {
       this.value.selection = selection;
@@ -120,6 +145,21 @@ export default {
       }
       if (this.value.on && this.value.on["sort-change"]) {
         this.value.on["sort-change"]({ column, prop, order });
+      }
+    },
+    pageChange(page) {
+      this.value.page.currentPage = page;
+      this.$nextTick(this.getData);
+      if (this.value.on && this.value.on["page-change"]) {
+        this.value.on["page-change"](page);
+      }
+    },
+    sizeChange(size) {
+      this.value.page.currentPage = 1;
+      this.value.page.pageSize = size;
+      this.$nextTick(this.getData);
+      if (this.value.on && this.value.on["size-change"]) {
+        this.value.on["size-change"](size);
       }
     },
     currentChange(...params) {

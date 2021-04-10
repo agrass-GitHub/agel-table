@@ -30,19 +30,19 @@ export default {
     },
   },
   methods: {
-    getColumns(columns) {
-      let config = columns;
-      if (!Array.isArray(config)) {
-        config = Object.keys(columns).map((k) => {
-          let v = columns[k];
+    getColumns(columnsObj) {
+      let columns = columnsObj;
+      if (!Array.isArray(columnsObj)) {
+        columns = Object.keys(columnsObj).map((k) => {
+          let v = columnsObj[k];
           if (v.prop == undefined) this.$set(v, "prop", k);
           return v;
         });
       }
-      return config
+      return columns
         .map((v) => {
-          let config = this.$agelTableConfig.column || {};
-          let attrs = Object.assign(columnProps(), config, v);
+          let config = this.$agelTableConfig;
+          let attrs = Object.assign(columnProps(), config.column || {}, v);
           this.handleVirtualScrollColumn(attrs);
           if (attrs.children) {
             attrs.children = this.getColumns(attrs.children);

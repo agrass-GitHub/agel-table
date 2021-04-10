@@ -18,8 +18,9 @@ export default {
       row: 100,
       table: {
         border: true,
-        height: 300,
+        height: "50vh",
         virtual: { enable: true, rowHeight: 34 },
+        page: { enable: true },
         columns: [
           { label: "序号", type: "index", width: 100, align: "center" },
           { label: "日期", prop: "date", width: 200 },
@@ -38,13 +39,11 @@ export default {
       let data = [];
       for (let i = 0; i < this.number; i++) {
         // 冻结对象可获得更好的性能
-        data.push(
-          Object.freeze({
-            date: "2016-05-02",
-            name: "王小虎" + i + 1 + "号",
-            address: "上海市",
-          })
-        );
+        data.push({
+          date: "2016-05-02",
+          name: "王小虎" + i + 1 + "号",
+          address: "上海市",
+        });
       }
       this.table.data = data;
     },

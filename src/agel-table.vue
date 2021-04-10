@@ -29,7 +29,6 @@
 <script>
 import basis from "./basic";
 import columns from "./columns";
-import page from "./page";
 import virtualScroll from "./virtual-scroll";
 import merge from "./merge";
 import resize from "./resize";
@@ -37,7 +36,7 @@ import resize from "./resize";
 export default {
   name: "agel-table",
   inheritAttrs: false,
-  mixins: [basis, columns, page, virtualScroll, merge, resize],
+  mixins: [basis, columns, virtualScroll, merge, resize],
   props: {
     value: {
       required: true,

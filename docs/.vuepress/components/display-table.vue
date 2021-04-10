@@ -11,7 +11,6 @@ export default {
     return {
       table: {
         border: true,
-        height: 100,
         columns: [
           { label: "日期", prop: "date", width: 200, display: true },
           { label: "姓名", prop: "name", width: 200, display: true },
