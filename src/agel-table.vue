@@ -68,7 +68,7 @@ export default {
 };
 </script>
  
-<style lang="stylus" >
+<style>
 .agel-table {
   width: 100%;
   height: auto;
@@ -81,14 +81,12 @@ export default {
   transform: translateX(-50%);
 }
 
-.agel-table .virtual-scroll-checkbox {
-  .el-checkbox__inner {
-    transition: none;
-  }
+.agel-table .virtual-scroll-checkbox .el-checkbox__inner {
+  transition: none;
+}
 
-  .el-checkbox__inner::after {
-    transition: none;
-  }
+.agel-table .virtual-scroll-checkbox .el-checkbox__inner::after {
+  transition: none;
 }
 
 .agel-pagination {
