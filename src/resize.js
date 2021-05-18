@@ -33,8 +33,10 @@ export default {
     resizeTable() {
       let resize = this.getProps("resize");
       let container = this.$refs.container;
-      let height = container.offsetParent.clientHeight - container.offsetTop - resize.offset;
-      this.$set(this.value, "height", height);
+      if (container.offsetParent) {
+        let height = container.offsetParent.clientHeight - container.offsetTop - resize.offset;
+        this.$set(this.value, "height", height);
+      }
     },
   }
 }

@@ -40,10 +40,11 @@ const pageProps = function () {
 // query 默认存在四个基本查询属性，可设置成你项目中所需要的 table queryProps，
 const queryProps = function () {
   return {
-    pageSize: (v) => ["pageSize", v],
-    currentPage: (v) => ["currentPage", v],
-    orderColumn: (v) => ["orderColumn", v],
-    order: (v) => ["order", v],
+    pageSize: "pageSize",
+    currentPage: "currentPage",
+    orderColumn: "orderColumn",
+    order: "order",
+    // order: (v) => ["order", v],
   };
 }
 
@@ -62,8 +63,12 @@ export default {
     // queryProps
     const queryPropsFormat = Object.assign(queryProps(), config.queryProps || {}, this.value.queryProps || {});
     this.$set(this.value, "queryProps", queryPropsFormat);
-    this.setQuery("orderColumn", "");
-    this.setQuery("order", "");
+    let defaultSort = this.value.defaultSort || {
+      prop: this.value.query[queryPropsFormat.orderColumn] || "",
+      order: this.value.query[queryPropsFormat.order] || "",
+    }
+    this.setQuery("orderColumn", defaultSort.prop);
+    this.setQuery("order", defaultSort.order);
 
     // page
     const page = Object.assign(pageProps(), config.page || {}, this.value.page || {});
@@ -183,24 +188,38 @@ export default {
         this.$set(this.value.query, newkey, newValue);
       }
     },
-    getData() {
+    async getData() {
       let request = this.value.request;
       if (!request || typeof request != "function") return;
       this.value.loading = true;
-      return new Promise((resolve, reject) => {
-        return request(this.value.query, resolve, reject);
-      })
-        .then((res) => {
-          let { data, total } = Array.isArray(res)
-            ? { data: res, total: res.length }
-            : res;
-          this.value.loading = false;
-          this.value.data = data;
-          if (this.getProps("page")) this.value.page.total = total;
+      let thenRes = (res) => {
+        let { data, total } = Array.isArray(res)
+          ? { data: res, total: res.length }
+          : res;
+        this.value.loading = false;
+        this.value.data = data;
+        if (this.getProps("page")) this.value.page.total = total;
+      }
+      if (request.length >= 2) {
+        return new Promise((resolve, reject) => {
+          try {
+            return request(this.value.query, resolve, reject);
+          } catch (error) {
+            this.value.loading = false;
+            console.error(error)
+          }
         })
-        .catch(() => {
+          .then((res) => thenRes(res))
+          .catch(() => this.value.loading = false);
+      } else {
+        try {
+          return thenRes(await request(this.value.query))
+        } catch (error) {
           this.value.loading = false;
-        });
+          console.error(error)
+        }
+      }
+
     },
     getRef(name = "table") {
       return this.$refs[name];
