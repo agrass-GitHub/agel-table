@@ -74,7 +74,7 @@ export default {
     const page = Object.assign(pageProps(), config.page || {}, this.value.page || {});
     if (this.value.page || this.$agelTableConfig.page) {
       this.$set(this.value, "page", page);
-      this.setQuery("currentPage", page.page);
+      this.setQuery("currentPage", page.currentPage);
       this.setQuery("pageSize", page.pageSize);
     }
   },

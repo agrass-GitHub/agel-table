@@ -5,6 +5,10 @@ sidebar: auto
 
 # 更新日志
 
+## v.0.3.5
+
+- `bug` query 的 currentPage 默认回填为空
+
 ## v.0.3.4
 - `bug` query 默认 orderColumn,order 被覆盖为空
 - `bug` table 隐藏时 resize 获取高度报错
