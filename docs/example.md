@@ -660,7 +660,7 @@ const config = {
   },
   // 设置每个表格列的配置
   column: {
-    algin:"center",
+    align:"center",
     "show-overflow-tooltip":true,
   },
   // 设置每个表格的分页配置
