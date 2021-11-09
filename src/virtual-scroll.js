@@ -21,8 +21,6 @@ export const virtualProps = function () {
     renderNum: 0,
     // 渲染数量偏移量
     offsetNum: 10,
-    // 是否全选
-    selectAll: false,
     // 容器
     warppers: [],
     // 动态渲染数据      
@@ -54,6 +52,9 @@ export default {
       v && this.virtualScrollUpdate();
     },
     'value.data'() {
+      const virtual = this.getProps("virtual");
+      if (!virtual) return;
+      this.initVirtualScrollTop();
       this.setVirtualSortData();
       this.virtualScrollUpdate();
     }
@@ -116,6 +117,7 @@ export default {
       let indexEnd = indexStart + renderNum + offsetNum;
       if (indexStart < 0) indexStart = 0;
       if (indexEnd > this.value.data.length) indexEnd = this.value.data.length;
+
       virtual.indexStart = indexStart;
       virtual.indexEnd = indexEnd;
 
@@ -132,7 +134,6 @@ export default {
       const virtual = this.getProps("virtual");
       if (!virtual) return;
       let data = virtual.sortData.length > 0 ? virtual.sortData : this.value.data;
-      // 考虑用 splice  翻页实现, 或者实时修改 placeholder 高度
       virtual.data = data.slice(
         virtual.indexStart,
         virtual.indexEnd
@@ -144,6 +145,13 @@ export default {
       indexStart = indexStart - 1 < 0 ? 0 : indexStart - 1;
       virtual.warppers.forEach(el => {
         el.scrollTop = indexStart * virtual.rowHeight;
+      });
+    },
+    initVirtualScrollTop() {
+      const virtual = this.getProps("virtual");
+      if (!virtual) return;
+      virtual.warppers.forEach(el => {
+        el.scrollTop = 0;
       });
     },
     // 针对虚拟滚动,对某些列做特殊处理
@@ -181,21 +189,22 @@ export default {
     getVirtualSelectionSlot() {
       const virtual = this.getProps("virtual");
       const isSelected = (row) => this.value.selection.indexOf(row) > -1;
-      const isDisabled = (column, row, index) => column.selectable ? !column.selectable.call(null, row, index) : false
+      const isDisabled = (column, row, index) => column.selectable ? !column.selectable.call(null, row, index) : false;
+
       const slotHeader = (h, { column }) => {
+        const checkData = this.value.data.filter((row, index) => !isDisabled(column, row, index));
+        const isSelectAll = this.value.selection.length === checkData.length;
+
         return h("el-checkbox", {
           class: "virtual-scroll-checkbox",
           props: {
-            value: virtual.selectAll,
+            value: isSelectAll,
             disabled: this.value.data && this.value.data.length === 0,
-            indeterminate: this.value.selection.length > 0 && !virtual.selectAll,
+            indeterminate: this.value.selection.length > 0 && !isSelectAll,
           },
           on: {
-            input: () => {
-              virtual.selectAll = !virtual.selectAll;
-              this.value.selection = virtual.selectAll
-                ? this.value.data.filter((row, index) => !isDisabled(column, row, index))
-                : [];
+            input: (v) => {
+              this.value.selection = v ? checkData : []
               this.selectionChange(this.value.selection);
               if (this.value.on && this.value.on["select-all"]) {
                 this.value.on["select-all"](this.value.selection);

@@ -131,7 +131,6 @@ sidebar: auto
 | ----------- | ------  | --------------| ---------------   |
 | enable      | Boolean | false         | 是否开启虚拟滚动     |
 | rowHeight   | Number  | 0             | 行高度      |
-| offsetNum   | 内置  | 10             | 渲染数量偏移量      |
 | totalHeight | 内置    | -             | 总高度      |
 | renderHeight | 内置   | -             | 渲染区域高度      |
 | indexStart   | 内置   | -              | 开始渲染位置      |
@@ -140,7 +139,6 @@ sidebar: auto
 | warppers    | 内置     | -             | 容器          |
 | data        | 内置     | -             | 动态渲染数据      |
 | sortData    | 内置     | -             | 排序后的数据          |
-| selectAll    | 内置    | -             | selection 列是否全选          |
 
 
 ## resize
