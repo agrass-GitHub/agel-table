@@ -54,6 +54,7 @@ export default {
       v && this.virtualScrollUpdate();
     },
     'value.data'() {
+      this.setVirtualSortData();
       this.virtualScrollUpdate();
     }
   },
@@ -62,7 +63,6 @@ export default {
     virtualScrollUpdate() {
       const virtual = this.getProps("virtual");
       if (!virtual || !this.$refs.table) return;
-
       setTimeout(() => {
         let data = this.value.data;
         let el = this.$refs.table.$el;
@@ -170,9 +170,12 @@ export default {
     // 设置排序后的数据
     setVirtualSortData() {
       const virtual = this.getProps("virtual");
-      let sortingColumn = this.getRef().store._data.states.sortingColumn || {};
-      virtual.sortData = orderBy(this.value.data, sortingColumn.property, sortingColumn.order, sortingColumn.sortMethod, sortingColumn.sortBy);
-      this.setVirtualScrollData();
+      if (!virtual) return;
+      if (this.columns.find(v => v.sortable == 'custom-by-virtual')) {
+        let sortingColumn = this.getRef().store._data.states.sortingColumn || {};
+        virtual.sortData = orderBy(this.value.data, sortingColumn.property, sortingColumn.order, sortingColumn.sortMethod, sortingColumn.sortBy);
+        this.setVirtualScrollData();
+      }
     },
     // 获取自定义 selection checkbox Slot
     getVirtualSelectionSlot() {
