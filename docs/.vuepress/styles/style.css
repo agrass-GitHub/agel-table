@@ -2,9 +2,6 @@
   覆盖 vuepress 默认样式给 el-table 的副作用
 */
 
-.agel-table{
-  margin:20px 0px;
-}
 
 .el-table table {
   margin: 0px;
@@ -25,4 +22,6 @@
 .el-table tr:nth-child(2n){
   background: transparent;
 }
+
+
 

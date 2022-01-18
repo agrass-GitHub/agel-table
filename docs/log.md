@@ -6,13 +6,24 @@ sidebar: auto
 
 # 更新日志
 
-随便写写更新日志
+## v.0.3.7
+
+- `bug` 修复嵌套table中无法自定义父级的头 [issues[3]](https://github.com/agrass-GitHub/agel-table/issues/3)
+- `bug` 修复使用 render 函数在横向滚动时会重复调用的问题
+- `bug` 修复虚拟滚动 data 变化时 selection列 全选状态异常的问题
+- `new` 新增 column.display 支持函数类型配置
+- `new` 新增 column.slot 属性自定义表列插槽，支持模板与渲染，
+- `new` 新增 column.label 属性自定义表头插槽，支持模板与渲染函数
+- `new` 新增 merge.direction horizontal 支持横向合并单元格
+- `new` 新增了 element-loading 配置
+- `new` 优化了表格在自定义插槽时的渲染性能，优化了虚拟滚动性能
+- `change` queryProps 不再支持局部配置
 
 ## v.0.3.6
 
-- `bug` 修复虚拟滚动开启排序时，数据更新异常的问题
-- `bug` 修复虚拟滚动开启selection列，全选 checkbox 状态异常的问题
 - `bug` 虚拟滚动数据刷新时重置滚动条
+- `bug` 修复虚拟滚动开启排序时，数据更新异常的问题
+- `bug` 模拟了selection列，修复虚拟滚动开启selection列 checkbox 状态异常的问题
 
 ## v.0.3.5
 

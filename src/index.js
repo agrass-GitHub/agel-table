@@ -1,7 +1,9 @@
-import agelTable from './agel-table.vue';
+import agelTable from './agel-table.js';
 
-if (typeof window !== 'undefined' && window.Vue) {
-  agelTable.install(window.Vue);
+
+agelTable.install = function (vue, opts = {}) {
+  vue.prototype.$agelTableConfig = opts;
+  vue.component(agelTable.name, agelTable);
 }
 
 export default agelTable;
