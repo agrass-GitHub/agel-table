@@ -203,6 +203,7 @@ Vue.component('agel-table', agelTable);
 | ......      | ......  | All Element-ui Pagination Attributes      | ......          |
 | enable      | Boolean | false                                     | 是否开启分页     |
 | height      | Nnmber  | 45                                        | 占据高度         |
+| justify     | String  | flex-end                                  | 对齐方式         |
 | layout      | String  | 'total, sizes, prev, pager, next, jumper' | 组件布局          |
 | pageSizes   | Array   | [10, 20, 50, 100]                         | 页码选项设置      |
 | pageSize    | Nnmber  | 20                                        | 每页显示条目个数  |
@@ -217,7 +218,7 @@ Vue.component('agel-table', agelTable);
 | ----------- | ------  | ----------------------------------------- | --------------- | 
 | ......     | ......          | ......   | All Element-ui [Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-column-attributes)   |
 | enable      | Boolean | false                                     | 是否开启菜单列     |
-| insertIndex | Number  | -                                 | 菜单列位置,默认在结尾    |
+| insertIndex | Number  | -                                  | 菜单列插入位置,默认在结尾    |
 | onEdit        | Function | -                               | 菜单编辑按钮点击回调，设置后显示编辑按钮     |
 | onDel         | Function | -                               | 菜单删除按钮点击回调，设置后显示删除按钮     |
 | editRender    | Function | -                               | 自定义编辑按钮, editRender({h,clickEvent})    |

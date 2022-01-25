@@ -118,7 +118,7 @@ export const menuProps = {
     default: "center"
   },
   // 操作列位置 可选 left right 
-  columnIndex: {
+  insertIndex: {
     type: Number,
   },
   onEdit: {
