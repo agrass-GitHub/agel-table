@@ -113,7 +113,7 @@ sidebar: auto
 
 设置 `resize` 属性可开启自适应高度，请指定 `relative` 参照物，否则默认取的 table.offsetParent 
 
-[DEMO展示请点击](/table-resize-demo)
+[DEMO展示请点击](/agel-table/table-resize-demo)
 
 ::: details 点击查看代码
 <<< @/docs/.vuepress/components/resize-table.vue
