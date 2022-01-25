@@ -176,10 +176,11 @@ Vue.component('agel-table', agelTable);
 | query       | Object       | { }    | 查询参数，默认包含分页排序参数  | 
 | on          | Object       | { }    | table 和 page 组件的 Event 事件      | 
 | request     | Function     | -      | 接口数据代理函数                     |
-| `page`        | Object       | { }    | 分页配置                | 
-| `merge`       | Object       | { }    | 自动合并单元格                  | 
-| `virtual`     | Object       | { }    | 大数据虚拟滚动                   |
-| `resize`      | Object        | { }   | 随窗口大小自适应高度              |
+| `page`        | Object       | -    | 分页配置                | 
+| `menu`        | Object       | -    | 菜单列配置                | 
+| `merge`       | Object       | -    | 自动合并单元格                  | 
+| `virtual`     | Object       | -    | 大数据虚拟滚动                   |
+| `resize`      | Object        | -   | 随窗口大小自适应高度              |
 
 ### column
 
