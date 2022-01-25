@@ -28,32 +28,11 @@ export const agTableProps = {
   page: {
     type: Object,
   },
+  // 选择的行数据 
   selection: {
     type: Array,
   }
 }
-
-export const agColumnProps = {
-  label: {
-    type: [String, Object, Function],
-  },
-  slot: {
-    type: [Boolean, Object, Function],
-    default: false,
-  },
-  display: {
-    type: Boolean,
-    default: true,
-  },
-  merge: {
-    type: Boolean,
-    default: false,
-  },
-  children: {
-    type: Array,
-    default: () => new Array(),
-  },
-};
 
 // agTable page Props 
 export const pagProps = {
@@ -80,6 +59,10 @@ export const pagProps = {
   layout: {
     type: String,
     default: "total, sizes, prev, pager, next, jumper",
+  },
+  justify: {
+    type: String,
+    default: "flex-end",
   },
   height: {
     type: Number,
@@ -108,16 +91,79 @@ export const resizeProps = {
     type: Boolean,
     default: false,
   },
+  relative: {
+    type: String,
+  },
   offset: {
-    type: Number,
-    default: false,
+    type: [Number, Function],
+    default: 0,
   },
 }
+
+export const menuProps = {
+  enable: {
+    type: Boolean,
+    default: false,
+  },
+  label: {
+    type: String,
+    default: "操作"
+  },
+  width: {
+    type: Number,
+    default: 100
+  },
+  align: {
+    type: String,
+    default: "center"
+  },
+  // 操作列位置 可选 left right 
+  columnIndex: {
+    type: Number,
+  },
+  onEdit: {
+    type: Function,
+  },
+  onDel: {
+    type: Function,
+  },
+  menuRender: {
+    type: Function,
+  },
+  editRender:{
+    type: Function,
+  },
+  delRender:{
+    type: Function,
+  }
+}
+
+export const agColumnProps = {
+  display: {
+    type: Boolean,
+    default: true,
+  },
+  slotHeader: {
+    type: [String, Function],
+  },
+  slotColumn: {
+    type: [String, Function],
+  },
+  merge: {
+    type: Boolean,
+    default: false,
+  },
+  children: {
+    type: Array,
+    default: () => new Array(),
+  },
+};
+
 
 // 全局 query 的 props 解析
 export const queryProps = {
   pageSize: "pageSize",
   currentPage: "currentPage",
-  sortProp: "sortProp",
-  sortOrder: "sortOrder"
+  orderColumn: "orderColumn",
+  order: "order",
 }

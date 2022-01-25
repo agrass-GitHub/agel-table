@@ -1,16 +1,16 @@
 <template>
   <agel-table v-model="table">
-    <template v-slot:expand="props">
-      <div style="text-align:center">{{props.row.date}}=>template展开行内容</div>
-    </template>
-    <template v-slot:date="props">
-      <el-tag>{{props.row.date}}</el-tag>
-    </template>
     <template v-slot:dateHeader>
       <el-tag>模板自定义列-表头</el-tag>
     </template>
+    <template v-slot:date="props">
+      <el-input v-model="props.row.date"></el-input>
+    </template>
+    <template v-slot:expand="props">
+      <div style="text-align:center">{{props.row.date}}=>template展开行内容</div>
+    </template>
     <template v-slot:append>
-      <p style="text-align:center">最后一行 slot append...</p>
+      <p slot="append" style="text-align:center">最后一行 slot append...</p>
     </template>
   </agel-table>
 </template>
@@ -26,15 +26,7 @@ export default {
             label: "展开行",
             type: "expand",
             width: 80,
-            // 也支持 render 函数写法
-            // slotExpand: (h, { row }) => {
-            //   return <p style="text-align:center">{row.date}=>render展开行内容</p>;
-            // },
-          },
-          {
-            width: 200,
-            slotColumn: "date",
-            slotHeader: "dateHeader",
+            slotColumn: "expand",
           },
           {
             minWidth: 200,
@@ -44,6 +36,11 @@ export default {
             slotHeader: () => {
               return <el-tag>render函数自定义列-表头</el-tag>;
             },
+          },
+          {
+            minWidth: 200,
+            slotColumn: "date",
+            slotHeader: "dateHeader",
           },
         ],
         data: [

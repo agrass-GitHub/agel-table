@@ -3,46 +3,16 @@
 */
 
 import { tableColumnPropKeys, agColumnProps, } from "./utils/const.js"
-import { getCustomProps, getIncludeAttrs, } from "./utils/utils"
-import renderComponent from "./render-component.js"
-
-
-// @description 对 v.0.3.6 之前版本 API 兼容补丁
-const patch = {
-  slotHeader: function (column, scopedSlots) {
-    if (column.slotHeader) {
-      if (typeof column.slotHeader === 'boolean') {
-        scopedSlots.header = this.$scopedSlots[column.slotHeader] || null
-      } else if (typeof column.slotHeader === 'function') {
-        scopedSlots.header = (scope) => column.slotHeader(this.$createElement, scope)
-      }
-    }
-  },
-  slotColumn: function (column, scopedSlots) {
-    if (column.slotColumn) {
-      if (typeof column.slotColumn === 'boolean') {
-        scopedSlots.default = this.$scopedSlots[column.slotColumn] || null
-      } else if (typeof column.slotColumn === 'function') {
-        scopedSlots.default = (scope) => column.slotColumn(this.$createElement, scope)
-      }
-    }
-  },
-  slotExpand: function (column, scopedSlots) {
-    if (column.slotExpand) {
-      if (typeof column.slotExpand === 'boolean') {
-        scopedSlots.header = this.$scopedSlots['expand'] || null
-      } else if (typeof column.slotExpand === 'function') {
-        scopedSlots.default = (scope) => column.slotExpand(this.$createElement, scope)
-      }
-    }
-  },
-}
+import { getCustomProps, getIncludeAttrs, guid, getProp } from "./utils/utils"
 
 export default {
   computed: {
     columns() {
       return this.getColumns(this.value.columns)
     },
+    flatColumns() {
+      return this.getFlatColumns(this.columns || []);
+    }
   },
   methods: {
     getColumns(tableColumns = []) {
@@ -52,39 +22,82 @@ export default {
         : tableColumns
       return columns.map((column) => {
         const agColumn = Object.assign(getCustomProps(agColumnProps), config, column)
+        agColumn.display = typeof column.display === 'function' ? column.display() : column.display
         agColumn.children = this.getColumns(agColumn.children)
+        if (!column['_key_'] || column.children && column.children.length != agColumn.children.length) {
+          column['_key_'] = guid();
+        }
         if (this.isEnable("virtual")) {
           this.handleVirtualScrollColumn(agColumn)
         }
         return agColumn
-      }).filter((v) => v.display)
+      }).filter((column) => column.display !== false)
     },
-    getElTableColumns(columns) {
-      this.$nextTick(() => {
-        this.$refs.table && this.$refs.table.doLayout()
+    getFlatColumns(columns) {
+      return columns.reduce((result, v) => {
+        return result.concat(Array.isArray(v.children) && v.children.length > 0 ? this.getFlatColumns(v.children) : v);
+      }, []);
+    },
+    getMenuColumn() {
+      const h = this.$createElement
+      const menu = this.value.menu;
+      const { onEdit, onDel, editRender, delRender, menuRender } = menu
+      return h("el-table-column", {
+        attrs: getIncludeAttrs(tableColumnPropKeys, menu),
+        key: "agel-table-menu-column",
+        scopedSlots: {
+          default: (scope) => {
+            const editButton = ({ h, clickEvent }) => {
+              return editRender ? editRender({ h, clickEvent }) : h('el-button', { attrs: { type: 'text' }, on: { click: clickEvent } }, '编辑')
+            }
+            const delButton = ({ h, clickEvent }) => {
+              return delRender ? delRender({ h, clickEvent }) : h('el-button', { attrs: { type: 'text' }, on: { click: clickEvent } }, '删除')
+            }
+            return h('div', {}, [
+              onEdit ? editButton({ h, clickEvent: () => onEdit(scope) }) : null,
+              onDel ? delButton({ h, clickEvent: () => onEdit(scope) }) : null,
+              menuRender && menuRender({ h, menu, scope }),
+            ])
+          }
+        }
       })
-      return columns.map((column) => {
+    },
+    getElTableColumns(columns, root = true) {
+      this.$nextTick(() => {
+        root && this.$refs.table && this.$refs.table.doLayout()
+      })
+      const columnVnodes = columns.map((column) => {
         const h = this.$createElement
         const attrs = getIncludeAttrs(tableColumnPropKeys, column)
         const scopedSlots = {}
-        if (column.label && typeof column.label !== "string") {
-          scopedSlots.header = (scope) => h(renderComponent, { attrs: { render: column.label, ...scope } })
-        }
-        if (column.slot) {
-          if (typeof column.slot === 'boolean') {
-            scopedSlots.default = this.$scopedSlots[column.prop] || null
-          } else {
-            scopedSlots.default = (scope) => h(renderComponent, { attrs: { render: column.slot, ...scope } })
-          }
-        }
-        patch.slotColumn.call(this, column, scopedSlots)
-        patch.slotHeader.call(this, column, scopedSlots)
-        patch.slotExpand.call(this, column, scopedSlots)
+        const slotColumn = column.slotColumn || column.slotExpand
+        const slotHeader = column.slotHeader
 
-        if (scopedSlots.header) attrs.label = ""
+        if (typeof slotColumn === 'string') {
+          scopedSlots.default = this.$scopedSlots[slotColumn] || null
+        } else if (typeof slotColumn === 'function') {
+          scopedSlots.default = (scope) => slotColumn(h, scope)
+        }
 
-        return h("el-table-column", { attrs, scopedSlots }, this.getElTableColumns(column.children))
+        if (typeof slotHeader === 'string') {
+          scopedSlots.header = this.$scopedSlots[slotHeader] || null
+        } else if (typeof slotHeader === 'function') {
+          scopedSlots.header = (scope) => slotHeader(h, scope)
+        }
+
+        return h("el-table-column", { attrs, scopedSlots, key: column['_key_'] }, this.getElTableColumns(column.children, false))
       })
+
+      if (root && this.isEnable('menu')) {
+        const insertIndex = this.value.menu.insertIndex
+        const menuColumnVnode = this.getMenuColumn();
+        if (typeof insertIndex === 'number') {
+          columnVnodes.splice(insertIndex, 0, menuColumnVnode)
+        } else {
+          columnVnodes.push(menuColumnVnode)
+        }
+      }
+      return columnVnodes
     }
   }
 }

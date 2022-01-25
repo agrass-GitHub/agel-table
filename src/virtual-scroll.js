@@ -2,6 +2,7 @@
  * @description 创建虚拟滚动，维持大数据 table 渲染 
  */
 import { orderBy } from 'element-ui/packages/table/src/util.js'
+import { dynamicStyleRule } from "./utils/utils"
 
 export default {
   data() {
@@ -9,40 +10,43 @@ export default {
       virtualScroll: {
         virtualData: [],
         renderData: [],
+        checkData: [],
+        selection: [],
         startIndex: 0,
         endIndex: 0,
         offsetNum: 3,
         resizeState: null,
-        selection: [],
       }
     }
   },
   mounted() {
     if (this.isEnable('virtual')) {
       this.virtualScroll.resizeState = this.$refs.table.resizeState
-      const { warpper } = this.getScrollWarppers();
-      warpper.addEventListener("scroll", this.onVirtualScroll);
-      this.refreshVirtualData()
+      this.getScrollWarppers().warpper.addEventListener("scroll", this.onVirtualScroll)
+      dynamicStyleRule(this.tableId, this.getVirtualStyleRule())
     }
   },
+  beforeDestroy() {
+    dynamicStyleRule(this.tableId)
+  },
   watch: {
-    "virtualScroll.resizeState.height"(v) {
-      v && this.updateRenderData()
-    },
     'value.data'(oldv, newv) {
       if (!this.isEnable("virtual")) return
       if (oldv && newv && oldv.length === newv.length) return
       this.virtualScroll.selection = []
-      this.refreshVirtualData();
-    }
+      this.refreshVirtualData()
+    },
+    "virtualScroll.resizeState.height"(v) {
+      v && this.updateRenderData()
+    },
   },
   methods: {
     updateRenderData() {
       const virtual = this.virtualScroll
       // 计算开始结束渲染位置
       const { offsetNum, virtualData } = virtual
-      const { warpper, warppers } = this.getScrollWarppers();
-      const rowHeight = this.value.virtual.rowHeight;
+      const { warpper, warppers } = this.getScrollWarppers()
+      const rowHeight = this.value.virtual.rowHeight
       const scrollTop = warppers[0].scrollTop || 0
       const offsetHeight = offsetNum * rowHeight
       const viewportHeight = warpper.clientHeight
@@ -69,9 +73,11 @@ export default {
       virtual.renderData = renderData
     },
     refreshVirtualData() {
-      const isSort = this.columns.findIndex(v => v.sortable == 'custom-by-virtual') !== -1
+      const sortColumn = this.flatColumns.find(v => v.sortable == 'virtual-sortable')
+      const selectionColumn = this.flatColumns.find(v => v.type == 'virtual-selection')
+
       const sortingColumn = this.$refs.table.store._data.states.sortingColumn
-      if (isSort && sortingColumn) {
+      if (sortColumn && sortingColumn) {
         this.virtualScroll.virtualData = orderBy(
           this.value.data,
           sortingColumn.property,
@@ -82,74 +88,62 @@ export default {
       } else {
         this.virtualScroll.virtualData = this.value.data
       }
+      if (selectionColumn) {
+        this.virtualScroll.checkData = selectionColumn.selectable
+          ? this.virtualScroll.virtualData.filter((row, index) => selectionColumn.selectable(row, index))
+          : this.virtualScroll.virtualData
+      }
       this.updateRenderData()
     },
     onVirtualScroll() {
       window.requestAnimationFrame(this.updateRenderData)
     },
-    getScrollWarppers() {
-      const el = this.$refs.table.$el
-      const warpper = el.querySelector('.el-table__body-wrapper')
-      const fixedWrapper = el.querySelector(".el-table__fixed .el-table__fixed-body-wrapper")
-      const rightFixedWrapper = el.querySelector(".el-table__fixed-right .el-table__fixed-body-wrapper")
-      const warppers = [warpper, fixedWrapper, rightFixedWrapper].filter(v => v)
-      return {
-        warpper,
-        warppers,
-      }
-    },
-    // 滚动到指定行
-    virtualScrollToRow(index) {
+    virtualScrollToRow(rowOrIndex) {
       const { warppers } = this.getScrollWarppers()
+      let index = typeof rowOrIndex === 'number' ? rowOrIndex : this.virtualScroll.virtualData.findIndex(row => row === rowOrIndex)
       index = index - 1 < 0 ? 0 : index - 1
       warppers.forEach(el => {
         el.scrollTop = index * this.value.virtual.rowHeight
       })
     },
-    // 对列特殊处理
     handleVirtualScrollColumn(column) {
-      column['show-overflow-tooltip'] = true;
+      // column['show-overflow-tooltip'] = true;
       if (column.sortable === true) {
-        column.sortable = "custom-by-virtual"
+        column.sortable = "virtual-sortable"
       }
       if (column.type === "selection") {
-        const { selectionHeader, selectionColumn } = this.getVirtualSelectionSlot(column)
-        column.label = selectionHeader
-        column.slot = selectionColumn
-        column.type = undefined
+        const { selectionHeader, selectionColumn } = this.getVirtualSelectionColumn(column)
+        column.slotHeader = selectionHeader
+        column.slotColumn = selectionColumn
+        column.type = "virtual-selection"
       }
       if (column.type === "index") {
         const indexMethod = column.index
         column.index = (v) => {
-          const index = this.getVirtualScrollIndex(v);
+          const index = this.getVirtualRowIndex(v)
           return indexMethod ? indexMethod(index) : index + 1
         }
       }
     },
-    // 获取虚拟滚动中正确的 rowIndex
-    getVirtualScrollIndex(index) {
+    getVirtualRowIndex(index) {
       return this.virtualScroll.startIndex + index
     },
-    // 获取自定义 selection checkbox Slot
-    getVirtualSelectionSlot(column) {
+    getVirtualSelectionColumn(column) {
       const virtual = this.virtualScroll
-      const h = this.$createElement
-      const isSelected = (row) => virtual.selection.indexOf(row) > -1
-      const isDisabled = (row, index) => column.selectable ? !column.selectable.call(null, row, index) : false
-
-      const selectionHeader = () => {
-        const checkData = virtual.virtualData.filter((row, index) => !isDisabled(row, index))
-        const isSelectAll = checkData.length > 0 && virtual.selection.length === checkData.length
+      const selectionHeader = (h) => {
+        const isSelected = virtual.checkData.length > 0 && virtual.selection.length === virtual.checkData.length
+        const isDisabled = virtual.checkData.length === 0
+        const isIndeterminate = virtual.selection.length > 0 && !isSelected
         return h("el-checkbox", {
           class: "virtual-scroll-checkbox",
           props: {
-            value: isSelectAll,
-            disabled: checkData.length === 0,
-            indeterminate: virtual.selection.length > 0 && !isSelectAll,
+            value: isSelected,
+            disabled: isDisabled,
+            indeterminate: isIndeterminate,
           },
           on: {
             input: (v) => {
-              virtual.selection = v ? checkData : []
+              virtual.selection = v ? [].concat(virtual.checkData) : []
               if (this.value.on && this.value.on["select-all"]) {
                 this.value.on["select-all"](virtual.selection)
               }
@@ -160,12 +154,14 @@ export default {
           }
         })
       }
-      const selectionColumn = ({ row, $index }) => {
+      const selectionColumn = (h, { row, $index }) => {
+        const isSelected = virtual.selection.indexOf(row) > -1
+        const isDisabled = column.selectable ? !column.selectable(row, this.getVirtualRowIndex($index)) : false
         return h("el-checkbox", {
           class: "virtual-scroll-checkbox",
           props: {
-            value: isSelected(row),
-            disabled: isDisabled(row, $index),
+            value: isSelected,
+            disabled: isDisabled
           },
           on: {
             input: () => {
@@ -187,6 +183,34 @@ export default {
         })
       }
       return { selectionHeader, selectionColumn }
-    }
+    },
+    getVirtualStyleRule() {
+      const tdBorderHeight = 1
+      const rowHeight = this.value.virtual.rowHeight - tdBorderHeight;
+      const styleRule = `
+      #${this.tableId} .el-table__cell {
+        padding: 0px !important;
+      }
+      #${this.tableId} .el-table__cell .cell {
+        height: ${rowHeight}px !important;
+        line-height: ${rowHeight}px;
+      }
+      #${this.tableId} .virtual-scroll-checkbox .el-checkbox__inner, 
+      #${this.tableId} .virtual-scroll-checkbox .el-checkbox__inner::after {
+        transition: none;
+      } `
+      return styleRule
+    },
+    getScrollWarppers() {
+      const el = this.$refs.table.$el
+      const warpper = el.querySelector('.el-table__body-wrapper')
+      const fixedWrapper = el.querySelector(".el-table__fixed .el-table__fixed-body-wrapper")
+      const rightFixedWrapper = el.querySelector(".el-table__fixed-right .el-table__fixed-body-wrapper")
+      const warppers = [warpper, fixedWrapper, rightFixedWrapper].filter(v => v)
+      return {
+        warpper,
+        warppers,
+      }
+    },
   }
 }

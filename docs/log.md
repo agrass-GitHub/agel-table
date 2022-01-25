@@ -11,19 +11,24 @@ sidebar: auto
 - `bug` 修复嵌套table中无法自定义父级的头 [issues[3]](https://github.com/agrass-GitHub/agel-table/issues/3)
 - `bug` 修复使用 render 函数在横向滚动时会重复调用的问题
 - `bug` 修复虚拟滚动 data 变化时 selection列 全选状态异常的问题
+- `bug` 修复虚拟滚动在多级表头下，selection 和 排序 异常的问题
+- `new` 新增 element-loading 配置
+- `new` 新增 table.getCol 方法
+- `new` 新增 table.menu 菜单列功能
 - `new` 新增 column.display 支持函数类型配置
-- `new` 新增 column.slot 属性自定义表列插槽，支持模板与渲染，
-- `new` 新增 column.label 属性自定义表头插槽，支持模板与渲染函数
 - `new` 新增 merge.direction horizontal 支持横向合并单元格
-- `new` 新增了 element-loading 配置
-- `new` 优化了表格在自定义插槽时的渲染性能，优化了虚拟滚动性能
-- `change` queryProps 不再支持局部配置
+- `new` 新增 table.request 可单独使用，不再依赖 getData 函数
+- `new` 新增 resize.relative 参照物，新增 resize.offset 支持函数配置
+- `new` 优化了表格在自定义插槽时的渲染性能
+- `new` 优化了虚拟滚动性能，强制设置虚拟滚动行高，新增 getVirtualRowIndex 方法
+- `change` 移除了 selection 属性
+- `change` 重写了文档
 
 ## v.0.3.6
 
 - `bug` 虚拟滚动数据刷新时重置滚动条
-- `bug` 修复虚拟滚动开启排序时，数据更新异常的问题
-- `bug` 模拟了selection列，修复虚拟滚动开启selection列 checkbox 状态异常的问题
+- `new` 新增虚拟滚动开启时，兼容 sortable:true 排序功能
+- `new` 新增虚拟滚动开启时，兼容 type:selection 多选功能
 
 ## v.0.3.5
 
@@ -64,7 +69,6 @@ sidebar: auto
 
 - `新增` 添加了虚拟滚动，
 - `bug` 修复部分 Bug
-- `优化` 优化了高度设置逻辑，去掉了 resize 功能
 - `优化` 重构了代码逻辑
 
 ## v.0.1.1

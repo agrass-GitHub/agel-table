@@ -41,11 +41,6 @@ export function getExcludeAttrs(keys, target) {
   return obj;
 }
 
-// 是否是对象
-export function isObject(obj) {
-  return Object.prototype.toString.call(obj) === '[object Object]';
-}
-
 // 获取自定义的 props
 export function getCustomProps(props, attrs) {
   const propsKyes = Object.keys(props);
@@ -75,16 +70,17 @@ export const extend = function (obj, target = {}, vueset, cover = false) {
   }
 }
 
-export const getArrItems = function (arr) {
-  if (Array.isArray(arr)) {
-    return arr.map(item => {
-      item.prop = item.prop || "_aguid_" + guid();
-      return item;
-    })
-  } else {
-    return Object.keys(arr).map(key => {
-      arr[key].prop = arr[key].prop || key;
-      return arr[key]
-    })
+export const dynamicStyleRule = function (id, styleRule) {
+  let styleId = 'dynamic-style-' + id;
+  let styleElement = document.getElementById(styleId);
+  if (styleElement) {
+    styleElement.parentNode.removeChild(styleElement);
+  }
+  if (styleRule) {
+    styleElement = document.createElement('style');
+    styleElement.type = 'text/css';
+    styleElement.id = styleId;
+    document.getElementsByTagName('head')[0].appendChild(styleElement);
+    styleElement.appendChild(document.createTextNode(styleRule));
   }
 }

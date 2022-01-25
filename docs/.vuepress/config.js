@@ -5,10 +5,10 @@ module.exports = {
   base: '/agel-table/',
   themeConfig: {
     updatePopup: true,
+    displayAllHeaders: true,
     nav: [
       { text: '首页', link: '/' },
-      { text: '教程', link: '/example' },
-      { text: 'API', link: '/api' },
+      { text: '文档', link: '/example' },
       { text: '更新日志', link: '/log' },
       { text: 'Github', link: 'https://github.com/agrass-GitHub/agel-table' }
     ],

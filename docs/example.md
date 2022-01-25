@@ -1,693 +1,269 @@
 ---
-title: 演示教程
+title: 使用文档
 sidebar: auto
 ---
 
-# agel-table | 使 element-ui table 组件更简单
+## 介绍
 
-## 特性
+[agel-table](https://github.com/agrass-GitHub/agel-table)是 element-ui table 的二次封装，保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发 ⬆⬆⬆
+[![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
+[![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
+
+
+### 特性
 
 该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
-- 解决 element-ui table [一些潜在问题](https://agrass.gitee.io/agel-table/sum.html#element-ui-table-一些潜在问题)
-- 添加额外的扩展功能
-  - 纯数据配置
-  - 动态显隐列
-  - 数据代理
-  - 集成分页组件
-  - 自动合并相同单元格
-  - 虚拟滚动支持大数据渲染 10w+
-  - 跟随窗口大小自适应高度
+- 纯数据配置
+- 集成分页组件
+- 菜单列
+- 动态显隐列
+- 数据代理
+- 自动合并相同行
+- 虚拟滚动支持大数据渲染 10w+
+- 跟随容器大小自适应高度
 
+### 安装
 
-## 安装使用
+`npm install agel-table --save # yarn add agel-table` 
 
-`cnpm install agel-table --save`
+## 创建表格
 
+### 数据配置
 
-## 简单的 Table 
+表格通过一个 table 对象渲染，下面的 Demo 展示了 element-ui 官网 el-table 的大多数例子:
 
-<ClientOnly><basics-table/></ClientOnly>
+<div>
+  <el-tag style="margin:0px 5px 5px 0px"  v-for="text in ['基础表格','带斑马纹表格','带边框表格','带状态表格','固定列','固定表头','单选','多选','排序','表尾合计行','自定义索引','树形数据与懒加载','分页','菜单列']" :key="text">{{text}}</el-tag>
+</div>
 
-::: details 点击查看代码
-```html
-<template>
-  <agel-table v-model="table"></agel-table>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        columns: [
-          { label: "日期", prop: "date", width: 200 },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address", minWidth: 300 },
-        ],
-        data: [
-          { date: "2016-05-02", name: "王小虎", address: "上海市" },
-          { date: "2016-05-04", name: "王小虎", address: "上海市" },
-        ],
-      },
-    };
-  },
-};
-</script>
-```
-:::
+分页与菜单列的属性建议配置在全局，在局部进行按需覆盖。
 
-## 复杂的 Table
-
-:::tip
-1. 支持所有的 Table Event，相关事件函数都写在 `table.on` 对象里
-2. 支持所有的 Table Method，table 实例通过 `table.getRef` 获取
-:::
-
-下面的 Demo 展示了 element-ui 官网 el-table 的[大多数例子](https://element.eleme.cn/#/zh-CN/component/table)
-
-<el-tag style="margin:0px 5px 5px 0px" type="success" v-for="text in ['基础表格','带斑马纹表格','带边框表格','带状态表格','固定列','固定表头','单选','多选','排序','表尾合计行','自定义索引','树形数据与懒加载']" :key="text">{{text}}</el-tag>
 
 <ClientOnly><complex-table/></ClientOnly>
 
 ::: details 点击查看代码
-```html
-<template>
-  <div class="demo">
-    <el-button @click="clearSelection">清空选中</el-button>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    let data = [];
-    for (let i = 0; i < 10; i++) {
-      data.push({
-        date: "2016-05-01 10:20",
-        name: "王小虎" + i,
-        sex: i % 2 == 0 ? "男" : "女",
-        address: "上海市普陀区金沙江路 1518 弄",
-        hasChildren: i == 0,
-      });
-    }
-    return {
-      table: {
-        data,
-        border: true,
-        stripe: true,
-        height: 300,
-        lazy: true,
-        "highlight-current-row": true,
-        "show-summary": true,
-        "sum-text": "合计",
-        "row-key": "name",
-        "default-sort": { prop: "name", order: "ascending" },
-        "tree-props": { children: "children", hasChildren: "hasChildren" },
-        "summary-method": () => ["合", "计", "也", "还", "可", "以"],
-        "row-class-name": ({ rowIndex }) => {
-          return rowIndex == 0 ? "success-row" : "";
-        },
-        load: (tree, treeNode, resolve) => {
-          setTimeout(() => {
-            resolve([
-              {
-                date: "2016-05-01 10:20",
-                name: "王小虎",
-                sex: "男",
-                address: "上海市普陀区金沙江路 1517 弄",
-              },
-            ]);
-          }, 1000);
-        },
-        columns: [
-          { type: "selection", width: 50, align: "center", fixed: true },
-          {
-            label: "#",
-            type: "index",
-            align: "center",
-            width: 50,
-            index: (index) => "#" + (index + 1),
-          },
-          { label: "日期", prop: "date", width: 200 },
-          {
-            label: "配送信息",
-            children: [
-              { label: "姓名", prop: "name", width: 80, sortable: true },
-              {
-                label: "性别",
-                prop: "sex",
-                width: 80,
-                filters: [
-                  { text: "男", value: "男" },
-                  { text: "女", value: "女" },
-                ],
-                "filter-method": (value, row) => {
-                  return row.sex === value;
-                },
-              },
-              { label: "地址", prop: "address", width: 400 },
-            ],
-          },
-        ],
-        on: {
-          "selection-change": () => {
-            this.$message.success("选择项发生变化");
-          },
-        },
-      },
-    };
-  },
-  methods: {
-    clearSelection() {
-      this.table.getRef().clearSelection();
-    },
-  },
-};
-</script>
-<style>
-.el-table .success-row {
-  background: #f0f9eb;
-}
-</style>
-```
+<<< @/docs/.vuepress/components/complex-table.vue
 :::
 
-## 显隐的 Table
+### 自定义列
 
-<ClientOnly><display-table/></ClientOnly>
+设置 `column.slotColumn` 支持配置自定义列，支持渲染函数
 
-::: details 点击查看代码
-```html
-<template>
-  <div class="demo">
-    <el-checkbox v-for="item in table.columns" v-model="item.display" :key="item.label">{{item.label}}</el-checkbox>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        columns: [
-          { label: "日期", prop: "date", width: 200, display: true },
-          { label: "姓名", prop: "name", width: 200, display: true },
-          { label: "地址", prop: "address", minWidth: 300, display: true },
-        ],
-        data: [],
-      },
-    };
-  },
-};
-</script>
-```
-:::
-
-## 分页的 Table
-
-:::tip
-el-pagination 与 el-table 拥有重名事件 `currentChange`，故此重定义为 `page-change`
-:::
-
-<ClientOnly><page-table/></ClientOnly>
-
-::: details 点击查看代码
-```html {11-18}
-<template>
-  <agel-table v-model="table"></agel-table>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        page: {
-          enable: true,
-          height: 50,
-          currentPage: 2,
-          total: 1000,
-          pageSize: 1,
-          pageSizes: [1, 2, 3, 4, 5, 6],
-        },
-        columns: [{ label: "自定义分页配置，支持所有分页属性和事件" }],
-        on: {
-          "page-change": () => {
-            // el-pagination 与 el-table 拥有重名事件 currentChange，故此重定义为 page-change
-            // currentPage 将自动变化 不需要手动赋值
-            this.$message.success(
-              `page-change,当前页码:${this.table.page.currentPage}页`
-            );
-          },
-          "size-change": () => {
-            // pageSize 将自动变化 不需要手动赋值
-            this.$message.success(
-              `page-change,每页展示:${this.table.page.pageSize}条`
-            );
-          },
-          "prev-click": () => {
-            this.$message.success("prev-click");
-          },
-          "next-click": () => {
-            this.$message.success("next-click");
-          },
-        },
-      },
-    };
-  },
-};
-</script>
-```
-:::
- 
-## 数据代理的 Table
-
-::: tip
-1. getData 流程： 开启 loading -> getQuery -> request -> 回填数据和分页 -> 关闭 loading
-2. 分页或者排序发生变化，会自动触发 getData 函数
-:::
-  
-<ClientOnly><get-data-table/></ClientOnly>
-
-::: details 点击查看代码
-```html {21,27-32,38}
-<template>
-  <div class="demo">
-    <el-input v-model="table.query.name" style="width:100px;margin-right:10px;"></el-input>
-    <el-button icon="el-icon-search" @click="load">查询</el-button>
-    <el-button @click="()=>table.loading=!table.loading">{{table.loading?'关闭':'开启'}}loading</el-button>
-    <p><code v-show="queryString">{{queryString}}</code></p>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      queryString: "",
-      table: {
-        border: true,
-        height: "200px",
-        data: [],
-        page: { enable: true },
-        query: { name: "小虎" },
-        columns: [
-          { label: "日期", prop: "date", width: 200, sortable: "custom" },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address", minWidth: 300 },
-        ],
-        request: (query, reslove, rejcet) => {
-          this.queryString = JSON.stringify(query);
-          this.http(query)
-            .then((res) => reslove({ data: res.data, total: res.total }))
-            .catch(rejcet);
-        },
-      },
-    };
-  },
-  methods: {
-    load() {
-      this.table.getData();
-    },
-    http(quey) {
-      // 模拟一个 http 请求
-      return new Promise((reslove) => {
-        setTimeout(() => {
-          let data = [];
-          for (let i = 0; i < quey.pageSize; i++) {
-            let index = (quey.currentPage - 1) * quey.pageSize + (i + 1);
-            data.push({
-              date: "2016-05-02",
-              name: "王小虎" + index,
-              address: "上海市" + index,
-            });
-          }
-          //  reslove(data); 如果没有分页，可直接 reslove 一个 data 数组
-          reslove({ data: data, total: 100 });
-        }, 1000);
-      });
-    },
-  },
-};
-</script>
-```
-:::
-
-## 自动合并列的 Table
-
-:::tip
-暂且只支持纵向自动合并，横向自动合并等待后续更新
-:::
-
-<ClientOnly> <merge-cell-table/></ClientOnly>
-
-::: details 点击查看代码
-```html {21,33}
-<template>
-  <div>
-    <p>设置 <code>table.merge.auto</code> 将自动合并所有相同列</p>
-    <agel-table v-model="table"></agel-table>
-    <p>也可设置指定列 <code>merge</code> 进行合并 </p>
-    <agel-table v-model="table2"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    const data = [
-      { date: "2016-05-02", name: "王小虎", address: "上海市1" },
-      { date: "2016-05-02", name: "王小虎", address: "上海市2" },
-      { date: "2016-05-02", name: "王小虎", address: "上海市3" },
-    ];
-    return {
-      table: {
-        border: true,
-        merge: { enable: true, auto: true },
-        columns: [
-          { label: "日期", prop: "date", width: 200 },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address", minWidth: 300 },
-        ],
-        data,
-      },
-      table2: {
-        border: true,
-        merge: { enable: true },
-        columns: [
-          { label: "日期", prop: "date", width: 200, merge: true },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address", minWidth: 300 },
-        ],
-        data,
-      },
-    };
-  },
-};
-</script>
-```
-:::
-
-## 虚拟滚动的 Table
-:::tip
-若列表数据量大, 开启可显著提高渲染性能 :smile:
-:::
-
-<ClientOnly> <virtual-scroll-table/></ClientOnly>
-
-::: details 点击查看代码
-```html {22}
-<template>
-  <div class="demo">
-    <el-row>
-      <el-input-number v-model="number" :min="1" :max="100000" :step="100" placeholder="数据条数"></el-input-number>
-      <el-button @click="setData">加载大数据</el-button>
-      <el-input-number v-model="row" :min="1" :max="table.data.length" placeholder="指定跳转行数"></el-input-number>
-      <el-button @click="jump">跳转到指定行数</el-button>
-    </el-row>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      number: 10000,
-      row: 100,
-      table: {
-        border: true,
-        height: 300,
-        virtual: { enable: true, rowHeight: 34 },
-        columns: [
-          { label: "序号", type: "index", width: 100, align: "center" },
-          { label: "日期", prop: "date", width: 200 },
-          { label: "姓名", prop: "name", width: 200 },
-          { label: "地址", prop: "address",minWidth: 100 },
-        ],
-        data: [],
-      },
-    };
-  },
-  mounted() {
-    this.setData();
-  },
-  methods: {
-    setData() {
-      let data = [];
-      for (let i = 0; i < this.number; i++) {
-        // 冻结对象可获得更好的性能
-        data.push({
-          date: "2016-05-02",
-          name: "王小虎" + i + 1 + "号",
-          address: "上海市",
-        });
-      }
-      this.table.data = data;
-    },
-    jump() {
-      this.table.virtualScrollToRow(this.row);
-    },
-  },
-};
-</script>
-```
-:::
-
-## 自定义模板的 Table
+设置 `column.slotHeader` 支持配置自定义表头，支持渲染函数
 
 <ClientOnly><slot-table/></ClientOnly>
 
 ::: details 点击查看代码
-```html
-<template>
-  <agel-table v-model="table">
-    <template v-slot:expand="props">
-      <div style="text-align:center">{{props.row.date}}=>template展开行内容</div>
-    </template>
-    <template v-slot:date="props">
-      <el-tag>{{props.row.date}}</el-tag>
-    </template>
-    <template v-slot:dateHeader>
-      <el-tag>模板自定义列-表头</el-tag>
-    </template>
-    <template v-slot:append>
-      <p style="text-align:center">最后一行 slot append...</p>
-    </template>
-  </agel-table>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        columns: [
-          {
-            label: "展开行",
-            type: "expand",
-            width: 80,
-            // 也支持 render 函数写法
-            // slotExpand: (h, { row }) => {
-            //   return <p style="text-align:center">{row.date}=>render展开行内容</p>;
-            // },
-          },
-          {
-            width: 200,
-            slotColumn: "date",
-            slotHeader: "dateHeader",
-          },
-          {
-            minWidth: 200,
-            slotColumn: (h, { row }) => {
-              return <el-tag>{row.name}</el-tag>;
-            },
-            slotHeader: () => {
-              return <el-tag>render函数自定义列-表头</el-tag>;
-            },
-          },
-        ],
-        data: [
-          { date: "2016-05-02", name: "王小虎", address: "上海市" },
-          { date: "2016-05-04", name: "王小虎", address: "上海市" },
-        ],
-      },
-    };
-  },
-};
-</script>
-```
+<<< @/docs/.vuepress/components/slot-table.vue
 :::
 
-## queryProps 属性的用法
+### 动态显隐
 
-:::tip
-`query` 默认存在四个基本查询属性，`pageSize`，`currentPage`，`orderColumn`，`order`，你可以设置成你项目中所需要的 table `queryProps`，建议这一步放在全局配置里面
-:::
+设置 `column.display` 控制是否显示隐藏，支持函数配置
 
-<ClientOnly><query-table/></ClientOnly>
+<ClientOnly><display-table/></ClientOnly>
 
 ::: details 点击查看代码
-```html {24-30}
-<template>
-  <div class="demo">
-    <p><code>{{queryString}}</code></p>
-    <el-input v-model="table.query.name" style="width:100px"></el-input>
-    <agel-table v-model="table"></agel-table>
-  </div>
-</template>
+<<< @/docs/.vuepress/components/display-table.vue
+:::
  
-<script>
-export default {
-  data() {
-    return {
-      table: {
-        border: true,
-        height: 200,
-        page: { enable: true, total: 1000 },
-        columns: [
-          { label: "性别", prop: "sex", sortable: "custom" },
-          { label: "日期", prop: "date", sortable: "custom" },
-        ],
-        query: {
-          name: "张三",
-        },
-        queryProps: {
-          pageSize: "size",
-          currentPage: "page",
-          orderColumn: "orderName",
-          // 也可对 value 进行格式化,
-          order: (v) => ["order", v == "descending" ? "倒序" : "正序"],
-        },
-      },
-    };
-  },
-  computed: {
-    queryString() {
-      return JSON.stringify(this.table.query);
-    },
-  },
-};
-</script>
-```
-:::
+### 数据代理
 
-## attach 属性的用法
+设置 `request` 属性可开启数据代理，当分页或者排序发生变化，会自动调用。
 
-:::tip
-在设计上，主张的是聚拢所有的参数为一个 table 对象，在组件初始化完成后会为 table 参数添加额外的内置属性和方法，因此该参数必须使用 `v-model`，且不可设为计算属性
+表格 `query` 对象默认存在四个基本查询属性，可以通过全局设置 `queryProps` 配置别名。
 
-为了保持其灵活性，添加了 `attach` 参数，配置项与 table 一致，不仅可聚拢也可打散，也可为计算属性，当其发生变化时候，会同步合并到 table 对象中
-
-另外值得一提的是，`columns` 属性也可以设置成对象
-:::
-
-<ClientOnly><attach-table/></ClientOnly>
+<ClientOnly> <get-data-table/></ClientOnly>
 
 ::: details 点击查看代码
-```html
-<template>
-  <div class="demo">
-    <el-button @click="add">修改高度</el-button>
-    <agel-table v-model="table" :attach="{border,height,data,columns}"></agel-table>
-  </div>
-</template>
- 
-<script>
-export default {
-  data() {
-    return {
-      table: {},
-      border: true,
-      height: 150,
-    };
-  },
-  computed: {
-    data() {
-      return [
-        { date: "2016-05-02", name: "王小虎", address: "上海市" },
-        { date: "2016-05-04", name: "王小虎", address: "上海市" },
-      ];
-    },
-    columns() {
-      // columns 属性也可以设置成对象
-      return {
-        date: { label: "日期", width: 200 },
-        name: { label: "姓名", width: 200 },
-        address: { label: "地址", minWidth: 300 },
-      };
-    },
-  },
-  methods: {
-    add() {
-      this.height += 10;
-      this.$message("高度发生变化，同步：" + this.table.height);
-    },
-  },
-};
-</script>
-```
+<<< @/docs/.vuepress/components/get-data-table.vue
 :::
 
 
+### 自动合并
 
-## 全局配置的用法
+设置 `merge` 可开启自动合并单元格。
 
-:::tip
-以下配置将应用到每个表格上，支持所有属性配置，注意的是某些内置属性和方法，请勿覆盖
+<ClientOnly> <merge-cell-table/></ClientOnly>
+
+::: details 点击查看代码
+<<< @/docs/.vuepress/components/merge-cell-table.vue
 :::
+
+### 虚拟滚动
+
+设置 `virtual` 可开启虚拟滚动，纯文本渲染效率最佳 :smile:
+
+只需要设置好 `rowHieght`，表格会自动设置固定行高，不会被 CSS 样式表所影响。
+
+支持多选列，索引列，固定列，排序，在组件内部做了兼容，不支持过滤、树形、合并单元格。
+
+
+<ClientOnly> <virtual-scroll-table/></ClientOnly>
+
+::: details 点击查看代码
+<<< @/docs/.vuepress/components/virtual-scroll-table.vue
+:::
+
+
+### 自适应高
+
+设置 `resize` 属性可开启自适应高度，请指定 `relative` 参照物，否则默认取的 table.offsetParent 
+
+[DEMO展示请点击](/table-resize-demo)
+
+::: details 点击查看代码
+<<< @/docs/.vuepress/components/resize-table.vue
+:::
+
+### 全局配置
+
+支持全局属性，配置将被继承到每个表格上; 分页与菜单列相关的属性建议配置在全局，在局部页面根据需求进行覆盖。
 
 ```js
-import agelTable from 'agel-table';
+import agelTable from "agel-table"
 
-const config = {
-  // component name,use() 生效
-  name: 'agel-table', 
-  // 设置每个表格的配置
+const tableConfig = {
   table: {
-    border:true,
-    "highlight-current-row":true,
+    border: true,
+    highlightCurrentRow: true,
   },
-  // 设置每个表格列的配置
-  column: {
-    align:"center",
-    "show-overflow-tooltip":true,
+  column:{
+    width:100,
   },
-  // 设置每个表格的分页配置
-  page: {
-    enable:true,
-    height: 45,
-    pageSize: 10,
-    pageSizes: [10, 20, 30, 40],
-    layout: "total, sizes, prev, pager, next, jumper",
-  }, 
-  // 设置每个表格的 query props 配置，也可对 value 进行格式化
+  menu:{
+    width:100,
+    editRender: ({ h, clickEvent }) =>  h("el-button", { on: clickEvent }, '编辑'),
+    delRender: ({ h, clickEvent }) => h("el-button", { on: clickEvent }, '删除')
+  },
+  page: { 
+     enable: true, 
+     height: 45, 
+     layout: "total, prev, pager, next, jumper, sizes", 
+     background: true 
+  },
   queryProps: {
-    pageSize: "page",
-    currentPage: "size",
-    orderColumn: "orderName",
-    order: (v) => ["order", v == "descending" ? 1 : 0],
+    currentPage: "page",
+    pageSize: "size",
+    orderColumn: 'sortProp',
+    order: (v) => ["sortOrder", v == "descending" ? 1 : 0], // 可格式化 order value
   },
-  // 只有指定的 key 才会传递到 el-table 组件的 props，如果有额外的 prop 可在这里配置
-  attributes:[ "style", "class" ],
 }
 
-Vue.use(agelTable, config);
+Vue.use(agelTable,tableConfig)
 
-// or
+// use 注册组件 OR component 注册组件
 
-Vue.prototype.$agelTableConfig = config;
+Vue.prototype.$agelTableConfig = tableConfig;
 Vue.component('agel-table', agelTable);
 ```
 
-以上所有例子都有源码 [链接](https://github.com/agrass-GitHub/agel-table/tree/master/docs/.vuepress/components)
+## 表格配置
+
+### table 
+
+表格属性配置。
+
+| 属性        | 类型         | 默认值  | 说明                                 | 
+| ----------- | ------------ | ------ | ------------------------------------ | 
+| ......      | ......       | ...... | All Element-ui [Table Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-attributes)     | 
+| loading     | Boolean      | false  | 是否开启加载状态                       | 
+| data        | Array        | [ ]    | 数据                                 | 
+| columns     | Array/Object | [ ]    | 列配置                               | 
+| query       | Object       | { }    | 查询参数，默认包含分页排序参数  | 
+| on          | Object       | { }    | table 和 page 组件的 Event 事件      | 
+| request     | Function     | -      | 接口数据代理函数                     |
+| `page`        | Object       | { }    | 分页配置                | 
+| `merge`       | Object       | { }    | 自动合并单元格                  | 
+| `virtual`     | Object       | { }    | 大数据虚拟滚动                   |
+| `resize`      | Object        | { }   | 随窗口大小自适应高度              |
+
+### column
+
+表格列扩展属性。
+
+| 属性       | 类型            | 默认值   | 说明                               |
+| ---------- | --------------- | -------- | ---------------------------------- |
+| ......     | ......          | ......   | All Element-ui [Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-column-attributes)   |
+| display    | Boolean/Function         | true     | 是否显示该列                       |
+| merge      | Boolean         | false    | 该列相同行是否自动合并              |
+| children   | Array           | -        | 配置多级表头                       |
+| slotColumn | String/Function | -        | 自定义表列的插槽名称 / slotColumn(h,scope) |
+| slotHeader | String/Function | -        | 自定义表头的插槽名称 / slotHeader(h,scope) |
+
+### page
+
+开启分页配置，基础属性建议配置在全局。
+
+| 属性        | 类型   | 默认值                                    | 说明              |
+| ----------- | ------  | ----------------------------------------- | --------------- | 
+| ......      | ......  | All Element-ui Pagination Attributes      | ......          |
+| enable      | Boolean | false                                     | 是否开启分页     |
+| height      | Nnmber  | 45                                        | 占据高度         |
+| layout      | String  | 'total, sizes, prev, pager, next, jumper' | 组件布局          |
+| pageSizes   | Array   | [10, 20, 50, 100]                         | 页码选项设置      |
+| pageSize    | Nnmber  | 20                                        | 每页显示条目个数  |
+| currentPage | Nnmber  | 1                                         | 当前页           |
+| total       | Nnmber  | 0                                         | 总条目数          |
+
+### menu
+
+开启菜单列，`editRender` `delRender` 等基础属性建议配置在全局。
+
+| 属性        | 类型   | 默认值                                    | 说明              |
+| ----------- | ------  | ----------------------------------------- | --------------- | 
+| ......     | ......          | ......   | All Element-ui [Table-column Attributes](https://element.eleme.cn/#/zh-CN/component/table#table-column-attributes)   |
+| enable      | Boolean | false                                     | 是否开启菜单列     |
+| insertIndex | Number  | -                                 | 菜单列位置,默认在结尾    |
+| onEdit        | Function | -                               | 菜单编辑按钮点击回调，设置后显示编辑按钮     |
+| onDel         | Function | -                               | 菜单删除按钮点击回调，设置后显示删除按钮     |
+| editRender    | Function | -                               | 自定义编辑按钮, editRender({h,clickEvent})    |
+| delRender     | Function | -                               | 自定义删除按钮, delRender({h,clickEvent})    |
+| menuRender    | Function | -                               | 自定义菜单按钮, menuRender({h,scope,menu})    |
+
+### merge
+
+开启自动合并单元格。
+
+| 属性        | 类型     | 默认值        | 说明    
+| ----------- | ------  | --------------| ---------------                    | 
+| enable      | Boolean | false         | 是否开启合并单元格     
+| auto        | Boolean | false         | 是否自动合并相同单元格                         |
+| direction   | String  | vertical      | 合并方向，可选 vertical horizontal       |
+
+### virtual
+
+开启虚拟滚动。
+
+| 属性        | 类型     | 默认值        | 说明    
+| ----------- | ------  | --------------| ---------------   |
+| enable      | Boolean | false         | 是否开启虚拟滚动     |
+| rowHeight   | Number  | 0             | 行高度      |
+
+
+### resize
+
+开启高度自适应容器。
+
+| 属性        | 类型     | 默认值        | 说明    
+| ----------- | ------  | --------------| ---------------                    | 
+| enable      | Boolean | false         | 是否开启自适应    
+| relative    | Stribg/Dom  | table.offsetParent             | 自适应参照物元素或者选择器                      |
+| offset      | Number/Function  | 0             | calcHeight 偏移高度                         |
+
+
+### methods
+
+和传统的通过 `$refs.table.xxx()` 来调用组件方法有所不同，在 ageltable 中方法会自动注入到 table 对象中，可以直接通过 `table.xxx()` 来调用。
+
+| 属性        | 参数              | 说明                                 | 备注                                 |  
+| ----------- | ------------    | ------------------------------------ | ------- | 
+| getRef      | -               | 获取组件实例   |  
+| getCol      | prop            | 获取 column 列对象  |  
+| getData     | -               | 快捷调用 request                       |request 配置 done 参数可用
+| resizeTable | -               | 刷新自适应表格                      | resize 开启可用
+| getVirtualRowIndex | -        | 获取虚拟滚动中当前 Index            | virtual 开启可用
+| virtualScrollToRow | index/row        | 滚动到指定行                        | virtual 开启可用

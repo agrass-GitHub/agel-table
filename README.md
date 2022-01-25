@@ -15,15 +15,14 @@
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
-- 解决 element-ui table [一些潜在问题](https://agrass.gitee.io/agel-table/sum.html#element-ui-table-一些潜在问题)
-- 添加额外的[扩展功能](https://agrass.gitee.io/agel-table/example.html)
-  - 纯数据配置
-  - 动态显隐列
-  - 集成分页组件
-  - 数据代理
-  - 自动合并相同行
-  - 虚拟滚动支持大数据渲染 10w+
-  - 跟随窗口大小自适应高度
+- 纯数据配置
+- 集成分页组件
+- 菜单列
+- 动态显隐列
+- 数据代理
+- 自动合并相同行
+- 虚拟滚动支持大数据渲染 10w+
+- 跟随容器大小自适应高度
 
 
 ## 安装使用
