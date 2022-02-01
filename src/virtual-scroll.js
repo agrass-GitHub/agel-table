@@ -32,8 +32,7 @@ export default {
   watch: {
     'value.data'(oldv, newv) {
       if (!this.isEnable("virtual")) return
-      if (oldv && newv && oldv.length === newv.length) return
-      this.virtualScroll.selection = []
+      if (oldv !== newv) this.virtualScroll.selection = []
       this.refreshVirtualData()
     },
     "virtualScroll.resizeState.height"(v) {

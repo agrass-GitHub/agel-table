@@ -6,6 +6,9 @@ sidebar: auto
 
 # 更新日志
 
+## v.0.3.71
+- `bug` 修复虚拟滚动当 data.length 相同刷新列表失败的问题 
+
 ## v.0.3.7
 
 - `bug` 修复嵌套table中无法自定义父级的头 [issues[3]](https://github.com/agrass-GitHub/agel-table/issues/3)
