@@ -6,7 +6,7 @@ sidebar: auto
 
 # 更新日志
 
-## v.0.3.72
+## v.0.3.73
 - `bug` 修复 resize.relative 获取为 null 时报错
 - `bug` 修复 menu.onDel 绑定事件错误的问题
 

@@ -88,7 +88,7 @@ export default {
     getData() {
       const request = this.value.request
       if (!request || typeof request != "function") return
-      if (request.length > 1) {
+      if (request.length <= 1) {
         return request()
       }
 
