@@ -22,6 +22,7 @@ export default {
       const relative = resize.relative
         ? (typeof resize.relative === 'string' ? document.querySelector(resize.relative) : resize.relative)
         : table.offsetParent
+      if (relative == null) return;
       const relativeReact = relative.getBoundingClientRect()
       const tableRect = table.getBoundingClientRect()
       const offset = resize.offset && typeof resize.offset === 'function' ? resize.offset() : resize.offset

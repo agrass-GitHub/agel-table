@@ -55,7 +55,7 @@ export default {
             }
             return h('div', {}, [
               onEdit ? editButton({ h, clickEvent: () => onEdit(scope) }) : null,
-              onDel ? delButton({ h, clickEvent: () => onEdit(scope) }) : null,
+              onDel ? delButton({ h, clickEvent: () => onDel(scope) }) : null,
               menuRender && menuRender({ h, menu, scope }),
             ])
           }

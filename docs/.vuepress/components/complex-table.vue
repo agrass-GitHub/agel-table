@@ -101,10 +101,10 @@ export default {
           enable: true,
           fixed: "right",
           onEdit: ({ row }) => {
-            this.$message.info(row.date);
+            this.$message.info("编辑", row.date);
           },
           onDel: ({ row }) => {
-            this.$message.info(row.date);
+            this.$message.info("删除", row.date);
           },
         },
         on: {
@@ -133,7 +133,7 @@ export default {
       this.table.getRef().clearSelection();
     },
     updateLabel() {
-      this.table.getCol("address").label = '地址'+ Math.random()
+      this.table.getCol("address").label = "地址" + Math.random();
     },
   },
 };
