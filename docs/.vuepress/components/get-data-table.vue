@@ -15,36 +15,39 @@ export default {
     return {
       table: {
         border: true,
-        loading: false,
-        height: "200px",
         data: [],
-        page: { enable: true },
+        // 该对象放置table 对象的查询参数，默认有 currentPage,pageSize,orderColumn,order
         query: { name: "小虎" },
+        // 默认排序列
         defaultSort: { prop: "date", order: "descending" },
+        // 分页组件在此配置，建议配置在全局，页面可省略
+        page: {
+          enable: true,
+          currentPage: 1,
+          pageSize: 5,
+          pageSizes: [5, 10, 15, 20],
+        },
+        // 菜单列配置
+        menu: {
+          enable: true,
+          fixed: "right",
+          onEdit: ({ row }) => {
+            this.$message.info("编辑", row.date);
+          },
+          onDel: ({ row }) => {
+            this.$message.info("删除", row.date);
+          },
+        },
+        // 表格列配置
         columns: [
           { label: "日期", prop: "date", width: 200, sortable: "custom" },
           { label: "姓名", prop: "name", width: 200 },
           { label: "地址", prop: "address", minWidth: 300 },
         ],
-        request: () => {
-          this.table.loading = true;
-          this.http(this.table.query)
-            .then((res) => {
-              this.table.data = res.data;
-              this.table.page.total = res.total;
-              this.table.loading = false;
-            })
-            .catch(() => {
-              this.table.loading = false;
-            });
-        },
-      },
-      table2: {
-        // request 函数也可以接受 done，err 参数
-        // 然后通过 table.getData 调用, getData => 开启loading => request => 回填分页 data => 关闭 loading
+        // 接口函数
         request: (query, done, err) => {
           this.http(query)
-            .then((res) => done({ data: res.data, total: res.total })) // 若没有分页可以直接 done(data)
+            .then((res) => done({ data: res.data, total: res.total }))
             .catch(err);
         },
       },
@@ -55,13 +58,13 @@ export default {
       return JSON.stringify(this.table.query);
     },
   },
+  // table.getData 只能在 mounted 生命周期之后调用
   mounted() {
-    this.table.request();
-    // this.table2.getData()
+    this.table.getData();
   },
   methods: {
     onSearch() {
-      this.table.request();
+      this.table.getData();
     },
     http(query) {
       // 模拟一个 http 请求

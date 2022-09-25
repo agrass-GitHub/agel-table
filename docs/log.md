@@ -6,6 +6,11 @@ sidebar: auto
 
 # 更新日志
 
+## v.0.3.74 （ #2022-09-18 ）
+- `new` 新增支持 empty 插槽
+- `new` 新增 slotEmpty 全局配置，可设置全局默认 empty 插槽
+
+
 ## v.0.3.73
 - `bug` 修复 resize.relative 获取为 null 时报错
 - `bug` 修复 menu.onDel 绑定事件错误的问题

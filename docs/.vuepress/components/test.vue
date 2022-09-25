@@ -1,5 +1,6 @@
 <template>
-  <agel-table v-model="table"></agel-table>
+  <agel-table v-model="table">
+  </agel-table>
 </template>
  
 <script>
@@ -8,17 +9,17 @@ export default {
     return {
       table: {
         border: true,
+        height: "100%",
         menu: {
-          xx:111,
           enable: true,
           onEdit: () => {},
           onDel: () => {},
-          menuRender:({h,menu})=>{
-            return <el-tag>{menu.xx}</el-tag>
-          }
+          menuRender: ({ h, menu }) => {
+            return <el-tag>{menu.xx}</el-tag>;
+          },
         },
         columns: [
-           {
+          {
             type: "selection",
             align: "center",
             width: 50,
@@ -29,8 +30,8 @@ export default {
           { label: "地址", prop: "address", minWidth: 300 },
         ],
         data: [
-          { date: "2016-05-02", name: "王小虎", address: "上海市" },
-          { date: "2016-05-04", name: "王小虎", address: "上海市" },
+          // { date: "2016-05-02", name: "王小虎", address: "上海市" },
+          // { date: "2016-05-04", name: "王小虎", address: "上海市" },
         ],
       },
     };

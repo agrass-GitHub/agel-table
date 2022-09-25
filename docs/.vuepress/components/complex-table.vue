@@ -89,24 +89,6 @@ export default {
             ],
           },
         ],
-        page: {
-          enable: true,
-          height: 50,
-          currentPage: 2,
-          total: 1000,
-          pageSize: 1,
-          pageSizes: [1, 2, 3, 4, 5, 6],
-        },
-        menu: {
-          enable: true,
-          fixed: "right",
-          onEdit: ({ row }) => {
-            this.$message.info("编辑", row.date);
-          },
-          onDel: ({ row }) => {
-            this.$message.info("删除", row.date);
-          },
-        },
         on: {
           "selection-change": () => {
             this.$message.success("选择项发生变化");

@@ -12,6 +12,8 @@ export default ({ Vue }) => {
       border: true,
       highlightCurrentRow: true,
     },
-   
-  });
-};
+    slotEmpty: function (h) {
+      return h('el-empty', { props: { description: "暂无数据" } });
+    }
+  })
+}

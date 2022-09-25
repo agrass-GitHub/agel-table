@@ -31,15 +31,33 @@ sidebar: auto
 
 ## 创建表格
 
+### 基础例子
+
+表格通过一个 table 对象渲染，组件渲染完成之后会注入默认方法和属性到 table 中。
+
+
+- 表格 `page` 对象用于配置 Pagination 分页组件的属性，当分页变化会自动同步修改。
+
+- 表格 `menu` 对象用于配置 菜单列，进行编辑删除等，按需使用。
+
+- 表格 `query` 对象默认存在四个基本查询属性，分别为 `currentPage pageSize orderColumn order`。
+
+- 设置 `request` 属性开启数据代理，使用 `table.getData` 进行调用接口，分页排序变化时自动调用。
+
+
+<ClientOnly> <get-data-table/></ClientOnly>
+
+::: details 点击查看代码
+<<< @/docs/.vuepress/components/get-data-table.vue
+:::
+
 ### 数据配置
 
-表格通过一个 table 对象渲染，下面的 Demo 展示了 element-ui 官网 el-table 的大多数例子:
+下面的 Demo 展示了 element-ui 官网 el-table 的大多数例子:
 
 <div>
   <el-tag style="margin:0px 5px 5px 0px"  v-for="text in ['基础表格','带斑马纹表格','带边框表格','带状态表格','固定列','固定表头','单选','多选','排序','表尾合计行','自定义索引','树形数据与懒加载','分页','菜单列']" :key="text">{{text}}</el-tag>
 </div>
-
-分页与菜单列的属性建议配置在全局，在局部进行按需覆盖。
 
 
 <ClientOnly><complex-table/></ClientOnly>
@@ -70,19 +88,6 @@ sidebar: auto
 <<< @/docs/.vuepress/components/display-table.vue
 :::
  
-### 数据代理
-
-设置 `request` 属性可开启数据代理，当分页或者排序发生变化，会自动调用。
-
-表格 `query` 对象默认存在四个基本查询属性，可以通过全局设置 `queryProps` 配置别名。
-
-<ClientOnly> <get-data-table/></ClientOnly>
-
-::: details 点击查看代码
-<<< @/docs/.vuepress/components/get-data-table.vue
-:::
-
-
 ### 自动合并
 
 设置 `merge` 可开启自动合并单元格。
@@ -121,7 +126,8 @@ sidebar: auto
 
 ### 全局配置
 
-支持全局属性，配置将被继承到每个表格上; 分页与菜单列相关的属性建议配置在全局，在局部页面根据需求进行覆盖。
+- 所有属性均可全局配置，配置将被继承到每个表格上; 
+- 强烈建议分页与菜单列相关的属性建议配置在全局,在局部页面根据需求进行覆盖。
 
 ```js
 import agelTable from "agel-table"
@@ -145,12 +151,17 @@ const tableConfig = {
      layout: "total, prev, pager, next, jumper, sizes", 
      background: true 
   },
+  // query 别名
   queryProps: {
     currentPage: "page",
     pageSize: "size",
     orderColumn: 'sortProp',
-    order: (v) => ["sortOrder", v == "descending" ? 1 : 0], // 可格式化 order value
+    order:"sortOrder"
   },
+  // table empty 插槽
+  slotEmpty: function (h) {
+    return h('el-empty', { props: { description: "暂无数据" } });
+  }
 }
 
 Vue.use(agelTable,tableConfig)

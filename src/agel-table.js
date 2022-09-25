@@ -199,13 +199,18 @@ export default {
     }
 
     const ElTable = () => {
-      const config = (this.$agelTableConfig || {})['table'] || {}
-      const attrs = getIncludeAttrs(tablePropKeys, Object.assign({}, config, this.value))
+      const C = this.$agelTableConfig || {};
+      const attrs = getIncludeAttrs(tablePropKeys, Object.assign({}, C.table || {}, this.value))
       if (this.isEnable('merge')) attrs.spanMethod = this.spanMethod
       if (this.isEnable('virtual')) attrs.data = this.virtualScroll.renderData
       if (this.value.height) {
         attrs.height = this.isEnable('page') ? `calc(100% - ${this.value.page.height}px)` : '100%'
       }
+
+      const emptyVnode = this.$slots.empty || (C.slotEmpty ? C.slotEmpty(h) : null)
+      const appendVnode = this.$slots.append
+      const columnsVnodes = this.getElTableColumns(this.columns)
+      
       return h(
         "el-table",
         {
@@ -216,8 +221,9 @@ export default {
           ref: "table",
         },
         [
-          this.getElTableColumns(this.columns),
-          this.$slots.append ? h('div', { slot: 'append' }, this.$slots.append) : null
+          columnsVnodes,
+          appendVnode ? h('div', { slot: 'append' }, [appendVnode]) : null,
+          emptyVnode ? h('div', { slot: 'empty' }, [emptyVnode]) : null
         ]
       )
     }
