@@ -6,9 +6,9 @@ sidebar: auto
 
 # 更新日志
 
-## v.0.3.75 （ #2022-10-27 ）
+## v.0.3.76 （ #2022-10-27 ）
 - `bug` 修复修改 page.currentPage 后调用 getData，query 没有及时更新的问题
-- `new` getData 函数新增 resetPage 进行重置分页
+- `new` getData 函数新增 currentPage/pageSize ，用于查询重置分页
 
 
 ## v.0.3.74 （ #2022-09-18 ）

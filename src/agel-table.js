@@ -86,14 +86,23 @@ export default {
       return columns.find(v => v.prop && v.prop == prop)
     },
     getData(option = {}) {
+      // 对 page 和 pageSize 进行重置
+      const props = this.value.queryProps || ((this.$agelTableConfig || {}).queryProps) || queryProps
+      if (option[props.currentPage] != undefined || option.currentPage != undefined) {
+        this.value.page.currentPage = option[props.currentPage] || option.currentPage
+      }
+      if (option[props.pageSize] != undefined || option.pageSize != undefined) {
+        this.value.page.pageSize = option[props.pageSize] || option.pageSize
+      }
+
+      // 若没有接收 query done err 参数，直接触发 request
       const request = this.value.request
       if (!request || typeof request != "function") return
       if (request.length <= 1) {
         return request()
       }
-      if (option.restPage) {
-        this.value.page.currentPage = 1;
-      }
+      
+      // 代理接口，开启loading，回填数据
       this.value.loading = true
       return new Promise((done, err) => {
         try {

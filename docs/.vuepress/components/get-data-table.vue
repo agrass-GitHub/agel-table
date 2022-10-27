@@ -66,7 +66,7 @@ export default {
   methods: {
     onSearch() {
       // restPage 重置 分页 为 1
-      this.table.getData({ restPage: true });
+      this.table.getData({ currentPage: 1 });
     },
     getHttpData(query) {
       // 模拟一个 http 请求
