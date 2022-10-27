@@ -12,7 +12,7 @@ sidebar: auto
 
 ### 特性
 
-该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
+该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了，适用于 vue2+elementUI。
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
@@ -31,18 +31,17 @@ sidebar: auto
 
 ## 创建表格
 
-### 基础例子
+### 接口代理
 
-表格通过一个 table 对象渲染，组件渲染完成之后会注入默认方法和属性到 table 中。
+这是一个基础的查询表格例子，表格通过一个 table 对象渲染，组件渲染完成之后会注入默认方法和属性到 table 中，方便你通过 table 直接进行所有操作。
 
+- 表格 `page` 对象用于配置 Pagination 分页组件的属性，当分页变化会自动同步修改。【可全局配置】
 
-- 表格 `page` 对象用于配置 Pagination 分页组件的属性，当分页变化会自动同步修改。
+- 表格 `menu` 对象用于配置 菜单列，进行编辑删除等，按需使用。【可全局配置】
 
-- 表格 `menu` 对象用于配置 菜单列，进行编辑删除等，按需使用。
+- 设置 `request` 开启接口代理，使用 `table.getData` 进行主动触发，当分页排序变化时自动触发。
 
-- 表格 `query` 对象默认存在四个基本查询属性，分别为 `currentPage pageSize orderColumn order`。
-
-- 设置 `request` 属性开启数据代理，使用 `table.getData` 进行调用接口，分页排序变化时自动调用。
+- 表格 `query` 对象默认存在四个查询属性，分别为 `currentPage pageSize orderColumn order` ，当分页排序发生变化时对会自动同步对应数据到 query 对象中。
 
 
 <ClientOnly> <get-data-table/></ClientOnly>
@@ -53,7 +52,7 @@ sidebar: auto
 
 ### 数据配置
 
-下面的 Demo 展示了 element-ui 官网 el-table 的大多数例子:
+这是一个复杂的例子，下面的 Demo 展示了 element-ui 官网 el-table 的大多数例子:
 
 <div>
   <el-tag style="margin:0px 5px 5px 0px"  v-for="text in ['基础表格','带斑马纹表格','带边框表格','带状态表格','固定列','固定表头','单选','多选','排序','表尾合计行','自定义索引','树形数据与懒加载','分页','菜单列']" :key="text">{{text}}</el-tag>

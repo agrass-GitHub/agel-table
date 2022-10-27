@@ -93,19 +93,6 @@ export default {
           "selection-change": () => {
             this.$message.success("选择项发生变化");
           },
-          "page-change": () => {
-            // el-pagination 与 el-table 拥有重名事件 currentChange，故此修改为 page-change
-            // currentPage 将自动变化 不需要手动赋值
-            this.$message.success(
-              `page-change,当前页码:${this.table.page.currentPage}页`
-            );
-          },
-          "size-change": () => {
-            // pageSize 将自动变化 不需要手动赋值
-            this.$message.success(
-              `page-change,每页展示:${this.table.page.pageSize}条`
-            );
-          },
         },
       },
     };

@@ -46,7 +46,8 @@ export default {
         ],
         // 接口函数
         request: (query, done, err) => {
-          this.http(query)
+          // query == this.table.query
+          this.getHttpData(query)
             .then((res) => done({ data: res.data, total: res.total }))
             .catch(err);
         },
@@ -55,7 +56,7 @@ export default {
   },
   computed: {
     queryString() {
-      return JSON.stringify(this.table.query);
+      return  JSON.stringify(this.table.query);
     },
   },
   // table.getData 只能在 mounted 生命周期之后调用
@@ -64,9 +65,10 @@ export default {
   },
   methods: {
     onSearch() {
-      this.table.getData();
+      // restPage 重置 分页 为 1
+      this.table.getData({ restPage: true });
     },
-    http(query) {
+    getHttpData(query) {
       // 模拟一个 http 请求
       return new Promise((reslove) => {
         setTimeout(() => {

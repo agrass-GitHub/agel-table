@@ -37,7 +37,7 @@ export default {
     },
     pageChange(page) {
       this.value.page.currentPage = page
-      this.$nextTick(this.getData)
+      this.getData()
       if (this.value.on && this.value.on["page-change"]) {
         this.value.on["page-change"](page)
       }
@@ -45,7 +45,7 @@ export default {
     sizeChange(size) {
       this.value.page.currentPage = 1
       this.value.page.pageSize = size
-      this.$nextTick(this.getData)
+      this.getData()
       if (this.value.on && this.value.on["size-change"]) {
         this.value.on["size-change"](size)
       }
@@ -85,17 +85,19 @@ export default {
       const columns = this.getFlatColumns(this.value.columns)
       return columns.find(v => v.prop && v.prop == prop)
     },
-    getData() {
+    getData(option = {}) {
       const request = this.value.request
       if (!request || typeof request != "function") return
       if (request.length <= 1) {
         return request()
       }
-
+      if (option.restPage) {
+        this.value.page.currentPage = 1;
+      }
       this.value.loading = true
       return new Promise((done, err) => {
         try {
-          return request(this.value.query, done, err)
+          this.$nextTick(() => request(this.value.query, done, err))
         } catch (error) {
           this.value.loading = false
           console.error(error)
@@ -210,7 +212,7 @@ export default {
       const emptyVnode = this.$slots.empty || (C.slotEmpty ? C.slotEmpty(h) : null)
       const appendVnode = this.$slots.append
       const columnsVnodes = this.getElTableColumns(this.columns)
-      
+
       return h(
         "el-table",
         {

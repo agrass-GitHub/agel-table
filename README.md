@@ -11,7 +11,7 @@
 
 ## 特性
 
-该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了。
+该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了，适用于 vue2+elementUI。
 
 - 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
 - 支持 element-ui table 组件的所有 api, slot, event, method
