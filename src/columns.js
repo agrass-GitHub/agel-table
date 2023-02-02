@@ -3,7 +3,7 @@
 */
 
 import { tableColumnPropKeys, agColumnProps, } from "./utils/const.js"
-import { getCustomProps, getIncludeAttrs, guid, getProp } from "./utils/utils"
+import { getCustomProps, getIncludeAttrs, guid } from "./utils/utils"
 
 export default {
   computed: {

@@ -16,6 +16,7 @@ export default {
       table: {
         border: true,
         data: [],
+        height:300,
         // 该对象放置table 对象的查询参数，默认有 currentPage,pageSize,orderColumn,order
         query: { name: "小虎" },
         // 默认排序列
@@ -65,7 +66,7 @@ export default {
   },
   methods: {
     onSearch() {
-      // restPage 重置 分页 为 1
+      // 传递参数可 重置 分页 为 1
       this.table.getData({ currentPage: 1 });
     },
     getHttpData(query) {

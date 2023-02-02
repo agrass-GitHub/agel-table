@@ -8,6 +8,7 @@
 
 - [官网 - 使用文档](https://agrass.gitee.io/agel-table/) 
 
+该组件适用于 vue2.x ，vue3.x 请转自 [element-plus-crx](https://github.com/agrass-GitHub/element-plus-crx)。
 
 ## 特性
 

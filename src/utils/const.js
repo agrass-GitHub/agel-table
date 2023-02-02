@@ -28,10 +28,6 @@ export const agTableProps = {
   page: {
     type: Object,
   },
-  // 选择的行数据 
-  selection: {
-    type: Array,
-  }
 }
 
 // agTable page Props 

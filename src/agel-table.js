@@ -228,7 +228,6 @@ export default {
           attrs: attrs,
           on: events,
           style: { width: '100%' },
-          directives: [{ name: "loading", value: this.value.loading }],
           ref: "table",
         },
         [
@@ -242,6 +241,7 @@ export default {
     return h(
       "div",
       {
+        directives: [{ name: "loading", value: this.value.loading }],
         attrs: { class: "agel-table", id: this.tableId },
         style: { height: isNaN(this.value.height) ? this.value.height : this.value.height + 'px' },
         ref: "container",

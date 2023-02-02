@@ -1,7 +1,7 @@
 // 驼峰转短横线 
 export function kebabcase(v) {
   return v.replace(/([^-])([A-Z])/g, '$1-$2').toLowerCase()
-};
+}
 
 
 // 短横线转驼峰 
@@ -49,7 +49,7 @@ export function getCustomProps(props, attrs) {
     defaultProps[k] = typeof props[k].default == 'function' ? props[k].default() : props[k].default
   })
   return attrs ? Object.assign(defaultProps, getIncludeAttrs(propsKyes, attrs)) : defaultProps;
-};
+}
 
 // 生成一个 id 
 export function guid() {
@@ -58,7 +58,7 @@ export function guid() {
     let v = c == "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
-};
+}
 
 // 继承属性 关联响应式
 export const extend = function (obj, target = {}, vueset, cover = false) {
