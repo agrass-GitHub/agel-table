@@ -6,7 +6,7 @@
 
 ## 文档
 
-- [官网 - 使用文档](https://agrass.gitee.io/agel-table/) 
+- [官网 - 使用文档](https://agrass-github.github.io/agel-table/)
 
 该组件适用于 vue2.x ，vue3.x 请转自 [element-plus-crx](https://github.com/agrass-GitHub/element-plus-crx)。
 
@@ -25,11 +25,9 @@
 - 虚拟滚动支持大数据渲染 10w+
 - 跟随容器大小自适应高度
 
-
 ## 安装使用
 
 `npm install agel-table --save`
-
 
 ### 如此简单
 
@@ -37,16 +35,16 @@
 <template>
   <agel-table v-model="table"></agel-table>
 </template>
- 
+
 <script>
-export default {
-  data() {
-    return {
-      table: {
-        // ...
-      },
-    };
-  },
-};
+  export default {
+    data() {
+      return {
+        table: {
+          // ...
+        },
+      };
+    },
+  };
 </script>
 ```

@@ -1,6 +1,6 @@
 {
   "name": "agel-table",
-  "version": "0.3.77",
+  "version": "0.3.78",
   "main": "src/index.js",
   "description": "a easy table of element-ui table",
   "homepage": "https://github.com/agrass-GitHub/agel-table",
@@ -21,7 +21,7 @@
     "publishdocs": "gh-pages -d distdocs",
     "setnpm": "npm config set registry https://registry.npmjs.org/",
     "publish": "npm publish",
-    "setnpmtb": "npm config set registry http://registry.npm.taobao.org/"
+    "setnpmtb": "npm config set registry https://registry.npmmirror.com"
   },
   "dependencies": {},
   "peerDependencies": {},

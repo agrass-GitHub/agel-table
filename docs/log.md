@@ -3,35 +3,40 @@ title: 更新日志
 sidebar: auto
 ---
 
-
 # 更新日志
 
+## v.0.3.78 （ #2025-07-28 ）
+
+- `bug` 虚拟滚动的 data 在 v-if 切换未正常渲染
+
 ## v.0.3.77 （ #2023-03-03 ）
+
 - `new` table loading 时禁用分页
 
 ## v.0.3.76 （ #2022-10-27 ）
+
 - `bug` 修复修改 page.currentPage 后调用 getData，query 没有及时更新的问题
 - `new` getData 函数新增 currentPage/pageSize ，用于查询重置分页
 
-
 ## v.0.3.74 （ #2022-09-18 ）
+
 - `new` 新增支持 empty 插槽
 - `new` 新增 slotEmpty 全局配置，可设置全局默认 empty 插槽
 
-
 ## v.0.3.73
+
 - `bug` 修复 resize.relative 获取为 null 时报错
 - `bug` 修复 menu.onDel 绑定事件错误的问题
 
-
 ## v.0.3.71
-- `bug` 修复虚拟滚动当 data.length 相同刷新列表失败的问题 
+
+- `bug` 修复虚拟滚动当 data.length 相同刷新列表失败的问题
 
 ## v.0.3.7
 
-- `bug` 修复嵌套table中无法自定义父级的头 [issues[3]](https://github.com/agrass-GitHub/agel-table/issues/3)
+- `bug` 修复嵌套 table 中无法自定义父级的头 [issues[3]](https://github.com/agrass-GitHub/agel-table/issues/3)
 - `bug` 修复使用 render 函数在横向滚动时会重复调用的问题
-- `bug` 修复虚拟滚动 data 变化时 selection列 全选状态异常的问题
+- `bug` 修复虚拟滚动 data 变化时 selection 列 全选状态异常的问题
 - `bug` 修复虚拟滚动在多级表头下，selection 和 排序 异常的问题
 - `new` 新增 element-loading 配置
 - `new` 新增 table.getCol 方法
@@ -56,24 +61,28 @@ sidebar: auto
 - `bug` query 的 currentPage 默认回填为空
 
 ## v.0.3.4
+
 - `bug` query 默认 orderColumn,order 被覆盖为空
 - `bug` table 隐藏时 resize 获取高度报错
 - `bug` table request 函数报错没有 error 提示
 - `新增` defaultSort 属性将默认回填到 query 中
 - `新增` table request 支持异步函数写法
 
-
 ## v.0.3.3
+
 - `bug` 修复因未安装 stylus-loader 导致引入报错的问题
 
 ## v.0.3.2
+
 - `bug` 修复虚拟滚动情况下，高度变化显示错误的问题
 
 ## v.0.3.1
+
 - `bug` 修复分页变化调用 getData ，参数错误的问题
 - `新增` 取消打包为 lib.umd.js，包直接指向 src
 
 ## v.0.3.0
+
 - `bug` 大数据虚拟滚动的情况下，排序不支持的问题
 - `bug` 大数据虚拟滚动的情况下，type selection 不支持的问题
 - `优化` 插件功需配置基础对象，相关属性才会注入到 table 对象
@@ -84,6 +93,7 @@ sidebar: auto
 - `新增` 添加 reisze 扩展，随着窗口变化自适应高度
 
 ## v.0.2.1
+
 - `优化` 提交到 npm 的包忽略了 docs 文档
 
 ## v.0.2.0
@@ -136,5 +146,3 @@ sidebar: auto
 - `bug` 多级表头自定义 slotColum，SlotHeader 失败问题
 - `bug` 多级表头列添加添加属性 display 为 false，渲染异常
 - `bug` 添加 request，getData 属性 api，方便和接口对接
-
-

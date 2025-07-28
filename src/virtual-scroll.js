@@ -23,6 +23,7 @@ export default {
     if (this.isEnable('virtual')) {
       this.virtualScroll.resizeState = this.$refs.table.resizeState
       this.getScrollWarppers().warpper.addEventListener("scroll", this.onVirtualScroll)
+      this.refreshVirtualData()
       dynamicStyleRule(this.tableId, this.getVirtualStyleRule())
     }
   },
@@ -32,8 +33,11 @@ export default {
   watch: {
     'value.data'(oldv, newv) {
       if (!this.isEnable("virtual")) return
-      if (oldv !== newv) this.virtualScroll.selection = []
-      this.refreshVirtualData()
+      if (!this.virtualScroll.resizeState) return
+      if (oldv !== newv) {
+        this.virtualScroll.selection = []
+        this.refreshVirtualData()
+      }
     },
     "virtualScroll.resizeState.height"(v) {
       v && this.updateRenderData()
