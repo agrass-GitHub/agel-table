@@ -6,6 +6,15 @@ import { tableColumnPropKeys, agColumnProps, } from "./utils/const.js"
 import { getCustomProps, getIncludeAttrs, guid } from "./utils/utils"
 
 export default {
+  watch: {
+    // 列配置变化才重新布局；虚拟表格由统一的动画帧调度器处理。
+    columns() {
+      if (this.isEnable('virtual')) return
+      this.$nextTick(() => {
+        if (!this._isDestroyed && !this._isBeingDestroyed) this.$refs.table.doLayout()
+      })
+    }
+  },
   computed: {
     columns() {
       return this.getColumns(this.value.columns)
@@ -27,6 +36,8 @@ export default {
         if (!column['_key_'] || column.children && column.children.length != agColumn.children.length) {
           column['_key_'] = guid();
         }
+        // 首次渲染也使用稳定 key，避免下一次改列时把整列当作新节点重建。
+        agColumn._key_ = column._key_
         if (this.isEnable("virtual")) {
           this.handleVirtualScrollColumn(agColumn)
         }
@@ -34,9 +45,17 @@ export default {
       }).filter((column) => column.display !== false)
     },
     getFlatColumns(columns) {
-      return columns.reduce((result, v) => {
-        return result.concat(Array.isArray(v.children) && v.children.length > 0 ? this.getFlatColumns(v.children) : v);
-      }, []);
+      // 累积到同一个数组，避免每次 concat 复制此前的全部列。
+      const result = []
+      const visit = (items) => {
+        const columns = Array.isArray(items) ? items : Object.keys(items || {}).map((prop) => Object.assign({ prop }, items[prop]))
+        columns.forEach((column) => {
+          if (Array.isArray(column.children) && column.children.length) visit(column.children)
+          else result.push(column)
+        })
+      }
+      visit(columns)
+      return result
     },
     getMenuColumn() {
       const h = this.$createElement
@@ -63,9 +82,6 @@ export default {
       })
     },
     getElTableColumns(columns, root = true) {
-      this.$nextTick(() => {
-        root && this.$refs.table && this.$refs.table.doLayout()
-      })
       const columnVnodes = columns.map((column) => {
         const h = this.$createElement
         const attrs = getIncludeAttrs(tableColumnPropKeys, column)

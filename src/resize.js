@@ -3,6 +3,10 @@
  */
 
 export default {
+  // 普通表格同样合并窗口 resize 的动画帧。
+  created() {
+    this._resizeFrame = null
+  },
   mounted() {
     if (this.isEnable("resize")) {
       this.resizeTable()
@@ -11,10 +15,21 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onWindowResize)
+    if (this._resizeFrame !== null) window.cancelAnimationFrame(this._resizeFrame)
+    this._resizeFrame = null
   },
   methods: {
     onWindowResize() {
-      window.requestAnimationFrame(this.resizeTable)
+      // 虚拟表格复用滚动调度；普通表格只保留一个待执行尺寸任务。
+      if (this.isEnable('virtual')) {
+        this._virtual.resize = true
+        this.scheduleVirtualFrame(true, true)
+      } else if (this._resizeFrame === null) {
+        this._resizeFrame = window.requestAnimationFrame(() => {
+          this._resizeFrame = null
+          this.resizeTable()
+        })
+      }
     },
     resizeTable() {
       const resize = this.value.resize

@@ -7,6 +7,29 @@
 ## 文档
 
 - [官网 - 使用文档](https://agrass-github.github.io/agel-table/)
+- [更新日志](./CHANGELOG.md)
+
+## 0.3.79 性能改进
+
+虚拟滚动保留原有配置和 Element UI 样式。滚动事件按帧合并，窗口有上下各 6 行缓冲；缓冲尚够用时复用可见数据，不主动调用 `doLayout()`。全量数据不会在每次滚动时重新收集响应式依赖，选择状态使用 Set 查询。
+
+在模拟 320px 视口、32px 行高、10 万行数据的测试中，同帧 100 次滚动只更新一次窗口，主表渲染不超过 23 行。这是操作计数测试，不是浏览器帧率或耗时提升比例。虚拟模式仍需配置固定 `rowHeight`，可变行高、树形展开、跨窗口合并不在支持范围内。
+
+## 本地验证
+
+使用 Node.js 18+ 运行测试，Vue 2.6.14 作为库内基线；消费项目另行验证 Vue 2.7.16。开发依赖使用 pnpm 锁定，运行时没有新增依赖。
+
+```sh
+npx pnpm@9.12.3 install --frozen-lockfile
+npm run lint
+npm test
+# Vue CLI 3 / Webpack 4 在 Node.js 18+ 下需要此兼容选项
+NODE_OPTIONS=--openssl-legacy-provider npm run build
+NODE_OPTIONS=--openssl-legacy-provider npm run builddocs
+npm pack --dry-run
+```
+
+发布前先运行上述检查，再执行 `npm publish --registry=https://registry.npmjs.org/`。`prepublishOnly` 会再次执行 lint 和测试；包内只包含源码、构建产物和公开说明。测试依赖中的 `agel-table-legacy` 固定为 0.3.78，用于新旧 DOM/CSS 对比，不进入发布包或运行时依赖。
 
 该组件适用于 vue2.x ，vue3.x 请转自 [element-plus-crx](https://github.com/agrass-GitHub/element-plus-crx)。
 

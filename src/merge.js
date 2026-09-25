@@ -65,14 +65,19 @@ export default {
       return mergeData
     },
     calculateColumnIndex(data, index, nextIndex, count, maxLength) {
-      if (nextIndex < maxLength && data[this.mergeColumns[index]['name']] === data[this.mergeColumns[nextIndex]['name']]) {
-        return this.calculateColumnIndex(data, index, ++nextIndex, ++count, maxLength)
+      // 长段合并使用迭代，避免递归深度随相同单元格数量增长。
+      const columns = this.mergeColumns
+      while (nextIndex < maxLength && data[columns[index].name] === data[columns[nextIndex].name]) {
+        nextIndex++
+        count++
       }
       return count
     },
     calculateRowIndex(data, index, nextIndex, count, name) {
-      if (nextIndex < data.length && data[index][name] === data[nextIndex][name]) {
-        return this.calculateRowIndex(data, index, ++nextIndex, ++count, name)
+      // 数万条相同值不再消耗数万层调用栈，合并结果与原来保持一致。
+      while (nextIndex < data.length && data[index][name] === data[nextIndex][name]) {
+        nextIndex++
+        count++
       }
       return count
     }

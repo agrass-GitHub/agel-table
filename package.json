@@ -1,6 +1,6 @@
 {
   "name": "agel-table",
-  "version": "0.3.78",
+  "version": "0.3.79",
   "main": "src/index.js",
   "description": "a easy table of element-ui table",
   "homepage": "https://github.com/agrass-GitHub/agel-table",
@@ -14,29 +14,36 @@
     "vue"
   ],
   "scripts": {
-    "lint": "vue-cli-service lint",
+    "lint": "eslint src --ext .js",
     "serve": "vuepress dev docs",
     "build": "vue-cli-service build --target lib --name agelTable --dest dist ./src/index.js",
     "builddocs": "vuepress build docs",
     "publishdocs": "gh-pages -d distdocs",
     "setnpm": "npm config set registry https://registry.npmjs.org/",
-    "publish": "npm publish",
-    "setnpmtb": "npm config set registry https://registry.npmmirror.com"
+    "setnpmtb": "npm config set registry https://registry.npmmirror.com",
+    "test": "node --test tests/*.test.cjs",
+    "prepublishOnly": "npm run lint && npm test"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.11.0",
     "@vue/cli-plugin-eslint": "^3.11.0",
     "@vue/cli-service": "^3.11.0",
+    "agel-table-legacy": "npm:agel-table@0.3.78",
     "babel-eslint": "^10.0.1",
+    "element-ui": "^2.15.7",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "gh-pages": "^3.1.0",
-    "element-ui": "^2.15.7",
+    "jsdom": "26.1.0",
     "vue": "^2.6.14",
-    "vue-template-compiler": "^2.6.10",
+    "vue-template-compiler": "^2.6.14",
     "vuepress": "^1.8.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "vue-server-renderer": "2.6.14",
+      "vue-template-compiler": "2.6.14"
+    }
   },
   "postcss": {
     "plugins": {
@@ -46,5 +53,21 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "files": [
+    "src",
+    "dist/agelTable.common.js",
+    "dist/agelTable.umd.js",
+    "dist/agelTable.umd.min.js",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agrass-GitHub/agel-table.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
 }

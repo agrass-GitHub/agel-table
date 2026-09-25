@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.3
+          run_install: false
+      - run: pnpm install --frozen-lockfile
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
+      - run: npm run builddocs
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
