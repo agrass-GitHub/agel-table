@@ -1,73 +1,90 @@
-# agel-table | 使 element-ui table 组件更简单
+# agel-table
 
-[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg)](https://opensource.org/licenses/mit-license.php)
-[![npm](https://img.shields.io/npm/v/agel-table.svg)](https://www.npmjs.com/package/agel-table)
-[![download](https://img.shields.io/npm/dt/agel-table)](https://npmcharts.com/compare/agel-table?minimal=true)
+[![npm version](https://img.shields.io/npm/v/agel-table)](https://www.npmjs.com/package/agel-table)
+[![npm downloads](https://img.shields.io/npm/dm/agel-table)](https://www.npmjs.com/package/agel-table)
+[![license](https://img.shields.io/npm/l/agel-table)](./LICENSE)
 
-## 文档
+基于 Vue 2 和 Element UI 2 的表格封装。将表格数据、列、查询、分页和扩展行为集中在一个配置对象中，同时保留 Element UI 表格的常用属性、事件和实例方法。
 
-- [官网 - 使用文档](https://agrass-github.github.io/agel-table/)
-- [更新日志](./CHANGELOG.md)
+适合已有 Vue 2 + Element UI 项目，需要复用表格配置、服务端分页、操作列、单元格合并、容器高度适配或固定行高虚拟滚动的场景。
 
-## 0.3.79 性能改进
+## 主要能力
 
-虚拟滚动保留原有配置和 Element UI 样式。滚动事件按帧合并，窗口有上下各 6 行缓冲；缓冲尚够用时复用可见数据，不主动调用 `doLayout()`。全量数据不会在每次滚动时重新收集响应式依赖，选择状态使用 Set 查询。
+- 使用一个响应式对象声明表格数据和列配置。
+- 通过 `request(query, done, fail)` 接入服务端数据、排序和分页。
+- 支持嵌套列、自定义单元格/表头插槽、动态列显隐和操作列。
+- 可配置纵向或横向相同值合并，以及随容器尺寸变化的表格高度。
+- 固定行高虚拟滚动支持大数据列表，并保留 Element UI 的表格、列和复选框渲染。
 
-在模拟 320px 视口、32px 行高、10 万行数据的测试中，同帧 100 次滚动只更新一次窗口，主表渲染不超过 23 行。这是操作计数测试，不是浏览器帧率或耗时提升比例。虚拟模式仍需配置固定 `rowHeight`，可变行高、树形展开、跨窗口合并不在支持范围内。
+虚拟模式需要固定行高；树形数据、表格筛选、行展开、单元格合并和可变行高不属于虚拟滚动支持范围。完整说明见[使用指南](https://agrass-github.github.io/agel-table/example.html)和 [API 参考](https://agrass-github.github.io/agel-table/api.html)。
 
-## 本地验证
+## 环境要求
 
-使用 Node.js 18+ 运行测试，Vue 2.6.14 作为库内基线；消费项目另行验证 Vue 2.7.16。开发依赖使用 pnpm 锁定，运行时没有新增依赖。
+- Vue 2
+- Element UI 2
+
+本库使用宿主项目已安装的 Vue 与 Element UI，不会替项目注册 Element UI 样式。Vue 3 项目请使用 [element-plus-crx](https://github.com/agrass-GitHub/element-plus-crx)。
+
+## 安装
 
 ```sh
-npx pnpm@9.12.3 install --frozen-lockfile
-npm run lint
-npm test
-# Vue CLI 3 / Webpack 4 在 Node.js 18+ 下需要此兼容选项
-NODE_OPTIONS=--openssl-legacy-provider npm run build
-NODE_OPTIONS=--openssl-legacy-provider npm run builddocs
-npm pack --dry-run
+npm install agel-table
 ```
 
-发布前先运行上述检查，再执行 `npm publish --registry=https://registry.npmjs.org/`。`prepublishOnly` 会再次执行 lint 和测试；包内只包含源码、构建产物和公开说明。测试依赖中的 `agel-table-legacy` 固定为 0.3.78，用于新旧 DOM/CSS 对比，不进入发布包或运行时依赖。
+## 快速开始
 
-该组件适用于 vue2.x ，vue3.x 请转自 [element-plus-crx](https://github.com/agrass-GitHub/element-plus-crx)。
+在应用入口注册 Element UI 和 agel-table：
 
-## 特性
+```js
+import Vue from 'vue'
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import agelTable from 'agel-table'
 
-该组件的思想就是以一个 table 对象来做所有的操作，哪怕页上多个列表也不用在 data 定义一堆 data1,data2,loading1,loading2 ... 等变量，更加简单明了，适用于 vue2+elementUI。
+Vue.use(ElementUI)
+Vue.use(agelTable, {
+  table: {
+    border: true
+  }
+})
+```
 
-- 保持灵活性，极简的思想，更少的代码，更多的功能，更快速的开发
-- 支持 element-ui table 组件的所有 api, slot, event, method
-- 纯数据配置
-- 集成分页组件
-- 菜单列
-- 动态显隐列
-- 数据代理
-- 自动合并相同行
-- 虚拟滚动支持大数据渲染 10w+
-- 跟随容器大小自适应高度
+在页面中通过一个对象配置表格：
 
-## 安装使用
-
-`npm install agel-table --save`
-
-### 如此简单
-
-```html
+```vue
 <template>
-  <agel-table v-model="table"></agel-table>
+  <agel-table v-model="table" />
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        table: {
-          // ...
-        },
-      };
-    },
-  };
+export default {
+  data() {
+    return {
+      table: {
+        height: 320,
+        columns: [
+          { prop: 'name', label: '姓名', minWidth: 120 },
+          { prop: 'status', label: '状态', width: 100 }
+        ],
+        data: [
+          { name: '张三', status: '正常' },
+          { name: '李四', status: '待处理' }
+        ]
+      }
+    }
+  }
+}
 </script>
 ```
+
+配置说明、服务端分页和虚拟滚动示例见[使用指南](https://agrass-github.github.io/agel-table/example.html)；选项、事件与方法见 [API 参考](https://agrass-github.github.io/agel-table/api.html)。
+
+## 文档与变更
+
+- [在线文档](https://agrass-github.github.io/agel-table/)
+- [更新日志](./CHANGELOG.md)
+- [GitHub 仓库](https://github.com/agrass-GitHub/agel-table)
+
+## 许可证
+
+[MIT](./LICENSE)
