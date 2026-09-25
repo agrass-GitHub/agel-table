@@ -362,6 +362,27 @@ test('attach 替换、数组原地排序和实时行字段修改都更新界面'
   fixture.destroy()
 })
 
+test('父级重渲染生成新的 attach 包装对象时，相同数据引用不会刷新虚拟窗口', async () => {
+  const fixture = await mount({}, { attach: { data: rows(10000) } })
+  const { grid, parent, table } = fixture
+  const visibleRows = grid.virtualScroll.renderData
+  let refreshCount = 0
+  const refreshVirtualData = grid.refreshVirtualData
+  grid.refreshVirtualData = function (...args) {
+    refreshCount++
+    return refreshVirtualData.apply(this, args)
+  }
+
+  // 轨迹明细页面用对象字面量传 attach；父级重渲染会更换包装对象但复用同一数组。
+  parent.attached = { data: table.data }
+  await settle()
+
+  assert.equal(refreshCount, 0)
+  assert.equal(table.data, parent.attached.data)
+  assert.equal(grid.virtualScroll.renderData, visibleRows)
+  fixture.destroy()
+})
+
 test('32/36px 样式与原组件一致，尺寸变化和动态固定列不累积占位节点或监听', async () => {
   const fixture = await mount()
   const { grid, table } = fixture

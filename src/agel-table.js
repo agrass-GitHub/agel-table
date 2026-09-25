@@ -90,6 +90,15 @@ export default {
         this.$set(this.value.query, propsKey, value)
       }
     },
+    // 父级可能每次渲染都创建新的 attach 包装对象；相同值无需重复写入表格配置。
+    syncAttachedOptions() {
+      const attachedOptions = this.attachedOptions
+      const changedOptions = {}
+      Object.keys(attachedOptions).forEach((key) => {
+        if (getProp(this.value, key) !== attachedOptions[key]) changedOptions[key] = attachedOptions[key]
+      })
+      extend(this.value, changedOptions, this.$set, true)
+    },
     isEnable(name) {
       return this.value[name] && this.value[name].enable
     },
@@ -193,7 +202,7 @@ export default {
     attachedOptions: {
       immediate: true,
       handler: function () {
-        extend(this.value, this.attachedOptions, this.$set, true)
+        this.syncAttachedOptions()
       },
     },
     'value.page.currentPage'(v) {
