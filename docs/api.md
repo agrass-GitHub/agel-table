@@ -35,9 +35,9 @@ Vue.use(agelTable, {
 | 全局选项 | 说明 |
 | --- | --- |
 | table | Element UI 表格的默认属性。页面表格对象中的同名属性优先。 |
-| page | 分页组件的默认属性；单个表格仍需设置 page.enable 开启分页。 |
+| page | 分页组件的默认属性。全局设置 enable: true 时所有表格默认开启分页，单个表格可用 page: { enable: false } 关闭；未全局开启时，需在表格上设置 page.enable。 |
 | column | 所有列共享的默认属性；单列配置优先。 |
-| menu | 操作列默认属性；可在全局设定宽度、按钮和回调。 |
+| menu | 操作列默认属性；可在全局设定宽度、按钮和回调。enable 的生效规则与 page 相同。 |
 | queryProps | 将内置查询字段映射为后端接口字段。 |
 | slotEmpty | 全局空数据内容渲染函数，参数为 Vue createElement 函数 h。 |
 
@@ -62,7 +62,11 @@ Vue.use(agelTable, {
 | resize | Object | — | 容器自适应高度选项，见下文。 |
 | on | Object | {} | Element UI 表格/分页事件回调。 |
 
-其余受支持的表格属性会传递给 Element UI Table，包括条纹、边框、行样式、合计行和树形数据等。属性名称兼容驼峰和短横线写法。具体行为请参阅 [Element UI Table 文档](https://element.eleme.cn/#/zh-CN/component/table)。
+以下 Element UI Table 属性会从 table 对象透传给 el-table，属性名称兼容驼峰和短横线写法（如 rowKey 与 row-key）；未在全局 table 默认值和表格对象中设置的属性不会传递：
+
+max-height、stripe、border、size、fit、show-header、highlight-current-row、current-row-key、row-class-name、row-style、cell-class-name、cell-style、header-row-class-name、header-row-style、header-cell-class-name、header-cell-style、row-key、empty-text、default-expand-all、expand-row-keys、default-sort、tooltip-effect、show-summary、sum-text、summary-method、span-method、select-on-indeterminate、indent、lazy、load、tree-props。
+
+height 由组件按容器高度和分页高度计算；开启 merge 后 span-method 由组件接管，未开启时使用表格对象中的 spanMethod。具体行为请参阅 [Element UI Table 文档](https://element.eleme.cn/#/zh-CN/component/table)。
 
 ### 列配置
 
@@ -87,7 +91,7 @@ columns: [
 | children | Array | [] | 子列定义，用于多级表头。 |
 | slotColumn | String or Function | — | 自定义单元格。字符串对应具名作用域插槽；函数签名为 slotColumn(h, scope)。 |
 | slotHeader | String or Function | — | 自定义表头。字符串对应具名作用域插槽；函数签名为 slotHeader(h, scope)。 |
-| slotExpand | String | — | 展开列内容的具名作用域插槽别名。 |
+| slotExpand | String or Function | — | slotColumn 的别名，常用于 type: 'expand' 的展开行内容；两者同时设置时 slotColumn 优先。 |
 | merge | Boolean | false | merge.auto 未开启时，指定此列参与自动合并。 |
 
 其他列属性使用 Element UI Table-column 属性，例如 type、index、width、fixed、sortable、formatter、align 和 filters。可通过全局 column 默认值统一设置列属性。
@@ -132,7 +136,9 @@ attach 可将父组件中的响应式属性同步到表格配置对象，适合�
 />
 ```
 
-attach 只同步传入的顶层属性，并覆盖 table 对象中的同名值。若需要更明确的数据流，优先直接把 data、columns 和 height 放在 table 对象中。
+attach 只同步传入的顶层属性，并覆盖 table 对象中的同名值；值未变化（同一引用）的属性不会重复写入。若需要更明确的数据流，优先直接把 data、columns 和 height 放在 table 对象中。
+
+模板中的 `{ data, columns }` 每次父组件渲染都会生成新的包装对象，这本身没有额外开销；但不要在其中直接写 `list.filter(...)`、`list.map(...)` 这类每次都返回新数组的表达式，否则父组件每次渲染都会让表格整体刷新。需要加工数据时请使用 computed。
 
 ## request 与 queryProps
 
@@ -237,13 +243,26 @@ queryProps: {
 | enable | Boolean | false | 是否启用虚拟滚动。 |
 | rowHeight | Number | — | 固定行高，单位 px；启用时必须提供正数。 |
 
-虚拟模式只渲染视口附近的行，适用于固定行高的大型平面列表。支持固定列、序号列、选择列和客户端排序。以下功能不能与虚拟模式组合使用：
+虚拟模式只渲染视口附近的行，适用于固定行高的大型平面列表。支持固定列、序号列、选择列和客户端排序。
+
+| 能力 | 虚拟模式下的行为 |
+| --- | --- |
+| 排序 | sortable: true 的列在浏览器端对全量数据排序，支持 sortMethod、sortBy；sortable: 'custom' 仍触发 request。 |
+| 序号列 | type: 'index' 显示完整数据中的序号；index 为函数时接收完整数据中的 0 起始下标。 |
+| 选择列 | type: 'selection' 由组件内部维护选中状态，可跨窗口勾选，全选针对全部可选行；selectable(row, index) 中的 index 为完整数据下标。 |
+| 选择事件 | select、select-all、selection-change 的参数与 Element UI 一致，selection 按勾选顺序排列。 |
+| 替换数据 | 将 table.data 替换为新数组会清空选中状态，且不触发 selection-change；对原数组 push、splice、sort 会保留选中。 |
+| 行字段更新 | 直接修改行对象字段时，只有可见行重新渲染。 |
+
+虚拟模式的选中状态不在 Element UI 表格内部，table.getRef() 上的 clearSelection、toggleRowSelection 不作用于它；请通过选择事件获取选中行。
+
+以下功能不能与虚拟模式组合使用：
 
 - 可变行高、树形数据或懒加载。
 - Element UI 表格筛选、展开行或单元格合并。
 - 会改变行高的换行文本、未固定尺寸的图片或自定义样式。
 
-数据首次进入 Vue 响应式系统的成本仍然存在。若每行包含大量深层对象，可优先减少无关字段或按需加载数据。
+数据首次进入 Vue 响应式系统的成本仍然存在。若每行包含大量深层对象，可优先减少无关字段或按需加载数据；只读数据可以冻结行对象跳过响应式转换，见[性能建议](./example.md#性能建议)。
 
 ## 高度自适应 resize
 
@@ -284,4 +303,6 @@ queryProps: {
 | getVirtualRowIndex(index) | 可见窗口内的 0 起始下标 | 转换为完整数据中的 0 起始下标；虚拟配置存在时注入。 |
 | virtualScrollToRow(indexOrRow) | 0 起始下标或原始行对象 | 滚动到指定数据行附近；虚拟配置存在时注入。 |
 
-table.getRef() 可调用 Element UI Table 自身公开的方法，例如 clearSelection、toggleRowSelection 或 sort。
+table.getRef() 可调用 Element UI Table 自身公开的方法，例如 clearSelection、toggleRowSelection 或 sort。虚拟模式下的选择列例外，见[虚拟滚动](#虚拟滚动-virtual)。
+
+实例方法在表格初始化（以及 v-model 绑定的对象被替换）时注入，因此要在组件创建之后调用，例如在页面的 mounted 中调用 table.getData()。

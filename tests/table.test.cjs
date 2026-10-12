@@ -668,6 +668,99 @@ test('缓冲窗口覆盖从头到底的大跨度跳跃，边界不越界', () =>
   }
 })
 
+test('随机数据下纵向、横向及未知方向的合并结果与旧版逐格一致', () => {
+  const merge = loadSource(path.join(root, 'src/merge.js')).default
+  const oldMerge = loadSource(require.resolve('agel-table-legacy/src/merge.js')).default
+  // 固定种子，覆盖 NaN、null、空数据和不相邻的合并列下标。
+  let seed = 7
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647
+  const values = [1, 1, '1', null, undefined, NaN, 'a']
+  for (const length of [0, 1, 2, 50, 300]) {
+    const data = Array.from({ length }, () => ({ a: values[Math.floor(random() * 3)], b: values[Math.floor(random() * values.length)], c: values[Math.floor(random() * 2)] }))
+    for (const direction of ['vertical', 'horizontal', undefined, 'unknown']) {
+      const state = { value: { data, merge: { direction } }, mergeColumns: [{ index: 0, name: 'a' }, { index: 2, name: 'b' }, { index: 3, name: 'c' }] }
+      assert.deepEqual(
+        merge.methods.getMergeData.call({ ...state, ...merge.methods }),
+        oldMerge.methods.getMergeData.call({ ...state, ...oldMerge.methods }),
+        `length=${length} direction=${direction}`
+      )
+    }
+  }
+})
+
+test('多级表头隐藏子列只在显隐变化时重建整组，无关列属性更新不重建', async () => {
+  const columns = [
+    { label: '分组', children: [{ prop: 'id', label: 'ID' }, { prop: 'name', label: '名称', display: true }, { prop: 'speed', label: '速度' }] },
+    { prop: 'enabled', label: '启用' }
+  ]
+  const fixture = await mount({ columns, virtual: { enable: false }, data: rows(5) })
+  const { grid, table } = fixture
+  const group = table.columns[0]
+  const header = () => grid.$el.querySelector('.el-table__header-wrapper').textContent
+  const firstKey = group._key_
+  table.columns[1].label = '是否启用'
+  await settle()
+  assert.equal(group._key_, firstKey)
+  // 隐藏子列：保留旧版整组重建行为。
+  group.children[1].display = false
+  await settle()
+  const hiddenKey = group._key_
+  assert.notEqual(hiddenKey, firstKey)
+  assert.equal(header().includes('名称'), false)
+  // 子列保持隐藏期间，其他列变化不再触发整组重建。
+  for (let i = 0; i < 3; i++) {
+    table.columns[1].label = '启用' + i
+    await settle()
+  }
+  assert.equal(group._key_, hiddenKey)
+  assert.ok(header().includes('启用2'))
+  group.children[1].display = true
+  await settle()
+  assert.ok(header().includes('名称'))
+  group.children[1].display = false
+  await settle()
+  assert.notEqual(group._key_, hiddenKey)
+  assert.equal(header().includes('名称'), false)
+  fixture.destroy()
+})
+
+test('对象形式列 key 稳定，更新列属性后表头同步且不改变原始配置的取值', async () => {
+  const columns = { id: { label: 'ID' }, name: { label: '名称' } }
+  const fixture = await mount({ columns, virtual: { enable: false }, data: rows(5) })
+  const { grid, table } = fixture
+  const keys = grid.columns.map((column) => column._key_)
+  table.columns.id.label = '编号'
+  await settle()
+  assert.deepEqual(grid.columns.map((column) => column._key_), keys)
+  assert.deepEqual(grid.columns.map((column) => column.prop), ['id', 'name'])
+  assert.ok(grid.$el.querySelector('.el-table__header-wrapper').textContent.includes('编号'))
+  // 冻结的列配置无法写入 key，退回旧版的临时 key，不应抛错。
+  table.columns = { id: Object.freeze({ label: '冻结列' }) }
+  await settle()
+  assert.ok(grid.$el.querySelector('.el-table__header-wrapper').textContent.includes('冻结列'))
+  fixture.destroy()
+})
+
+test('文档建议的冻结只读行在虚拟模式下可滚动、排序和跨窗口选择', async () => {
+  const events = []
+  const fixture = await mount({
+    data: Object.freeze(rows(5000).map((row) => Object.freeze(row))),
+    columns: [{ type: 'selection' }, { prop: 'name' }, { prop: 'speed', sortable: true }],
+    on: { 'selection-change': (selection) => events.push(selection) }
+  })
+  const { grid, table } = fixture
+  grid.$el.querySelector('.el-table__body-wrapper input[type=checkbox]').click()
+  await settle()
+  scroll(grid, 64000)
+  await settle()
+  assert.equal(grid.virtualScroll.renderData[0], table.data[grid.virtualScroll.startIndex])
+  table.getRef().sort('speed', 'descending')
+  await settle()
+  assert.equal(grid._virtual.rows[0], table.data[4999])
+  assert.deepEqual(events.at(-1), [table.data[0]])
+  fixture.destroy()
+})
+
 // 关闭 DOM 后不留下 Element UI 的尺寸观察和计时资源。
 afterEach(() => {
   for (const parent of fixtures) {

@@ -1,7 +1,9 @@
 <template>
   <div class="demo">
     <div style="margin-bottom:10px">
-      <el-checkbox v-for="item in table.columns" v-if="item.prop" :key="item.prop" v-model="item.display">{{item.label}}</el-checkbox>
+      <template v-for="item in table.columns">
+        <el-checkbox v-if="item.prop" :key="item.prop" v-model="item.display">{{item.label}}</el-checkbox>
+      </template>
     </div>
     <agel-table v-model="table"></agel-table>
   </div>

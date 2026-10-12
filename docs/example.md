@@ -44,7 +44,7 @@ Vue.use(agelTable, {
 })
 ```
 
-Vue.use(agelTable, options) 会注册 &lt;agel-table&gt;，无需再手动调用 Vue.component。全局选项只提供默认值；例如 page.enable 仍需在某个表格上显式开启。
+Vue.use(agelTable, options) 会注册 &lt;agel-table&gt;，无需再手动调用 Vue.component。全局选项只提供默认值，表格对象中的同名属性优先。上例没有设置 page.enable，因此分页仍需在具体表格上开启；若全局设置 page: { enable: true }，所有表格默认带分页，可在单个表格上用 page: { enable: false } 关闭。
 
 ## 创建本地数据表格
 
@@ -217,7 +217,42 @@ merge.auto 会按相同字段值自动合并；也可以仅在指定列上设置
 
 更多限制和滚动定位方法见 [API 参考](./api.md#虚拟滚动-virtual)。
 
+## 性能建议
+
+组件内部已对渲染、滚动和合并计算做了缓存与合并；业务侧保持以下用法，可以避免不必要的整表刷新。
+
+### 选择合适的渲染模式
+
+非虚拟模式下 Element UI 会为每一行创建 DOM。数据达到数千行、或需要连续实时刷新时，建议开启 virtual，并让 rowHeight 与实际行高一致。分页能满足需求时，服务端分页通常是更简单的选择。
+
+### 保持列配置引用稳定
+
+组件按列对象识别每一列。把 columns 定义在 data 中并原地修改，例如 `table.getCol('name').label = '新标题'`、`column.display = false` 或修改 width / fixed，表格只更新变化的列。
+
+避免在模板中直接写列字面量（例如 `:attach="{ columns: [{ prop: 'name', label: '姓名' }] }"`）：父组件每次渲染都会创建新的列对象，新对象会被当作新列，导致所有列重建并重新布局。用 computed 生成列时，它只在依赖变化时重新创建，可以接受；频繁变化的属性仍建议原地修改。
+
+### 保持数据引用稳定
+
+- 通过 attach 传数据时，传入 data 中的数组或 computed 结果，不要在模板中写 `list.filter(...)`。
+- 实时更新单行时直接修改行对象字段，不必替换整个 data 数组。虚拟模式下只有可见行会重新渲染。
+- 虚拟模式下替换 data 数组会清空选中状态；需要保留选中时，用 push、splice 等方法原地修改。
+
+### 只读大数据可以冻结
+
+Vue 2 会把赋给 table.data 的每一行转换为响应式对象，10 万行时这一步本身就有明显开销。如果行数据只用于展示、之后不会修改字段，可以在赋值前冻结：
+
+```js
+this.table.data = Object.freeze(list.map((row) => Object.freeze(row)))
+```
+
+冻结后虚拟滚动、客户端排序和选择列照常工作，但修改行字段不会再更新界面，需要更新时替换整个数组。
+
+### 合并单元格的计算量
+
+开启 merge 后，数据或合并列变化时会对全量数据重新计算一次合并信息，计算量与「行数 × 合并列数」成正比。只在需要合并的列上设置 merge: true，比开启 merge.auto 计算更少；虚拟模式不支持合并单元格。
+
 ## 下一步
 
 - [API 参考：表格配置、事件、方法](./api.md)
+- [Element UI 兼容说明](./sum.md)
 - [更新日志](./log.md)

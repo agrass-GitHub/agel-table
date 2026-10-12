@@ -1,20 +1,27 @@
+// 属性名是有限集合，缓存转换结果，render 中不再对每个属性重复执行正则。
+const kebabCache = Object.create(null)
+const humpCache = Object.create(null)
+const hasOwn = Object.prototype.hasOwnProperty
+
 // 驼峰转短横线 
 export function kebabcase(v) {
-  return v.replace(/([^-])([A-Z])/g, '$1-$2').toLowerCase()
+  const cached = kebabCache[v]
+  return cached !== undefined ? cached : (kebabCache[v] = v.replace(/([^-])([A-Z])/g, '$1-$2').toLowerCase())
 }
 
 
 // 短横线转驼峰 
 export function humpcase(v) {
-  return v.replace(/-(\w)/g, (a, b) => b.toUpperCase())
+  const cached = humpCache[v]
+  return cached !== undefined ? cached : (humpCache[v] = v.replace(/-(\w)/g, (a, b) => b.toUpperCase()))
 }
 
 // 获取 prop 值 ，以支持短横线，驼峰，两种写法
 export function getProp(obj, key) {
   let key1 = kebabcase(key);
-  if (obj.hasOwnProperty(key1)) return obj[key1]
+  if (hasOwn.call(obj, key1)) return obj[key1]
   let key2 = humpcase(key);
-  if (obj.hasOwnProperty(key2)) return obj[key2];
+  if (hasOwn.call(obj, key2)) return obj[key2];
 }
 
 // 数组是否存在 key

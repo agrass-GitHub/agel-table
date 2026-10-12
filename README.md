@@ -77,7 +77,7 @@ export default {
 </script>
 ```
 
-配置说明、服务端分页和虚拟滚动示例见[使用指南](https://agrass-github.github.io/agel-table/example.html)；选项、事件与方法见 [API 参考](https://agrass-github.github.io/agel-table/api.html)。
+配置说明、服务端分页和虚拟滚动示例见[使用指南](https://agrass-github.github.io/agel-table/example.html)；选项、事件与方法见 [API 参考](https://agrass-github.github.io/agel-table/api.html)。大数据量或实时刷新场景请先阅读[性能建议](https://agrass-github.github.io/agel-table/example.html#性能建议)。
 
 ## 文档与变更
 

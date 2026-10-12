@@ -2,6 +2,11 @@
  * @description 合并相同单元格
  */
 
+// 绝大多数单元格的合并结果相同，共享只读数组以减少大数据量下的对象分配。
+const SINGLE_CELL = Object.freeze([1, 1])
+const MERGED_ROW = Object.freeze([0, 1])
+const MERGED_COLUMN = Object.freeze([1, 0])
+
 export default {
   computed: {
     mergeColumns() {
@@ -26,44 +31,44 @@ export default {
         }).filter(v => v.merge)
     },
     getMergeData() {
-      // 遍历表格中需要合并的所有单元格
+      // 按连续相同值分段：每个单元格只读取一次响应式字段，结果与逐格比较一致。
       const mergeData = {}
       const tableData = this.value.data;
+      const columns = this.mergeColumns
       const direction = this.value.merge.direction || 'vertical';
-      for (let i = 0; i < tableData.length; i++) {
-        for (let j = 0; j < this.mergeColumns.length; j++) {
-          // 初始化行、列坐标信息
-          let rowIndex = 1
-          let columnIndex = 1
-
-          if (direction === 'vertical') {
-            // 比较纵坐标上方的第一个元素
-            if (i > 0 && tableData[i][this.mergeColumns[j]['name']] === tableData[i - 1][this.mergeColumns[j]['name']]) {
-              rowIndex = 0
-            }
-            // 比较纵坐标下方元素
-            if (rowIndex > 0) {
-              rowIndex = this.calculateRowIndex(tableData, i, i + 1, 1, this.mergeColumns[j]['name'])
-            }
+      if (direction === 'vertical') {
+        columns.forEach(({ name, index }) => {
+          let start = 0
+          while (start < tableData.length) {
+            const value = tableData[start][name]
+            let end = start + 1
+            while (end < tableData.length && tableData[end][name] === value) end++
+            mergeData[index + '_' + start] = end - start === 1 ? SINGLE_CELL : [end - start, 1]
+            for (let i = start + 1; i < end; i++) mergeData[index + '_' + i] = MERGED_ROW
+            start = end
           }
-
-          if (direction === 'horizontal') {
-            // 比较横坐标左方的第一个元素
-            if (j > 0 && tableData[i][this.mergeColumns[j]['name']] === tableData[i][this.mergeColumns[j - 1]['name']]) {
-              columnIndex = 0
-            }
-            // 比较横坐标右方元素
-            if (columnIndex > 0) {
-              columnIndex = this.calculateColumnIndex(tableData[i], j, j + 1, 1, this.mergeColumns.length)
-            }
+        })
+      } else {
+        for (let i = 0; i < tableData.length; i++) {
+          const row = tableData[i]
+          if (direction !== 'horizontal') {
+            columns.forEach(({ index }) => { mergeData[index + '_' + i] = SINGLE_CELL })
+            continue
           }
-
-          const key = this.mergeColumns[j]['index'] + '_' + i
-          mergeData[key] = [rowIndex, columnIndex]
+          let start = 0
+          while (start < columns.length) {
+            const value = row[columns[start].name]
+            let end = start + 1
+            while (end < columns.length && row[columns[end].name] === value) end++
+            mergeData[columns[start].index + '_' + i] = end - start === 1 ? SINGLE_CELL : [1, end - start]
+            for (let j = start + 1; j < end; j++) mergeData[columns[j].index + '_' + i] = MERGED_COLUMN
+            start = end
+          }
         }
       }
       return mergeData
     },
+    // 以下两个方法不再被 getMergeData 使用，保留以兼容通过组件实例调用的旧代码。
     calculateColumnIndex(data, index, nextIndex, count, maxLength) {
       // 长段合并使用迭代，避免递归深度随相同单元格数量增长。
       const columns = this.mergeColumns

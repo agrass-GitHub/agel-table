@@ -10,6 +10,7 @@ module.exports = {
       { text: '首页', link: '/' },
       { text: '使用指南', link: '/example.html' },
       { text: 'API 参考', link: '/api.html' },
+      { text: '兼容说明', link: '/sum.html' },
       { text: '更新日志', link: '/log.html' },
       { text: 'Github', link: 'https://github.com/agrass-GitHub/agel-table' }
     ],
